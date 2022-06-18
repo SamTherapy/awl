@@ -3,11 +3,11 @@ type: docker
 name: default
 steps:
   - name: lint
-    image: denoland/deno:alpine
+    image: denoland/deno:debian
     commands:
       - deno fmt --check
       - deno lint
   - name: test
-    image: denoland/deno:alpine
+    image: denoland/deno:debian
     commands:
       - deno test -A
