@@ -1,3 +1,4 @@
+
 import { Args } from "./deps.ts";
 import { isRecordType, ServerOptions } from "./lib/utils.ts";
 /**
@@ -36,7 +37,7 @@ export function parseArgs(args: Args): arguments {
     }
 
     if (isRecordType(arg)) {
-      parsed.type = arg;
+      parsed.type = arg.toUpperCase() as Deno.RecordType;
       return;
     }
 

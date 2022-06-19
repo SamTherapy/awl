@@ -24,9 +24,9 @@ export type ServerOptions = {
 };
 
 export function isRecordType(type: string): type is Deno.RecordType {
-  return type === "A" || type === "AAAA" || type === "CNAME" || type === "MX" ||
-    type === "NS" || type === "PTR" || type === "SOA" || type === "TXT" ||
-    type === "NAPTR" || type === "SRV";
+  return type.toUpperCase() === "A" || type.toUpperCase() === "AAAA" || type.toUpperCase() === "CNAME" || type.toUpperCase() === "MX" ||
+    type.toUpperCase() === "NS" || type.toUpperCase() === "PTR" || type.toUpperCase() === "SOA" || type.toUpperCase() === "TXT" ||
+    type.toUpperCase() === "NAPTR" || type.toUpperCase() === "SRV" || type.toUpperCase() === "CAA";
 }
 
 /**
