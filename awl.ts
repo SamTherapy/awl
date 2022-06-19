@@ -3,6 +3,7 @@ import { bold, italic, parse, underline } from "./deps.ts";
 import { QueryResponse, ServerOptions } from "./lib/utils.ts";
 import { doQuery } from "./lib/query.ts";
 import { parseResponse } from "./lib/response.ts";
+import { parseArgs } from "./args.ts";
 import { parseNAPTR, parsePTR } from "./lib/reverse.ts";
 
 async function main() {
@@ -39,7 +40,7 @@ Written by (YOUR NAME GOES HERE)`,
        ${bold("<type>")}    defaults to A
        ${bold("<@server>")} defaults to your local resolver
 
-       arguments ${bold(underline("NEED TO BE"))} in this order\n
+       Order ${bold("DOES NOT")} matter\n
       `,
       `${underline("Options")}:
         -p <port> use <port> for query, defaults to 53
@@ -53,12 +54,11 @@ Written by (YOUR NAME GOES HERE)`,
 
   if (args.version) Deno.exit(0);
 
-  let domain = args._[0]?.toString();
-  domain ??= ".";
+  const parsedArgs = parseArgs(args);
 
-  let query: Deno.RecordType =
-    (args._[1] ?? (args.ptr ? "PTR" : "A")) as Deno.RecordType;
+  let domain = parsedArgs.name || ".";
 
+  let query = parsedArgs.type || "A";
   if (domain === ".") query = "NS";
 
   if (query === "PTR") {
@@ -69,14 +69,7 @@ Written by (YOUR NAME GOES HERE)`,
     domain = parseNAPTR(domain);
   }
 
-  if (domain.charAt(domain.length - 1) !== ".") {
-    domain = domain.concat(".");
-  }
-
-  const server: ServerOptions = {
-    server: (args._[2] as string)?.split("@").pop() || "",
-    port: parseInt(args.port),
-  };
+  const server = parsedArgs.server || { server: "", port: 53 };
 
   const response: QueryResponse = await doQuery(domain, query, server);
 

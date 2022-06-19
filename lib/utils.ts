@@ -23,6 +23,12 @@ export type ServerOptions = {
   port?: number;
 };
 
+export function isRecordType(type: string): type is Deno.RecordType {
+  return type === "A" || type === "AAAA" || type === "CNAME" || type === "MX" ||
+    type === "NS" || type === "PTR" || type === "SOA" || type === "TXT" ||
+    type === "NAPTR" || type === "SRV";
+}
+
 /**
  * Test if the DNS query is an MX record
  * @param {QueryResponse["dnsResponse"]} record - DNS response

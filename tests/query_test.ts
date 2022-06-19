@@ -20,9 +20,10 @@ Deno.test("PTR localhost", async () => {
 });
 
 // This test will fail if this random Bri ish phone number goes down
+// It's also unreliable, so it's disabled
 // Deno.test("NAPTR, Remote",async () => {
 //   const res = await doQuery("4.4.2.2.3.3.5.6.8.1.4.4.e164.arpa.", "NAPTR");
-//   assertEquals(res.dnsResponse, [
+//   assertStrictEquals(res.dnsResponse, [
 //     {
 //       order: 100,
 //       preference: 10,
@@ -48,11 +49,11 @@ Deno.test("Get invalid IP, regular NS", async () => {
   assertEquals(res.response, "NXDOMAIN");
 });
 
-// This isn't supposed to SERVFAIL but idk
+// This isn't supposed to SERVFAIL
 // It also takes forever
 
-// Deno.test("Get invalid IP, external NS", async () => {
-//   const res = await doQuery("b", "AAAA", { server: "1.1.1.1" });
-//   assertEquals(res.dnsResponse, undefined);
-//   assertEquals(res.response, "SERVFAIL");
-// });
+Deno.test("Get invalid IP, external NS", async () => {
+  const res = await doQuery("b", "AAAA", { server: "1.1.1.1" });
+  assertEquals(res.dnsResponse, undefined);
+  assertEquals(res.response, "SERVFAIL");
+});

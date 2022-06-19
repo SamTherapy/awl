@@ -32,6 +32,7 @@ export async function doQuery(
             response.response = "NXDOMAIN";
             break;
           default:
+            console.dir(e)
             response.response = "SERVFAIL";
         }
       });
