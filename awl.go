@@ -1,31 +1,20 @@
 package main
 
 import (
-	"encoding/base64"
 	"encoding/json"
-	"errors"
 	"fmt"
-	"io"
 	"net"
-	"net/http"
 	"os"
 	"runtime"
 	"strconv"
 	"strings"
 	"time"
 
-	"github.com/c-robinson/iplib"
+	"git.froth.zone/sam/awl/util"
 	"github.com/miekg/dns"
 	"github.com/urfave/cli/v2"
 	"golang.org/x/net/idna"
 )
-
-// The basic structure of a DNS request
-type request struct {
-	server  string // The server to make the DNS request from
-	request uint16 // The type of request
-	name    string // The domain name to make a DNS request for
-}
 
 func main() {
 	// Custom version string
@@ -126,8 +115,8 @@ func main() {
 		},
 		Action: func(c *cli.Context) error {
 			var err error
-
-			req := parseArgs(c.Args().Slice())
+			var resp util.Response
+			resp.Answers = parseArgs(c.Args().Slice())
 			// Set DNS-over-TLS, if enabled
 			port := c.Int("port")
 
@@ -141,29 +130,26 @@ func main() {
 			}
 
 			if !c.Bool("https") {
-				req.server = net.JoinHostPort(req.server, strconv.Itoa(port))
+				resp.Answers.Server = net.JoinHostPort(resp.Answers.Server, strconv.Itoa(port))
 			} else {
-				req.server = "https://" + req.server
+				resp.Answers.Server = "https://" + resp.Answers.Server
 			}
 
 			// Process the IP/Phone number so a PTR/NAPTR can be done
 			if c.Bool("reverse") {
-				if dns.TypeToString[req.request] == "A" {
-					req.request = dns.StringToType["PTR"]
+				if dns.TypeToString[resp.Answers.Request] == "A" {
+					resp.Answers.Request = dns.StringToType["PTR"]
 				}
-				req.name, err = reverseDNS(req.name, dns.TypeToString[req.request])
-				if err != nil {
-					return err
-				}
+				resp.Answers.Name, err = util.ReverseDNS(resp.Answers.Name, dns.TypeToString[resp.Answers.Request])
 			}
 
 			// if the domain is not canonical, make it canonical
-			if !strings.HasSuffix(req.name, ".") {
-				req.name = fmt.Sprintf("%s.", req.name)
+			if !strings.HasSuffix(resp.Answers.Name, ".") {
+				resp.Answers.Name = fmt.Sprintf("%s.", resp.Answers.Name)
 			}
 
 			msg := new(dns.Msg)
-			msg.SetQuestion(req.name, req.request)
+			msg.SetQuestion(resp.Answers.Name, resp.Answers.Request)
 
 			// Set DNSSEC if requested
 			if c.Bool("dnssec") {
@@ -171,13 +157,12 @@ func main() {
 			}
 
 			var (
-				in  *dns.Msg
-				rtt time.Duration
+				in *dns.Msg
 			)
 
 			// Make the DNS request
 			if c.Bool("https") {
-				in, err = resolveHTTPS(msg, req.server)
+				in, err = util.ResolveHTTPS(msg, resp.Answers.Server)
 			} else if c.Bool("quic") {
 				return fmt.Errorf("quic: not yet implemented")
 			} else {
@@ -208,7 +193,7 @@ func main() {
 				if c.Bool("tls") {
 					d.Net = "tcp-tls"
 				}
-				in, rtt, err = d.Exchange(msg, req.server)
+				in, resp.Answers.RTT, err = d.Exchange(msg, resp.Answers.Server)
 
 				// If UDP truncates, use TCP instead
 				if !c.Bool("no-truncate") {
@@ -221,7 +206,7 @@ func main() {
 						if c.Bool("6") {
 							d.Net = "tcp6"
 						}
-						in, rtt, err = d.Exchange(msg, req.server)
+						in, resp.Answers.RTT, err = d.Exchange(msg, resp.Answers.Server)
 					}
 				}
 			}
@@ -231,14 +216,14 @@ func main() {
 			}
 
 			if c.Bool("json") {
-				json, _ := json.Marshal(in)
+				json, _ := json.MarshalIndent(in, "", "    ")
 				fmt.Println(string(json))
 			} else {
 				if !c.Bool("short") {
 					// Print everything
 					fmt.Println(in)
-					fmt.Println(";; Query time:", rtt)
-					fmt.Println(";; SERVER:", req.server)
+					fmt.Println(";; Query time:", resp.Answers.RTT)
+					fmt.Println(";; SERVER:", resp.Answers.Server)
 					fmt.Println(";; WHEN:", time.Now().Format(time.RFC1123))
 					fmt.Println(";; MSG SIZE  rcvd:", in.Len())
 				} else {
@@ -261,114 +246,51 @@ func main() {
 	}
 }
 
-func parseArgs(args []string) request {
+func parseArgs(args []string) util.Answers {
 	var (
-		server string
-		req    uint16
-		name   string
+		resp util.Response
 	)
 	for _, arg := range args {
 		// If it starts with @, it's a DNS server
 		if strings.HasPrefix(arg, "@") {
-			server = strings.Split(arg, "@")[1]
+			resp.Answers.Server = strings.Split(arg, "@")[1]
 			continue
 		}
 		// If there's a dot, it's a name
 		if strings.Contains(arg, ".") {
-			name, _ = idna.ToUnicode(arg)
+			resp.Answers.Name, _ = idna.ToUnicode(arg)
 			continue
 		}
 		// If it's a request, it's a request (duh)
 		if r, ok := dns.StringToType[strings.ToUpper(arg)]; ok {
-			req = r
+			resp.Answers.Request = r
 			continue
 		}
 
 		//else, assume it's a name
-		name, _ = idna.ToUnicode(arg)
+		resp.Answers.Name, _ = idna.ToUnicode(arg)
 	}
 
 	// If nothing was set, set a default
-	if name == "" {
-		name = "."
-		if req == 0 {
-			req = dns.StringToType["NS"]
+	if resp.Answers.Name == "" {
+		resp.Answers.Name = "."
+		if resp.Answers.Request == 0 {
+			resp.Answers.Request = dns.StringToType["NS"]
 		}
 	} else {
-		if req == 0 {
-			req = dns.StringToType["A"]
+		if resp.Answers.Request == 0 {
+			resp.Answers.Request = dns.StringToType["A"]
 		}
 	}
-	if server == "" {
+	if resp.Answers.Server == "" {
 		resolv, err := dns.ClientConfigFromFile("/etc/resolv.conf")
 		if err != nil { // Query Google by default, needed for Windows since the DNS library doesn't support Windows
 			// TODO: Actually find where windows stuffs its dns resolvers
-			server = "8.8.4.4"
+			resp.Answers.Server = "8.8.4.4"
 		} else {
-			server = resolv.Servers[0]
+			resp.Answers.Server = resolv.Servers[0]
 		}
 	}
 
-	return request{server: server, request: req, name: name}
-}
-
-func reverseDNS(dom string, q string) (string, error) {
-	if q == "PTR" {
-		if strings.Contains(dom, ".") {
-			// It's an IPv4 address
-			ip := net.ParseIP(dom)
-			if ip != nil {
-				return iplib.IP4ToARPA(ip), nil
-			} else {
-				return "", errors.New("error: Could not parse IPv4 address")
-			}
-
-		} else if strings.Contains(dom, ":") {
-			// It's an IPv6 address
-			ip := net.ParseIP(dom)
-			if ip != nil {
-				return iplib.IP6ToARPA(ip), nil
-			} else {
-				return "", errors.New("error: Could not parse IPv6 address")
-			}
-		}
-	}
-	return "", errors.New("error: -x flag given but no IP found")
-}
-
-func resolveHTTPS(msg *dns.Msg, server string) (*dns.Msg, error) {
-	httpR := &http.Client{}
-	buf, err := msg.Pack()
-	if err != nil {
-		return nil, err
-	}
-	query := server + "?dns=" + base64.RawURLEncoding.EncodeToString(buf)
-	req, err := http.NewRequest("GET", query, nil)
-	if err != nil {
-		return nil, err
-	}
-	req.Header.Set("Accept", "application/dns-message")
-
-	res, err := httpR.Do(req)
-	if err != nil {
-		return nil, err
-	}
-	defer res.Body.Close()
-
-	if res.StatusCode != http.StatusOK {
-		return nil, fmt.Errorf("bad HTTP Request: %d", res.StatusCode)
-	}
-
-	fullRes, err := io.ReadAll(res.Body)
-	if err != nil {
-		return nil, err
-	}
-	response := dns.Msg{}
-	err = response.Unpack(fullRes)
-	if err != nil {
-		return nil, err
-	}
-
-	return &response, nil
-
+	return util.Answers{Server: resp.Answers.Server, Request: resp.Answers.Request, Name: resp.Answers.Name}
 }
