@@ -6,7 +6,7 @@ require (
 	github.com/lucas-clemente/quic-go v0.27.2
 	github.com/miekg/dns v1.1.50
 	github.com/urfave/cli/v2 v2.10.2
-	golang.org/x/net v0.0.0-20220621193019-9d032be2e588
+	golang.org/x/net v0.0.0-20220622184535-263ec571b305
 )
 
 require (
@@ -16,6 +16,7 @@ require (
 )
 
 require (
+	github.com/c-robinson/iplib v1.0.3
 	github.com/cheekybits/genny v1.0.0 // indirect
 	github.com/cpuguy83/go-md2man/v2 v2.0.2 // indirect
 	github.com/fsnotify/fsnotify v1.4.9 // indirect
