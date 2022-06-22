@@ -7,6 +7,8 @@
 [`doggo`](https://github.com/mr-karan/doggo),
 or [`q`](https://github.com/natesales/q)
 
+This was made as my first major experiment with Go, so there are probably things that can be improved
+
 The excellent [dns](https://github.com/miekg/dns) library for Go does most of the heavy
 lifting.
 
@@ -16,10 +18,10 @@ lifting.
 - TCP
 - TLS
 - HTTPS (maybe)
+- QUIC (extreme maybe)
 
 ## What doesn't
 
-- DNS-over-QUIC (eventually)
 - Your sanity after reading my awful code
 - A motivation for making this after finding q and doggo
 
@@ -29,5 +31,4 @@ lifting.
   or just use stdlib's flags)
 - Optimize everything
 - Make the code less spaghetti
-  - Like not just having one massive unreadable file, this is AWFUL
 - Documentation, documentation, documentation
