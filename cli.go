@@ -2,6 +2,7 @@ package main
 
 import (
 	"fmt"
+	"math/rand"
 	"runtime"
 	"strings"
 
@@ -36,9 +37,9 @@ func prepareCLI() *cli.App {
 
 	cli.AppHelpTemplate = `{{.Name}} - {{.Usage}}
 	
-		Usage: {{.HelpName}} name [@server] [type]
+		Usage: {{.HelpName}} name [@server] [record]
 			<name>	can be a name or an IP address
-			<type>	defaults to A
+			<record>	defaults to A
 	
 			arguments can be in any order
 		{{if .VisibleFlags}}
@@ -48,13 +49,13 @@ func prepareCLI() *cli.App {
 	app := &cli.App{
 		Name:    "awl",
 		Usage:   "drill, writ small",
-		Version: "v0.2.0",
+		Version: "v0.2.1",
 		Flags: []cli.Flag{
 			&cli.IntFlag{
 				Name:        "port",
 				Aliases:     []string{"p"},
-				Usage:       "`port` to make DNS query",
-				DefaultText: "53 over plain TCP/UDP, 853 over TLS or QUIC, and 443 over HTTPS",
+				Usage:       "`<port>` to make DNS query",
+				DefaultText: "53 over plain TCP/UDP, 853 over TLS or QUIC",
 			},
 			&cli.BoolFlag{
 				Name:  "4",
@@ -104,20 +105,28 @@ func prepareCLI() *cli.App {
 				Usage: "ignore truncation if a UDP request truncates (default: retry with TCP)",
 			},
 			&cli.BoolFlag{
+				Name:  "aa",
+				Usage: "set AA (Authoratative Answer) flag (default: not set)",
+			},
+			&cli.BoolFlag{
+				Name:  "tc",
+				Usage: "set tc (TrunCated) flag (default: not set)",
+			},
+			&cli.BoolFlag{
 				Name:  "z",
-				Usage: "set Z (zero) flag (default: not set) [THIS DOESN'T DO ANYTHING]",
+				Usage: "set Z (Zero) flag (default: not set)",
 			},
 			&cli.BoolFlag{
 				Name:  "cd",
-				Usage: "set CD (CheckingDisabled) flag (default: not set)",
+				Usage: "set CD (Checking Disabled) flag (default: not set)",
 			},
 			&cli.BoolFlag{
 				Name:  "no-rd",
-				Usage: "UNset RD (RecursionDesired) flag (default: set)",
+				Usage: "UNset RD (Recursion Desired) flag (default: set)",
 			},
 			&cli.BoolFlag{
 				Name:  "no-ra",
-				Usage: "UNset RA (RecursionAvailable) flag (default: set)",
+				Usage: "UNset RA (Recursion Available) flag (default: set)",
 			},
 			&cli.BoolFlag{
 				Name:    "reverse",
@@ -134,29 +143,29 @@ func prepareCLI() *cli.App {
 func parseArgs(args []string) (util.Answers, error) {
 	var (
 		resp util.Response
+		err  error
 	)
 	for _, arg := range args {
+		r, ok := dns.StringToType[strings.ToUpper(arg)]
+		switch {
 		// If it starts with @, it's a DNS server
-		if strings.HasPrefix(arg, "@") {
+		case strings.HasPrefix(arg, "@"):
 			resp.Answers.Server = strings.Split(arg, "@")[1]
-			continue
-		}
-		// If there's a dot, it's a name
-		if strings.Contains(arg, ".") {
-			resp.Answers.Name, _ = idna.ToUnicode(arg)
-			continue
-		}
-		// If it's a request, it's a request (duh)
-		if r, ok := dns.StringToType[strings.ToUpper(arg)]; ok {
+		case strings.Contains(arg, "."):
+			resp.Answers.Name, err = idna.ToUnicode(arg)
+			if err != nil {
+				return util.Answers{}, err
+			}
+		case ok:
+			// If it's a DNS request, it's a DNS request (obviously)
 			resp.Answers.Request = r
-			continue
-		}
+		default:
+			//else, assume it's a name
+			resp.Answers.Name, err = idna.ToUnicode(arg)
+			if err != nil {
+				return util.Answers{}, err
+			}
 
-		//else, assume it's a name
-		var err error
-		resp.Answers.Name, err = idna.ToUnicode(arg)
-		if err != nil {
-			return util.Answers{}, err
 		}
 	}
 
@@ -177,7 +186,7 @@ func parseArgs(args []string) (util.Answers, error) {
 			// TODO: Actually find where windows stuffs its dns resolvers
 			resp.Answers.Server = "8.8.4.4"
 		} else {
-			resp.Answers.Server = resolv.Servers[0]
+			resp.Answers.Server = resolv.Servers[rand.Intn(len(resolv.Servers)-1)]
 		}
 	}
 

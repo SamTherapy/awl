@@ -15,13 +15,17 @@ import (
 )
 
 func doQuery(c *cli.Context) error {
-	var err error
-	var resp util.Response
-	var isHTTPS bool
+	var (
+		err     error
+		resp    util.Response
+		isHTTPS bool
+	)
+
 	resp.Answers, err = parseArgs(c.Args().Slice())
 	if err != nil {
-		return nil
+		return err
 	}
+
 	port := c.Int("port")
 
 	// If port is not set, set it
@@ -63,23 +67,32 @@ func doQuery(c *cli.Context) error {
 
 	msg.SetQuestion(resp.Answers.Name, resp.Answers.Request)
 
+	// TODO: maybe not make this a gross chunk of if statements? who knows
+
+	// Make this authoritative (does this do anything?)
+	if c.Bool("aa") {
+		msg.Authoritative = true
+	}
+	// Set truncated flag (why)
+	if c.Bool("tc") {
+		msg.Truncated = true
+	}
 	// Set the zero flag if requested (does nothing)
 	if c.Bool("z") {
 		msg.Zero = true
 	}
-	// Disable DNSSEC validation if enabled
+	// Disable DNSSEC validation
 	if c.Bool("cd") {
 		msg.CheckingDisabled = true
 	}
-
+	// Disable wanting recursion
 	if c.Bool("no-rd") {
 		msg.RecursionDesired = false
 	}
-
+	// Disable recursion being available (I don't think this does anything)
 	if c.Bool("no-ra") {
 		msg.RecursionAvailable = false
 	}
-
 	// Set DNSSEC if requested
 	if c.Bool("dnssec") {
 		msg.SetEdns0(1232, true)
@@ -97,47 +110,40 @@ func doQuery(c *cli.Context) error {
 		d := new(dns.Client)
 
 		// Set TCP/UDP, depending on flags
-		if c.Bool("tcp") {
+		if c.Bool("tcp") || c.Bool("tls") {
 			d.Net = "tcp"
-			if c.Bool("4") {
-				d.Net = "tcp4"
-			}
-			if c.Bool("6") {
-				d.Net = "tcp6"
-			}
 		} else {
 			d.Net = "udp"
-			if c.Bool("4") {
-				d.Net = "udp4"
-			}
-			if c.Bool("6") {
-				d.Net = "udp6"
-			}
 		}
 
-		// This is apparently all it takes to enable DoT
-		// TODO: Is it really?
+		// Set IPv4 or IPv6, depending on flags
+		switch {
+		case c.Bool("4"):
+			d.Net += "4"
+		case c.Bool("6"):
+			d.Net += "6"
+		}
+
+		// Add TLS, if requested
 		if c.Bool("tls") {
-			d.Net = "tcp-tls"
+			d.Net += "-tls"
 		}
 
 		in, resp.Answers.RTT, err = d.Exchange(msg, resp.Answers.Server)
 		if err != nil {
 			return err
 		}
-		// If UDP truncates, use TCP instead
-		if !c.Bool("no-truncate") {
-			if in.MsgHdr.Truncated {
-				fmt.Printf(";; Truncated, retrying with TCP\n\n")
-				d.Net = "tcp"
-				if c.Bool("4") {
-					d.Net = "tcp4"
-				}
-				if c.Bool("6") {
-					d.Net = "tcp6"
-				}
-				in, resp.Answers.RTT, err = d.Exchange(msg, resp.Answers.Server)
+		// If UDP truncates, use TCP instead (unless truncation is to be ignored)
+		if in.MsgHdr.Truncated && !c.Bool("no-truncate") {
+			fmt.Printf(";; Truncated, retrying with TCP\n\n")
+			d.Net = "tcp"
+			switch {
+			case c.Bool("4"):
+				d.Net += "4"
+			case c.Bool("6"):
+				d.Net += "6"
 			}
+			in, resp.Answers.RTT, err = d.Exchange(msg, resp.Answers.Server)
 		}
 	}
 
@@ -157,7 +163,7 @@ func doQuery(c *cli.Context) error {
 			fmt.Println(in)
 			fmt.Println(";; Query time:", resp.Answers.RTT)
 			fmt.Println(";; SERVER:", resp.Answers.Server)
-			fmt.Println(";; WHEN:", time.Now().Format(time.RFC1123))
+			fmt.Println(";; WHEN:", time.Now().Format(time.RFC1123Z))
 			fmt.Println(";; MSG SIZE  rcvd:", in.Len())
 		} else {
 			// Print just the responses, nothing else

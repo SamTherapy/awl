@@ -30,5 +30,6 @@ lifting.
 - Make the CLI less abysmal (migrate to [cobra](https://github.com/spf13/cobra)?
   or just use stdlib's flags)
 - Optimize everything
-- Make the code less spaghetti
-- Documentation, documentation, documentation
+- Make the code less spaghetti (partially completed)
+- Feature parity with drill
+  - Making a drop-in replacement for drill?

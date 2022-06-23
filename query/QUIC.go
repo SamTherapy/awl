@@ -19,9 +19,6 @@ func ResolveQUIC(msg *dns.Msg, server string) (*dns.Msg, time.Duration, error) {
 		return nil, 0, err
 	}
 
-	// Close with error: no error
-	defer connection.CloseWithError(0, "")
-
 	// Compress request to over-the-wire
 	buf, err := msg.Pack()
 	if err != nil {
@@ -42,6 +39,12 @@ func ResolveQUIC(msg *dns.Msg, server string) (*dns.Msg, time.Duration, error) {
 		return nil, 0, err
 	}
 	rtt := time.Since(t)
+
+	// Close with error: no error
+	err = connection.CloseWithError(0, "")
+	if err != nil {
+		return nil, 0, err
+	}
 
 	err = stream.Close()
 	if err != nil {

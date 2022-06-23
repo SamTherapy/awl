@@ -12,15 +12,6 @@ func TestIPv4(t *testing.T) {
 	assert.Equal(t, act, "4.4.8.8.in-addr.arpa.", "IPv4 reverse")
 }
 
-// WIP
-// func FuzzIPv4(f *testing.F) {
-// 	f.Add("1.1.1.1", "1.1.1.1.in-addr.arpa")
-// 	f.Fuzz(func(t *testing.T, a string, b string) {
-// 		_, err := ReverseDNS(a, b)
-// 		assert.Nil(t, err)
-// 	})
-// }
-
 func TestIPv6(t *testing.T) {
 	act, err := ReverseDNS("2606:4700:4700::1111", "PTR")
 	assert.Nil(t, err)
@@ -34,8 +25,8 @@ func TestNAPTR(t *testing.T) {
 	}{
 		{"1-800-555-1234", "4.3.2.1.5.5.5.0.0.8.1.e164.arpa."},
 		{"+1 800555  1234", "4.3.2.1.5.5.5.0.0.8.1.e164.arpa."},
-		{"18005551234", "4.3.2.1.5.5.5.0.0.8.1.e164.arpa."},
-		{"+1-770-555-1212", "2.1.2.1.5.5.5.0.7.7.1.e164.arpa."},
+		{"+46766861004", "4.0.0.1.6.8.6.6.7.6.4.e164.arpa."},
+		{"17705551212", "2.1.2.1.5.5.5.0.7.7.1.e164.arpa."},
 	}
 	for _, test := range tests {
 		act, err := ReverseDNS(test.in, "NAPTR")
