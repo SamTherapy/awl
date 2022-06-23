@@ -186,7 +186,7 @@ func parseArgs(args []string) (util.Answers, error) {
 			// TODO: Actually find where windows stuffs its dns resolvers
 			resp.Answers.Server = "8.8.4.4"
 		} else {
-			resp.Answers.Server = resolv.Servers[rand.Intn(len(resolv.Servers)-1)]
+			resp.Answers.Server = resolv.Servers[rand.Intn(len(resolv.Servers))]
 		}
 	}
 
