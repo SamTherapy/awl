@@ -6,7 +6,7 @@ require (
 	github.com/lucas-clemente/quic-go v0.27.2
 	github.com/miekg/dns v1.1.50
 	github.com/urfave/cli/v2 v2.10.2
-	golang.org/x/net v0.0.0-20220622184535-263ec571b305
+	golang.org/x/net v0.0.0-20220624214902-1bab6f366d9e
 )
 
 require (
