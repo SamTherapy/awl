@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: BSD-3-Clause
 package main
 
 import (
@@ -132,11 +133,6 @@ func prepareCLI() *cli.App {
 				Name:    "reverse",
 				Aliases: []string{"x"},
 				Usage:   "do a reverse lookup",
-			},
-			&cli.BoolFlag{
-				Name:  "debug",
-				Usage: "enable debug logging",
-				Value: false,
 			},
 		},
 		Action: doQuery,
