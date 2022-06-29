@@ -8,6 +8,7 @@ import (
 	"strings"
 	"time"
 
+	"git.froth.zone/sam/awl/logawl"
 	"git.froth.zone/sam/awl/query"
 	"git.froth.zone/sam/awl/util"
 	"github.com/miekg/dns"
@@ -19,15 +20,20 @@ func doQuery(c *cli.Context) error {
 		err     error
 		resp    util.Response
 		isHTTPS bool
+		Logger  = logawl.New() //init logger
 	)
 
 	resp.Answers, err = parseArgs(c.Args().Slice())
 	if err != nil {
+		Logger.Error("Unable to parse args")
 		return err
 	}
-
 	port := c.Int("port")
+	if c.Bool("debug") {
+		Logger.SetLevel(3)
+	}
 
+	Logger.Debug("Starting awl")
 	// If port is not set, set it
 	if port == 0 {
 		if c.Bool("tls") || c.Bool("quic") {
@@ -67,8 +73,6 @@ func doQuery(c *cli.Context) error {
 
 	msg.SetQuestion(resp.Answers.Name, resp.Answers.Request)
 
-	// TODO: maybe not make this a gross chunk of if statements? who knows
-
 	// Make this authoritative (does this do anything?)
 	if c.Bool("aa") {
 		msg.Authoritative = true
@@ -79,6 +83,7 @@ func doQuery(c *cli.Context) error {
 	}
 	// Set the zero flag if requested (does nothing)
 	if c.Bool("z") {
+		Logger.Debug("Setting message to zero")
 		msg.Zero = true
 	}
 	// Disable DNSSEC validation
@@ -95,6 +100,7 @@ func doQuery(c *cli.Context) error {
 	}
 	// Set DNSSEC if requested
 	if c.Bool("dnssec") {
+		Logger.Debug("Using DNSSEC")
 		msg.SetEdns0(1232, true)
 	}
 

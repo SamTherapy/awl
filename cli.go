@@ -133,6 +133,11 @@ func prepareCLI() *cli.App {
 				Aliases: []string{"x"},
 				Usage:   "do a reverse lookup",
 			},
+			&cli.BoolFlag{
+				Name:  "debug",
+				Usage: "enable debug logging",
+				Value: false,
+			},
 		},
 		Action: doQuery,
 	}
