@@ -1,4 +1,5 @@
 // SPDX-License-Identifier: BSD-3-Clause
+
 package main
 
 import (
@@ -7,7 +8,9 @@ import (
 	"runtime"
 	"strings"
 
+	"git.froth.zone/sam/awl/conf"
 	"git.froth.zone/sam/awl/util"
+
 	"github.com/miekg/dns"
 	"github.com/urfave/cli/v2"
 	"golang.org/x/net/idna"
@@ -111,7 +114,7 @@ func prepareCLI() *cli.App {
 			},
 			&cli.BoolFlag{
 				Name:  "tc",
-				Usage: "set tc (TrunCated) flag (default: not set)",
+				Usage: "set TC (TrunCated) flag (default: not set)",
 			},
 			&cli.BoolFlag{
 				Name:  "z",
@@ -182,9 +185,8 @@ func parseArgs(args []string) (util.Answers, error) {
 		}
 	}
 	if resp.Answers.Server == "" {
-		resolv, err := dns.ClientConfigFromFile("/etc/resolv.conf")
-		if err != nil { // Query Google by default, needed for Windows since the DNS library doesn't support Windows
-			// TODO: Actually find where windows stuffs its dns resolvers
+		resolv, err := conf.GetDNSConfig()
+		if err != nil { // Query Google by default
 			resp.Answers.Server = "8.8.4.4"
 		} else {
 			resp.Answers.Server = resolv.Servers[rand.Intn(len(resolv.Servers))]

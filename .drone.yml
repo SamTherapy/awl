@@ -2,7 +2,7 @@ kind: pipeline
 type: docker
 name: default
 steps:
-  - name: test
+  - name: Test
     image: golang
     commands:
       - go test ./...
