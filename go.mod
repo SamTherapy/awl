@@ -3,7 +3,7 @@ module git.froth.zone/sam/awl
 go 1.18
 
 require (
-	github.com/lucas-clemente/quic-go v0.27.2
+	github.com/lucas-clemente/quic-go v0.28.0
 	github.com/miekg/dns v1.1.50
 	github.com/urfave/cli/v2 v2.10.3
 	golang.org/x/net v0.0.0-20220630215102-69896b714898
