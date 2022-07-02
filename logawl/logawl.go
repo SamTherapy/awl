@@ -46,7 +46,7 @@ func (l *Logger) UnMarshalLevel(lv Level) (string, error) {
 	case 3:
 		return "DEBUG ", nil
 	}
-	return "", fmt.Errorf("Invalid log level choice")
+	return "", fmt.Errorf("invalid log level choice")
 }
 
 func (l *Logger) IsLevel(level Level) bool {

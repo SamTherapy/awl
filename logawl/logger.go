@@ -44,7 +44,7 @@ func (l *Logger) Println(level Level, v ...any) {
 }
 
 // Formats the log header as such <LogLevel> YYYY/MM/DD HH:MM:SS (local time) <the message to log>
-func (l *Logger) formatHeader(buf *[]byte, t time.Time, line int, level Level) {
+func (l *Logger) formatHeader(buf *[]byte, t time.Time, line int, level Level) error {
 	if lvl, err := l.UnMarshalLevel(level); err == nil {
 		// This is ugly but functional
 		// maybe there can be an append func or something in the future
@@ -67,10 +67,9 @@ func (l *Logger) formatHeader(buf *[]byte, t time.Time, line int, level Level) {
 		*buf = append(*buf, ':')
 		*buf = append(*buf, ' ')
 	} else {
-		fmt.Printf("Unable to unmarshal log level: %v", err)
-		os.Exit(2) //Fucking kill him
+		return fmt.Errorf("invalid log level choice")
 	}
-
+	return nil
 }
 
 // Printer prints the formatted message directly to stdErr
