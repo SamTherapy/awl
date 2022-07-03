@@ -18,142 +18,142 @@ import (
 
 func doQuery(c *cli.Context) error {
 	var (
-		err     error
-		resp    util.Response
-		isHTTPS bool
+		err error
 	)
-	resp.Logger = util.InitLogger(c.Bool("debug")) //init logger
-	resp.Answers, err = parseArgs(c.Args().Slice())
+	// load cli flags into options struct
+	Options := query.Options{
+		Logger:   util.InitLogger(c.Bool("debug")),
+		Port:     c.Int("port"),
+		IPv4:     c.Bool("4"),
+		IPv6:     c.Bool("6"),
+		DNSSEC:   c.Bool("dnssec"),
+		Short:    c.Bool("short"),
+		TCP:      c.Bool("tcp"),
+		TLS:      c.Bool("tls"),
+		HTTPS:    c.Bool("https"),
+		QUIC:     c.Bool("quic"),
+		Truncate: c.Bool("no-truncate"),
+		AA:       c.Bool("aa"),
+		TC:       c.Bool("tc"),
+		Z:        c.Bool("z"),
+		CD:       c.Bool("cd"),
+		NoRD:     c.Bool("no-rd"),
+		NoRA:     c.Bool("no-ra"),
+		Reverse:  c.Bool("reverse"),
+		Debug:    c.Bool("debug"),
+	}
+	Options.Answers, err = parseArgs(c.Args().Slice(), Options)
 	if err != nil {
-		resp.Logger.Error("unable to parse args")
+		Options.Logger.Error("Unable to parse args")
 		return err
 	}
-	port := c.Int("port")
-
-	resp.Logger.Debug("starting awl")
-	// If port is not set, set it
-	if port == 0 {
-		if c.Bool("tls") || c.Bool("quic") {
-			resp.Logger.Debug("setting port to 853")
-			port = 853
-		} else {
-			resp.Logger.Debug("setting port to 53")
-			port = 53
-		}
-	}
-
-	if c.Bool("https") || strings.HasPrefix(resp.Answers.Server, "https://") {
-		// add https:// if it doesn't already exist
-		if !strings.HasPrefix(resp.Answers.Server, "https://") {
-			resp.Answers.Server = "https://" + resp.Answers.Server
-		}
-		isHTTPS = true
-	} else {
-		resp.Answers.Server = net.JoinHostPort(resp.Answers.Server, strconv.Itoa(port))
-	}
-
-	// Process the IP/Phone number so a PTR/NAPTR can be done
-	if c.Bool("reverse") {
-		if dns.TypeToString[resp.Answers.Request] == "A" {
-			resp.Answers.Request = dns.StringToType["PTR"]
-		}
-		resp.Answers.Name, err = util.ReverseDNS(resp.Answers.Name, dns.TypeToString[resp.Answers.Request])
-		if err != nil {
-			return err
-		}
-	}
-
-	// if the domain is not canonical, make it canonical
-	if !strings.HasSuffix(resp.Answers.Name, ".") {
-		resp.Answers.Name = fmt.Sprintf("%s.", resp.Answers.Name)
-	}
-	resp.Logger.Debug("packing DNS message")
 	msg := new(dns.Msg)
-
-	msg.SetQuestion(resp.Answers.Name, resp.Answers.Request)
-
+	// if the domain is not canonical, make it canonical
+	if !strings.HasSuffix(Options.Answers.Name, ".") {
+		Options.Answers.Name = fmt.Sprintf("%s.", Options.Answers.Name)
+	}
+	msg.SetQuestion(Options.Answers.Name, Options.Answers.Request)
+	// If port is not set, set it
+	if Options.Port == 0 {
+		if Options.TLS || Options.QUIC {
+			Options.Port = 853
+		} else {
+			Options.Port = 53
+		}
+	}
+	Options.Logger.Debug("setting any message flags")
 	// Make this authoritative (does this do anything?)
-	if c.Bool("aa") {
+	if Options.AA {
+		Options.Logger.Debug("making message authorative")
 		msg.Authoritative = true
 	}
 	// Set truncated flag (why)
-	if c.Bool("tc") {
+	if Options.TC {
 		msg.Truncated = true
 	}
 	// Set the zero flag if requested (does nothing)
-	if c.Bool("z") {
-		resp.Logger.Debug("setting message to zero")
+	if Options.Z {
+		Options.Logger.Debug("setting to zero")
 		msg.Zero = true
 	}
 	// Disable DNSSEC validation
-	if c.Bool("cd") {
+	if Options.CD {
+		Options.Logger.Debug("disabling DNSSEC validation")
 		msg.CheckingDisabled = true
 	}
 	// Disable wanting recursion
-	if c.Bool("no-rd") {
+	if Options.NoRD {
+		Options.Logger.Debug("disabling recursion")
 		msg.RecursionDesired = false
 	}
 	// Disable recursion being available (I don't think this does anything)
-	if c.Bool("no-ra") {
+	if Options.NoRA {
 		msg.RecursionAvailable = false
 	}
 	// Set DNSSEC if requested
-	if c.Bool("dnssec") {
-		resp.Logger.Debug("using DNSSEC")
+	if Options.DNSSEC {
+		Options.Logger.Debug("using DNSSEC")
 		msg.SetEdns0(1232, true)
 	}
 
-	var in *dns.Msg
+	resolver, err := query.LoadResolver(Options.Answers.Server, Options)
+	if err != nil {
+		return err
+	}
+
+	if Options.Debug {
+		Options.Logger.SetLevel(3)
+	}
+
+	Options.Logger.Debug("Starting awl")
+
+	var in = Options.Answers.DNS
 
 	// Make the DNS request
-	if isHTTPS {
-		resp.Logger.Debug("resolving DoH query")
-		in, resp.Answers.RTT, err = query.ResolveHTTPS(msg, resp.Answers.Server)
-	} else if c.Bool("quic") {
-		resp.Logger.Debug("resolving DoQ query")
-		in, resp.Answers.RTT, err = query.ResolveQUIC(msg, resp.Answers.Server)
+	if Options.HTTPS {
+		in, Options.Answers.RTT, err = resolver.LookUp(msg)
+	} else if Options.QUIC {
+		in, Options.Answers.RTT, err = resolver.LookUp(msg)
 	} else {
-
+		Options.Answers.Server = net.JoinHostPort(Options.Answers.Server, strconv.Itoa(Options.Port))
 		d := new(dns.Client)
 
 		// Set TCP/UDP, depending on flags
-		if c.Bool("tcp") || c.Bool("tls") {
-			resp.Logger.Debug("using tcp")
+		if Options.TCP || Options.TLS {
 			d.Net = "tcp"
 		} else {
-			resp.Logger.Debug("using udp")
+			Options.Logger.Debug("using udp")
 			d.Net = "udp"
 		}
 
 		// Set IPv4 or IPv6, depending on flags
 		switch {
-		case c.Bool("4"):
+		case Options.IPv4:
 			d.Net += "4"
-		case c.Bool("6"):
+		case Options.IPv6:
 			d.Net += "6"
 		}
 
 		// Add TLS, if requested
-		if c.Bool("tls") {
+		if Options.TLS {
 			d.Net += "-tls"
 		}
-		resp.Logger.Debug("exchanging DNS message")
-		in, resp.Answers.RTT, err = d.Exchange(msg, resp.Answers.Server)
+
+		in, Options.Answers.RTT, err = d.Exchange(msg, Options.Answers.Server)
 		if err != nil {
 			return err
 		}
 		// If UDP truncates, use TCP instead (unless truncation is to be ignored)
-		if in.MsgHdr.Truncated && !c.Bool("no-truncate") {
+		if in.MsgHdr.Truncated && !Options.Truncate {
 			fmt.Printf(";; Truncated, retrying with TCP\n\n")
 			d.Net = "tcp"
 			switch {
-			case c.Bool("4"):
+			case Options.IPv4:
 				d.Net += "4"
-			case c.Bool("6"):
+			case Options.IPv4:
 				d.Net += "6"
 			}
-			resp.Logger.Debug("exchanging DNS message")
-			in, resp.Answers.RTT, err = d.Exchange(msg, resp.Answers.Server)
+			in, Options.Answers.RTT, err = d.Exchange(msg, Options.Answers.Server)
 		}
 	}
 
@@ -171,8 +171,8 @@ func doQuery(c *cli.Context) error {
 		if !c.Bool("short") {
 			// Print everything
 			fmt.Println(in)
-			fmt.Println(";; Query time:", resp.Answers.RTT)
-			fmt.Println(";; SERVER:", resp.Answers.Server)
+			fmt.Println(";; Query time:", Options.Answers.RTT)
+			fmt.Println(";; SERVER:", Options.Answers.Server)
 			fmt.Println(";; WHEN:", time.Now().Format(time.RFC1123Z))
 			fmt.Println(";; MSG SIZE  rcvd:", in.Len())
 		} else {

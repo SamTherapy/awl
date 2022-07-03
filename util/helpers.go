@@ -6,25 +6,9 @@ import (
 	"errors"
 	"fmt"
 	"strings"
-	"time"
 
-	"git.froth.zone/sam/awl/logawl"
 	"github.com/miekg/dns"
 )
-
-type Response struct {
-	Answers Answers `json:"Response"` // These be DNS query answers
-	Logger  *logawl.Logger
-}
-
-// The Answers struct is the basic structure of a DNS request
-// to be returned to the user upon making a request
-type Answers struct {
-	Server  string        `json:"Server"`  // The server to make the DNS request from
-	Request uint16        `json:"Request"` // The type of request
-	Name    string        `json:"Name"`    // The domain name to make a DNS request for
-	RTT     time.Duration `json:"RTT"`     // The time it took to make the DNS query
-}
 
 // Given an IP or phone number, return a canonical string to be queried
 func ReverseDNS(address string, query string) (string, error) {

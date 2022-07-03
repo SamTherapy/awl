@@ -11,12 +11,18 @@ import (
 	"github.com/miekg/dns"
 )
 
-// Resolve DNS over QUIC, the hip new standard (for privacy I think, IDK)
-func ResolveQUIC(msg *dns.Msg, server string) (*dns.Msg, time.Duration, error) {
+type QUICResolver struct {
+	server string
+	opts   Options
+}
+
+func (r *QUICResolver) LookUp(msg *dns.Msg) (*dns.Msg, time.Duration, error) {
+	var resp Response
 	tls := &tls.Config{
 		NextProtos: []string{"doq"},
 	}
-	connection, err := quic.DialAddr(server, tls, nil)
+	r.opts.Logger.Debug("making DoQ request")
+	connection, err := quic.DialAddr(r.server, tls, nil)
 	if err != nil {
 		return nil, 0, err
 	}
@@ -40,7 +46,7 @@ func ResolveQUIC(msg *dns.Msg, server string) (*dns.Msg, time.Duration, error) {
 	if err != nil {
 		return nil, 0, err
 	}
-	rtt := time.Since(t)
+	resp.Answers.RTT = time.Since(t)
 
 	// Close with error: no error
 	err = connection.CloseWithError(0, "")
@@ -53,11 +59,11 @@ func ResolveQUIC(msg *dns.Msg, server string) (*dns.Msg, time.Duration, error) {
 		return nil, 0, err
 	}
 
-	response := dns.Msg{}
-	err = response.Unpack(fullRes)
+	resp.DNS = dns.Msg{}
+	r.opts.Logger.Debug("unpacking DoQ response")
+	err = resp.DNS.Unpack(fullRes)
 	if err != nil {
 		return nil, 0, err
 	}
-
-	return &response, rtt, nil
+	return &resp.DNS, resp.Answers.RTT, nil
 }

@@ -9,7 +9,7 @@ import (
 	"strings"
 
 	"git.froth.zone/sam/awl/conf"
-	"git.froth.zone/sam/awl/util"
+	"git.froth.zone/sam/awl/query"
 
 	"github.com/miekg/dns"
 	"github.com/urfave/cli/v2"
@@ -148,9 +148,9 @@ func prepareCLI() *cli.App {
 }
 
 // Parse the wildcard arguments, drill style
-func parseArgs(args []string) (util.Answers, error) {
+func parseArgs(args []string, opts query.Options) (query.Answers, error) {
 	var (
-		resp util.Response
+		resp query.Response
 		err  error
 	)
 	for _, arg := range args {
@@ -162,7 +162,7 @@ func parseArgs(args []string) (util.Answers, error) {
 		case strings.Contains(arg, "."):
 			resp.Answers.Name, err = idna.ToUnicode(arg)
 			if err != nil {
-				return util.Answers{}, err
+				return query.Answers{}, err
 			}
 		case ok:
 			// If it's a DNS request, it's a DNS request (obviously)
@@ -171,7 +171,7 @@ func parseArgs(args []string) (util.Answers, error) {
 			//else, assume it's a name
 			resp.Answers.Name, err = idna.ToUnicode(arg)
 			if err != nil {
-				return util.Answers{}, err
+				return query.Answers{}, err
 			}
 
 		}
@@ -193,9 +193,24 @@ func parseArgs(args []string) (util.Answers, error) {
 		if err != nil { // Query Google by default
 			resp.Answers.Server = "8.8.4.4"
 		} else {
-			resp.Answers.Server = resolv.Servers[rand.Intn(len(resolv.Servers))]
+			for _, srv := range resolv.Servers {
+				if opts.IPv4 {
+					if strings.Contains(srv, ".") {
+						resp.Answers.Server = srv
+						break
+					}
+				} else if opts.IPv6 {
+					if strings.Contains(srv, ":") {
+						resp.Answers.Server = srv
+						break
+					}
+				} else {
+					resp.Answers.Server = resolv.Servers[rand.Intn(len(resolv.Servers))]
+					break
+				}
+			}
 		}
 	}
 
-	return util.Answers{Server: resp.Answers.Server, Request: resp.Answers.Request, Name: resp.Answers.Name}, nil
+	return query.Answers{Server: resp.Answers.Server, Request: resp.Answers.Request, Name: resp.Answers.Name}, nil
 }

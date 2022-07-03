@@ -6,7 +6,7 @@ import (
 	"os"
 	"testing"
 
-	"git.froth.zone/sam/awl/util"
+	"git.froth.zone/sam/awl/query"
 	"github.com/miekg/dns"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
@@ -21,23 +21,23 @@ func TestApp(t *testing.T) {
 func TestArgParse(t *testing.T) {
 	tests := []struct {
 		in   []string
-		want util.Answers
+		want query.Answers
 	}{
 		{
 			[]string{"@::1", "localhost", "AAAA"},
-			util.Answers{Server: "::1", Request: dns.TypeAAAA, Name: "localhost"},
+			query.Answers{Server: "::1", Request: dns.TypeAAAA, Name: "localhost"},
 		},
 		{
 			[]string{"@1.0.0.1", "google.com"},
-			util.Answers{Server: "1.0.0.1", Request: dns.TypeA, Name: "google.com"},
+			query.Answers{Server: "1.0.0.1", Request: dns.TypeA, Name: "google.com"},
 		},
 		{
 			[]string{"@8.8.4.4"},
-			util.Answers{Server: "8.8.4.4", Request: dns.TypeNS, Name: "."},
+			query.Answers{Server: "8.8.4.4", Request: dns.TypeNS, Name: "."},
 		},
 	}
 	for _, test := range tests {
-		act, err := parseArgs(test.in)
+		act, err := parseArgs(test.in, query.Options{})
 		assert.Nil(t, err)
 		assert.Equal(t, test.want, act)
 	}
@@ -50,11 +50,49 @@ func TestQuery(t *testing.T) {
 	err := app.Run(args)
 	assert.NotNil(t, err)
 }
+
+func TestNoArgs(t *testing.T) {
+	app := prepareCLI()
+	args := os.Args[0:1]
+	args = append(args, "--no-truncate")
+	err := app.Run(args)
+	assert.Nil(t, err)
+}
+
+func TestFlags(t *testing.T) {
+	app := prepareCLI()
+	args := os.Args[0:1]
+	args = append(args, "--debug")
+	args = append(args, "--short")
+	args = append(args, "-4")
+	err := app.Run(args)
+	assert.Nil(t, err)
+}
+
 func TestHTTPS(t *testing.T) {
 	app := prepareCLI()
 	args := os.Args[0:1]
 	args = append(args, "-H")
 	args = append(args, "@https://cloudflare-dns.com/dns-query")
+	args = append(args, "git.froth.zone")
+	err := app.Run(args)
+	assert.Nil(t, err)
+}
+
+func TestJSON(t *testing.T) {
+	app := prepareCLI()
+	args := os.Args[0:1]
+	args = append(args, "-j")
+	args = append(args, "git.froth.zone")
+	err := app.Run(args)
+	assert.Nil(t, err)
+}
+
+func TestQUIC(t *testing.T) {
+	app := prepareCLI()
+	args := os.Args[0:1]
+	args = append(args, "-Q")
+	args = append(args, "@dns.adguard.com")
 	args = append(args, "git.froth.zone")
 	err := app.Run(args)
 	assert.Nil(t, err)
