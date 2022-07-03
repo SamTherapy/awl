@@ -137,6 +137,10 @@ func prepareCLI() *cli.App {
 				Aliases: []string{"x"},
 				Usage:   "do a reverse lookup",
 			},
+			&cli.BoolFlag{
+				Name:  "debug",
+				Usage: "enable verbose logging",
+			},
 		},
 		Action: doQuery,
 	}

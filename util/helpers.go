@@ -8,11 +8,13 @@ import (
 	"strings"
 	"time"
 
+	"git.froth.zone/sam/awl/logawl"
 	"github.com/miekg/dns"
 )
 
 type Response struct {
 	Answers Answers `json:"Response"` // These be DNS query answers
+	Logger  *logawl.Logger
 }
 
 // The Answers struct is the basic structure of a DNS request

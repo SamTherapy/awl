@@ -10,7 +10,6 @@ import (
 	"strings"
 	"time"
 
-	"git.froth.zone/sam/awl/logawl"
 	"git.froth.zone/sam/awl/query"
 	"git.froth.zone/sam/awl/util"
 	"github.com/miekg/dns"
@@ -22,25 +21,23 @@ func doQuery(c *cli.Context) error {
 		err     error
 		resp    util.Response
 		isHTTPS bool
-		Logger  = logawl.New() //init logger
 	)
-
+	resp.Logger = util.InitLogger(c.Bool("debug")) //init logger
 	resp.Answers, err = parseArgs(c.Args().Slice())
 	if err != nil {
-		Logger.Error("Unable to parse args")
+		resp.Logger.Error("unable to parse args")
 		return err
 	}
 	port := c.Int("port")
-	if c.Bool("debug") {
-		Logger.SetLevel(3)
-	}
 
-	Logger.Debug("Starting awl")
+	resp.Logger.Debug("starting awl")
 	// If port is not set, set it
 	if port == 0 {
 		if c.Bool("tls") || c.Bool("quic") {
+			resp.Logger.Debug("setting port to 853")
 			port = 853
 		} else {
+			resp.Logger.Debug("setting port to 53")
 			port = 53
 		}
 	}
@@ -70,7 +67,7 @@ func doQuery(c *cli.Context) error {
 	if !strings.HasSuffix(resp.Answers.Name, ".") {
 		resp.Answers.Name = fmt.Sprintf("%s.", resp.Answers.Name)
 	}
-
+	resp.Logger.Debug("packing DNS message")
 	msg := new(dns.Msg)
 
 	msg.SetQuestion(resp.Answers.Name, resp.Answers.Request)
@@ -85,7 +82,7 @@ func doQuery(c *cli.Context) error {
 	}
 	// Set the zero flag if requested (does nothing)
 	if c.Bool("z") {
-		Logger.Debug("Setting message to zero")
+		resp.Logger.Debug("setting message to zero")
 		msg.Zero = true
 	}
 	// Disable DNSSEC validation
@@ -102,7 +99,7 @@ func doQuery(c *cli.Context) error {
 	}
 	// Set DNSSEC if requested
 	if c.Bool("dnssec") {
-		Logger.Debug("Using DNSSEC")
+		resp.Logger.Debug("using DNSSEC")
 		msg.SetEdns0(1232, true)
 	}
 
@@ -110,8 +107,10 @@ func doQuery(c *cli.Context) error {
 
 	// Make the DNS request
 	if isHTTPS {
+		resp.Logger.Debug("resolving DoH query")
 		in, resp.Answers.RTT, err = query.ResolveHTTPS(msg, resp.Answers.Server)
 	} else if c.Bool("quic") {
+		resp.Logger.Debug("resolving DoQ query")
 		in, resp.Answers.RTT, err = query.ResolveQUIC(msg, resp.Answers.Server)
 	} else {
 
@@ -119,8 +118,10 @@ func doQuery(c *cli.Context) error {
 
 		// Set TCP/UDP, depending on flags
 		if c.Bool("tcp") || c.Bool("tls") {
+			resp.Logger.Debug("using tcp")
 			d.Net = "tcp"
 		} else {
+			resp.Logger.Debug("using udp")
 			d.Net = "udp"
 		}
 
@@ -136,7 +137,7 @@ func doQuery(c *cli.Context) error {
 		if c.Bool("tls") {
 			d.Net += "-tls"
 		}
-
+		resp.Logger.Debug("exchanging DNS message")
 		in, resp.Answers.RTT, err = d.Exchange(msg, resp.Answers.Server)
 		if err != nil {
 			return err
@@ -151,6 +152,7 @@ func doQuery(c *cli.Context) error {
 			case c.Bool("6"):
 				d.Net += "6"
 			}
+			resp.Logger.Debug("exchanging DNS message")
 			in, resp.Answers.RTT, err = d.Exchange(msg, resp.Answers.Server)
 		}
 	}
