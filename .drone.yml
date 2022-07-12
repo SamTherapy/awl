@@ -1,8 +1,0 @@
-kind: pipeline
-type: docker
-name: default
-steps:
-  - name: Test
-    image: golang
-    commands:
-      - go test ./...
