@@ -5,17 +5,23 @@ package util
 import (
 	"testing"
 
+	"github.com/miekg/dns"
 	"github.com/stretchr/testify/assert"
 )
 
+var (
+	PTR   = dns.StringToType["PTR"]
+	NAPTR = dns.StringToType["NAPTR"]
+)
+
 func TestIPv4(t *testing.T) {
-	act, err := ReverseDNS("8.8.4.4", "PTR")
+	act, err := ReverseDNS("8.8.4.4", PTR)
 	assert.Nil(t, err)
 	assert.Equal(t, act, "4.4.8.8.in-addr.arpa.", "IPv4 reverse")
 }
 
 func TestIPv6(t *testing.T) {
-	act, err := ReverseDNS("2606:4700:4700::1111", "PTR")
+	act, err := ReverseDNS("2606:4700:4700::1111", PTR)
 	assert.Nil(t, err)
 	assert.Equal(t, act, "1.1.1.1.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.7.4.0.0.7.4.6.0.6.2.ip6.arpa.", "IPv6 reverse")
 }
@@ -31,13 +37,13 @@ func TestNAPTR(t *testing.T) {
 		{"17705551212", "2.1.2.1.5.5.5.0.7.7.1.e164.arpa."},
 	}
 	for _, test := range tests {
-		act, err := ReverseDNS(test.in, "NAPTR")
+		act, err := ReverseDNS(test.in, NAPTR)
 		assert.Nil(t, err)
 		assert.Equal(t, test.want, act)
 	}
 }
 
 func TestInvalid(t *testing.T) {
-	_, err := ReverseDNS("AAAAA", "A")
+	_, err := ReverseDNS("AAAAA", 1)
 	assert.NotNil(t, err)
 }

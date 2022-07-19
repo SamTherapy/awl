@@ -98,6 +98,15 @@ func TestQUIC(t *testing.T) {
 	assert.Nil(t, err)
 }
 
+func TestReverse(t *testing.T) {
+	app := prepareCLI()
+	args := os.Args[0:1]
+	args = append(args, "-x")
+	args = append(args, "8.8.8.8")
+	err := app.Run(args)
+	assert.Nil(t, err)
+}
+
 func FuzzCli(f *testing.F) {
 	testcases := []string{"git.froth.zone", "", "!12345", "google.com.edu.org.fr"}
 	for _, tc := range testcases {

@@ -11,7 +11,8 @@ import (
 )
 
 // Given an IP or phone number, return a canonical string to be queried
-func ReverseDNS(address string, query string) (string, error) {
+func ReverseDNS(address string, querInt uint16) (string, error) {
+	query := dns.TypeToString[querInt]
 	if query == "PTR" {
 		return dns.ReverseAddr(address)
 	} else if query == "NAPTR" {

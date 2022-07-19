@@ -48,6 +48,17 @@ func doQuery(c *cli.Context) error {
 		return err
 	}
 	msg := new(dns.Msg)
+
+	if Options.Reverse {
+		if dns.TypeToString[Options.Answers.Request] == "A" {
+			Options.Answers.Request = dns.StringToType["PTR"]
+		}
+		Options.Answers.Name, err = util.ReverseDNS(Options.Answers.Name, Options.Answers.Request)
+		if err != nil {
+			return err
+		}
+	}
+
 	// if the domain is not canonical, make it canonical
 	if !strings.HasSuffix(Options.Answers.Name, ".") {
 		Options.Answers.Name = fmt.Sprintf("%s.", Options.Answers.Name)
