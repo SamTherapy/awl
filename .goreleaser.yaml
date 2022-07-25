@@ -38,4 +38,4 @@ changelog:
       - '^docs:'
       - '^test:'
 gitea_urls:
-  api: https://gitea.froth.zone/api/v1/
+  api: https://git.froth.zone/api/v1/

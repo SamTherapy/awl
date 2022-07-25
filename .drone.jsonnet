@@ -25,7 +25,12 @@ local testing(version, arch) = {
         "go test -race ./... -cover"
       ]
     },
-  ]
+  ],
+    trigger: {
+    event: {
+      exclude: "tag",
+    }
+  },
 };
 
 // "Inspired by" https://goreleaser.com/ci/drone/
