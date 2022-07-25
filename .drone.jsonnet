@@ -8,6 +8,13 @@ local testing(version, arch) = {
   },
   steps: [
     {
+      name: "submodules",
+      image: "alpine/git",
+      commands: [
+        "git submodule update --init --recursive"
+      ]
+    },
+    {
       name: "lint",
       image: "rancher/drone-golangci-lint:latest"
     },
@@ -33,7 +40,8 @@ local release() = {
       name: "fetch",
       image: "docker:git",
       commands : [
-        "git fetch --tags"
+        "git fetch --tags",
+        "git submodule update --init --recursive"
       ]
     },
     {
