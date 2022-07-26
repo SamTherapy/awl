@@ -1,14 +1,17 @@
 // SPDX-License-Identifier: BSD-3-Clause
 
-package conf
+package conf_test
 
 import (
 	"testing"
 
-	"github.com/stretchr/testify/assert"
+	"git.froth.zone/sam/awl/conf"
+
+	"gotest.tools/v3/assert"
 )
 
 func TestGetPlan9Config(t *testing.T) {
+	t.Parallel()
 	ndbs := []struct {
 		in   string
 		want string
@@ -27,9 +30,14 @@ func TestGetPlan9Config(t *testing.T) {
 	}
 
 	for _, ndb := range ndbs {
-		act, err := getPlan9Config(ndb.in)
-		assert.Nil(t, err)
-		assert.Equal(t, ndb.want, act.Servers[0])
+		// Go is a little quirky
+		ndb := ndb
+		t.Run(ndb.want, func(t *testing.T) {
+			t.Parallel()
+			act, err := conf.GetPlan9Config(ndb.in)
+			assert.NilError(t, err)
+			assert.Equal(t, ndb.want, act.Servers[0])
+		})
 	}
 
 	invalid := `sys = spindle
@@ -38,8 +46,7 @@ func TestGetPlan9Config(t *testing.T) {
 	ip=135.104.117.32 ether=080069020677
 	proto=il`
 
-	act, err := getPlan9Config(invalid)
+	act, err := conf.GetPlan9Config(invalid)
 	assert.ErrorContains(t, err, "no DNS servers found")
-	assert.Nil(t, act)
-
+	assert.Assert(t, act == nil)
 }

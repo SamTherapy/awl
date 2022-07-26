@@ -1,6 +1,5 @@
 // SPDX-License-Identifier: BSD-3-Clause
 //go:build !windows
-// +build !windows
 
 package conf
 
@@ -18,7 +17,7 @@ func GetDNSConfig() (*dns.ClientConfig, error) {
 		if err != nil {
 			return nil, err
 		}
-		return getPlan9Config(string(dat))
+		return GetPlan9Config(string(dat))
 	} else {
 		return dns.ClientConfigFromFile("/etc/resolv.conf")
 	}

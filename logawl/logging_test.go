@@ -1,52 +1,53 @@
-package logawl
+// SPDX-License-Identifier: BSD-3-Clause
+
+package logawl_test
 
 import (
 	"bytes"
 	"testing"
 	"time"
 
-	"github.com/stretchr/testify/assert"
+	"git.froth.zone/sam/awl/logawl"
+
+	"gotest.tools/v3/assert"
 )
 
-var logger = New()
+var logger = logawl.New()
 
 func TestLogawl(t *testing.T) {
+	t.Parallel()
 
-	assert.Equal(t, Level(2), logger.Level) //cast 2 (int) to 2 (level)
-
-	//Validate setting and getting levels from memory works
-	for i := range AllLevels {
-		logger.SetLevel(Level(i))
-		assert.Equal(t, Level(i), logger.GetLevel())
+	for i := range logawl.AllLevels {
+		logger.SetLevel(logawl.Level(i))
+		assert.Equal(t, logawl.Level(i), logger.GetLevel())
 	}
-
 }
 
 func TestUnmarshalLevels(t *testing.T) {
+	t.Parallel()
 	m := make(map[int]string)
 	var err error
-	//Fill map with unmarshalled level info
-	for i := range AllLevels {
-		m[i], err = logger.UnMarshalLevel(Level(i))
-		assert.Nil(t, err)
+
+	for i := range logawl.AllLevels {
+		m[i], err = logger.UnMarshalLevel(logawl.Level(i))
+		assert.NilError(t, err)
 	}
 
-	//iterate over map and assert equal
-	for i := range AllLevels {
-		lv, err := logger.UnMarshalLevel(Level(i))
-		assert.Nil(t, err)
+	for i := range logawl.AllLevels {
+		lv, err := logger.UnMarshalLevel(logawl.Level(i))
+		assert.NilError(t, err)
 		assert.Equal(t, m[i], lv)
 	}
 
-	lv, err := logger.UnMarshalLevel(Level(9001))
-	assert.NotNil(t, err)
+	lv, err := logger.UnMarshalLevel(logawl.Level(9001))
 	assert.Equal(t, "", lv)
-	assert.ErrorContains(t, err, "invalid log level choice")
+	assert.ErrorContains(t, err, "invalid log level")
 }
 
 func TestLogger(t *testing.T) {
+	t.Parallel()
 
-	for i := range AllLevels {
+	for i := range logawl.AllLevels {
 		// only test non-exiting log levels
 		switch i {
 		case 1:
@@ -72,12 +73,12 @@ func TestLogger(t *testing.T) {
 			fn()
 		}
 	}
-
 }
 
 func TestFmt(t *testing.T) {
+	t.Parallel()
 	ti := time.Now()
 	test := []byte("test")
-	assert.NotNil(t, logger.formatHeader(&test, ti, 0, Level(9001))) //make sure error is error
+	assert.ErrorContains(t, logger.FormatHeader(&test, ti, 0, 9001), "invalid log level") //make sure error is error
 
 }

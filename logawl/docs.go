@@ -20,7 +20,7 @@ because awl is a cli utility it writes directly to std err.
 //
 //	Logger.SetLevel(3)
 // This allows you to change the default level (Info) and prevent log messages from being posted at higher verbosity levels
-//for example if
+// for example if
 //	Logger.SetLevel(3)
 // is not called and you call
 //	Logger.Debug()

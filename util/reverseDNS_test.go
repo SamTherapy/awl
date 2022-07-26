@@ -1,12 +1,14 @@
 // SPDX-License-Identifier: BSD-3-Clause
 
-package util
+package util_test
 
 import (
 	"testing"
 
+	"git.froth.zone/sam/awl/util"
+
 	"github.com/miekg/dns"
-	"github.com/stretchr/testify/assert"
+	"gotest.tools/v3/assert"
 )
 
 var (
@@ -15,18 +17,21 @@ var (
 )
 
 func TestIPv4(t *testing.T) {
-	act, err := ReverseDNS("8.8.4.4", PTR)
-	assert.Nil(t, err)
+	t.Parallel()
+	act, err := util.ReverseDNS("8.8.4.4", PTR)
+	assert.NilError(t, err)
 	assert.Equal(t, act, "4.4.8.8.in-addr.arpa.", "IPv4 reverse")
 }
 
 func TestIPv6(t *testing.T) {
-	act, err := ReverseDNS("2606:4700:4700::1111", PTR)
-	assert.Nil(t, err)
+	t.Parallel()
+	act, err := util.ReverseDNS("2606:4700:4700::1111", PTR)
+	assert.NilError(t, err)
 	assert.Equal(t, act, "1.1.1.1.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.7.4.0.0.7.4.6.0.6.2.ip6.arpa.", "IPv6 reverse")
 }
 
 func TestNAPTR(t *testing.T) {
+	t.Parallel()
 	tests := []struct {
 		in   string
 		want string
@@ -37,13 +42,19 @@ func TestNAPTR(t *testing.T) {
 		{"17705551212", "2.1.2.1.5.5.5.0.7.7.1.e164.arpa."},
 	}
 	for _, test := range tests {
-		act, err := ReverseDNS(test.in, NAPTR)
-		assert.Nil(t, err)
-		assert.Equal(t, test.want, act)
+		// Thanks Goroutines, very cool!
+		test := test
+		t.Run(test.in, func(t *testing.T) {
+			t.Parallel()
+			act, err := util.ReverseDNS(test.in, NAPTR)
+			assert.NilError(t, err)
+			assert.Equal(t, test.want, act)
+		})
 	}
 }
 
 func TestInvalid(t *testing.T) {
-	_, err := ReverseDNS("AAAAA", 1)
-	assert.NotNil(t, err)
+	t.Parallel()
+	_, err := util.ReverseDNS("AAAAA", 1)
+	assert.ErrorContains(t, err, "no IP found")
 }

@@ -13,7 +13,7 @@ import (
 // Yoink it and use it.
 //
 // See ndb(7).
-func getPlan9Config(str string) (*dns.ClientConfig, error) {
+func GetPlan9Config(str string) (*dns.ClientConfig, error) {
 	str = strings.ReplaceAll(str, "\n", "")
 	spl := strings.FieldsFunc(str, splitChars)
 	var servers []string
@@ -34,7 +34,7 @@ func getPlan9Config(str string) (*dns.ClientConfig, error) {
 	}, nil
 }
 
-// Split the string at either space or tabs
+// Split the string at either space or tabs.
 func splitChars(r rune) bool {
 	return r == ' ' || r == '\t'
 }

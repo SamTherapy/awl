@@ -28,15 +28,25 @@ func (l *Logger) Println(level Level, v ...any) {
 	if l.IsLevel(level) {
 		switch level { //Goes through log levels and does stuff based on them (Fatal os.Exit...etc)
 		case 0:
-			l.Printer(0, fmt.Sprintln(v...)) //Fatal level
-			os.Exit(1)
+			err := l.Printer(0, fmt.Sprintln(v...)) //Fatal level
+			if err != nil {
+				fmt.Fprintln(os.Stderr, "FATAL: Logger failed: ", err)
+			}
 		case 1:
-			l.Printer(1, fmt.Sprintln(v...)) //Error level
-			os.Exit(2)
+			err := l.Printer(1, fmt.Sprintln(v...)) //Error level
+			if err != nil {
+				fmt.Fprintln(os.Stderr, "FATAL: Logger failed: ", err)
+			}
 		case 2:
-			l.Printer(2, fmt.Sprintln(v...)) //Info level
+			err := l.Printer(2, fmt.Sprintln(v...)) //Info level
+			if err != nil {
+				fmt.Fprintln(os.Stderr, "FATAL: Logger failed: ", err)
+			}
 		case 3:
-			l.Printer(3, fmt.Sprintln(v...)) //Debug level
+			err := l.Printer(3, fmt.Sprintln(v...)) //Debug level
+			if err != nil {
+				fmt.Fprintln(os.Stderr, "FATAL: Logger failed: ", err)
+			}
 		default:
 			break
 		}
@@ -44,7 +54,7 @@ func (l *Logger) Println(level Level, v ...any) {
 }
 
 // Formats the log header as such <LogLevel> YYYY/MM/DD HH:MM:SS (local time) <the message to log>
-func (l *Logger) formatHeader(buf *[]byte, t time.Time, line int, level Level) error {
+func (l *Logger) FormatHeader(buf *[]byte, t time.Time, line int, level Level) error {
 	if lvl, err := l.UnMarshalLevel(level); err == nil {
 		// This is ugly but functional
 		// maybe there can be an append func or something in the future
@@ -80,12 +90,15 @@ func (l *Logger) Printer(level Level, s string) error {
 	defer l.Mu.Unlock()
 
 	l.buf = l.buf[:0]
-	l.formatHeader(&l.buf, now, line, level)
+	err := l.FormatHeader(&l.buf, now, line, level)
+	if err != nil {
+		return err
+	}
 	l.buf = append(l.buf, s...)
 	if len(s) == 0 || s[len(s)-1] != '\n' {
 		l.buf = append(l.buf, '\n')
 	}
-	_, err := l.Out.Write(l.buf)
+	_, err = l.Out.Write(l.buf)
 	return err
 }
 
@@ -120,12 +133,12 @@ func (l *Logger) Info(v ...any) {
 	l.Println(InfoLevel, v...)
 }
 
-// Call print directly with Error level
-func (l *Logger) Error(v ...any) {
-	l.Println(ErrorLevel, v...)
+// Call print directly with Warn level
+func (l *Logger) Warn(v ...any) {
+	l.Println(WarnLevel, v...)
 }
 
-// Call print directly with Fatal level
-func (l *Logger) Fatal(v ...any) {
-	l.Println(FatalLevel, v...)
+// Call print directly with Error level
+func (l *Logger) Error(v ...any) {
+	l.Println(ErrLevel, v...)
 }

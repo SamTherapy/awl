@@ -16,3 +16,8 @@
 
 # Go workspace file
 go.work
+dist/
+
+# Test coverage
+coverage/*
+!coverage/.gitkeep

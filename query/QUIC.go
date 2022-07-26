@@ -7,63 +7,70 @@ import (
 	"io"
 	"time"
 
+	"git.froth.zone/sam/awl/cli"
+	"git.froth.zone/sam/awl/internal/helpers"
+
 	"github.com/lucas-clemente/quic-go"
 	"github.com/miekg/dns"
 )
 
 type QUICResolver struct {
-	server string
-	opts   Options
+	opts cli.Options
 }
 
-func (r *QUICResolver) LookUp(msg *dns.Msg) (*dns.Msg, time.Duration, error) {
-	var resp Response
+func (r *QUICResolver) LookUp(msg *dns.Msg) (helpers.Response, error) {
+	var resp helpers.Response
 	tls := &tls.Config{
+		MinVersion: tls.VersionTLS12,
 		NextProtos: []string{"doq"},
 	}
+
+	conf := new(quic.Config)
+	conf.HandshakeIdleTimeout = r.opts.Request.Timeout
+
 	r.opts.Logger.Debug("making DoQ request")
-	connection, err := quic.DialAddr(r.server, tls, nil)
+	connection, err := quic.DialAddr(r.opts.Request.Server, tls, conf)
 	if err != nil {
-		return nil, 0, err
+		return helpers.Response{}, err
 	}
 
 	// Compress request to over-the-wire
 	buf, err := msg.Pack()
 	if err != nil {
-		return nil, 0, err
+		return helpers.Response{}, err
 	}
 	t := time.Now()
 	stream, err := connection.OpenStream()
 	if err != nil {
-		return nil, 0, err
+		return helpers.Response{}, err
 	}
 	_, err = stream.Write(buf)
 	if err != nil {
-		return nil, 0, err
+		return helpers.Response{}, err
 	}
 
 	fullRes, err := io.ReadAll(stream)
 	if err != nil {
-		return nil, 0, err
+		return helpers.Response{}, err
 	}
-	resp.Answers.RTT = time.Since(t)
+	resp.RTT = time.Since(t)
 
 	// Close with error: no error
 	err = connection.CloseWithError(0, "")
 	if err != nil {
-		return nil, 0, err
+		return helpers.Response{}, err
 	}
 
 	err = stream.Close()
 	if err != nil {
-		return nil, 0, err
+		return helpers.Response{}, err
 	}
 
-	resp.DNS = dns.Msg{}
+	resp.DNS = &dns.Msg{}
 	r.opts.Logger.Debug("unpacking DoQ response")
 	err = resp.DNS.Unpack(fullRes)
 	if err != nil {
-		return nil, 0, err
+		return helpers.Response{}, err
 	}
-	return &resp.DNS, resp.Answers.RTT, nil
+	return resp, nil
 }

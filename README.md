@@ -1,35 +1,66 @@
 # awl
 
+[![Build Status](https://ci.git.froth.zone/api/badges/sam/awl/status.svg)](https://ci.git.froth.zone/sam/awl)
+
 `awl` is a command-line DNS client, much like
 [`drill`](https://github.com/NLnetLabs/ldns),
 [`dig`](https://bind9.readthedocs.io/en/v9_18_3/manpages.html#dig-dns-lookup-utility),
 [`dog`](https://github.com/ogham/dog),
-[`doggo`](https://github.com/mr-karan/doggo),
-or [`q`](https://github.com/natesales/q)
+[`doggo`](https://github.com/mr-karan/doggo), or
+[`q`](https://github.com/natesales/q).
 
-This was made as my first major experiment with Go, so there are probably things that can be improved
+`awl` is designed to be a drop-in replacement for the venerable dig, but support
+newer RFC query types, such as DNS-over-HTTPS and DNS-over-QUIC.
 
-The excellent [dns](https://github.com/miekg/dns) library for Go does most of the heavy
-lifting.
+## Usage
 
-## What works
+- [Feature wiki](https://git.froth.zone/sam/awl/wiki/Supported)
+- [Manpage](https://git.froth.zone/sam/awl/wiki/awl.1)
 
-- UDP
-- TCP
-- TLS
-- HTTPS (maybe)
-- QUIC (extreme maybe)
 
-## What doesn't
+## Building and installing
 
-- Your sanity after reading my awful code
-- A motivation for making this after finding q and doggo
+### From releases
 
-## What should change
+Grab a prebuilt binary from the
+[release](https://git.froth.zone/sam/awl/releases) section.
 
-- Make the CLI less abysmal (migrate to [cobra](https://github.com/spf13/cobra)?
-  or just use stdlib's flags)
-- Optimize everything
-- Make the code less spaghetti (partially completed)
-- Feature parity with drill
-  - Making a drop-in replacement for drill?
+### From source
+
+Dependencies:
+
+- Go >= 1.18
+- GNU/BSD make or Plan 9 mk
+- [scdoc](https://git.sr.ht/~sircmpwn/scdoc) (optional, for manpage)
+
+Make sure to recursively clone the repo:
+
+```sh
+git clone --recursive https://git.froth.zone/sam/awl
+```
+
+Using the makefile:
+
+```sh
+make
+sudo make install
+```
+
+Alternatively, using `go install`:
+
+```sh
+go install git.froth.zone/sam/awl@latest
+```
+
+## Contributing
+
+Send a [pull request](https://git.froth.zone/sam/awl/pulls) our way. Prefer
+emails? Send a patch to the
+[mailing list](https://lists.sr.ht/~sammefishe/awl-dev).
+
+Found a bug or want a new feature? Create an issue
+[here](https://git.froth.zone/sam/awl/issues).
+
+### License
+
+See [LICENSE](./LICENSE)

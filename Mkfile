@@ -1,9 +1,0 @@
-GO=GO
-awl: awl.go
-  $GO build -o awl
-
-install:
-  $GO install .
-
-test:
-  $GO test ./...

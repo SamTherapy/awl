@@ -1,13 +1,14 @@
+// SPDX-License-Identifier: BSD-3-Clause
+
 package util
 
 import "git.froth.zone/sam/awl/logawl"
 
-func InitLogger(debug bool) (Logger *logawl.Logger) {
+// Initialize the logawl instance.
+func InitLogger(verbosity int) (Logger *logawl.Logger) {
 	Logger = logawl.New()
 
-	if debug {
-		Logger.SetLevel(3)
-	}
+	Logger.SetLevel(logawl.Level(verbosity))
 
 	return
 }

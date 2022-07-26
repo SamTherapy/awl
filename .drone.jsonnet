@@ -1,4 +1,6 @@
-local pipeline(version, arch) = {
+// SPDX-License-Identifier: BSD-3-Clause
+
+local testing(version, arch) = {
   kind: "pipeline",
   name: version + "-" + arch ,
   platform: {
@@ -6,17 +8,61 @@ local pipeline(version, arch) = {
   },
   steps: [
     {
+      name: "lint",
+      image: "rancher/drone-golangci-lint:latest"
+    },
+    {
       name: "test",
       image: "golang:" + version,
       commands: [
-        "go test ./..."
+        "go test -race ./... -cover"
       ]
+    },
+  ]
+};
+
+// "Inspired by" https://goreleaser.com/ci/drone/
+local release() = {
+  kind: "pipeline",
+  name: "release",
+  trigger: {
+    event: "tag"
+  },
+  steps: [
+    {
+      name: "fetch",
+      image: "docker:git",
+      commands : [
+        "git fetch --tags"
+      ]
+    },
+    {
+      name: "test",
+      image: "golang",
+      commands: [
+        "go test -race ./... -cover"
+      ]
+    },
+    {
+      name: "release",
+      image: "goreleaser/goreleaser",
+      environment: {
+        "GITEA_TOKEN": {
+          from_secret: "GITEA_TOKEN"
+        }
+      },
+      commands: [
+        "goreleaser release"
+      ],
+      // when: {
+      //   event: "tag"
+      // }
     }
   ]
 };
 
-// logawl uses generics so 1.18 is the minimum
 [
-  pipeline("1.18", "amd64"),
-  pipeline("1.18", "arm64"),
+  testing("1.18", "amd64"),
+  testing("1.18", "arm64"),
+  release()
 ]
