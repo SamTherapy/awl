@@ -13,10 +13,11 @@ $(PROG):
 	$(GO) build -o $(EXE) $(GOFLAGS) .
 
 ## install: installs awl
-install: all
 ifeq ($(OS),Windows_NT)
+install:
 	$(GO) install $(GOFLAGS) .
 else
+install: all
 	install -m755 $(PROG) $(PREFIX)/$(BIN)
 	install -m644 doc/$(PROG).1 $(MAN)/man1
 endif

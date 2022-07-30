@@ -15,13 +15,13 @@ type Options struct {
 	Port      int            // DNS port
 	IPv4      bool           // Force IPv4
 	IPv6      bool           // Force IPv6
-	DNSSEC    bool           // Enable DNSSEC
 	TCP       bool           // Query with TCP
 	DNSCrypt  bool           // Query over DNSCrypt
 	TLS       bool           // Query over TLS
 	HTTPS     bool           // Query over HTTPS
 	QUIC      bool           // Query over QUIC
 	Truncate  bool           // Ignore truncation
+	ShowQuery bool           // Show query before being sent
 	AA        bool           // Set Authoratative Answer
 	AD        bool           // Set Authenticated Data
 	CD        bool           // Set CD
@@ -32,24 +32,47 @@ type Options struct {
 	Z         bool           // Set Z (Zero)
 	Reverse   bool           // Make reverse query
 	Verbosity int            // Set logawl verbosity
-	// HumanTTL  bool           // Make TTL human readable
-	Short bool // Short output
-	JSON  bool // Outout as JSON
-	XML   bool // Output as XML
-	YAML  bool // Output at YAML
+	HumanTTL  bool           // Make TTL human readable
+	ShowTTL   bool           //Display TTL
+	Short     bool           // Short output
+	Identify  bool           // If short, add identity stuffs
+	JSON      bool           // Outout as JSON
+	XML       bool           // Output as XML
+	YAML      bool           // Output at YAML
 
 	Display Displays        // Display options
 	Request helpers.Request // DNS reuqest
+	EDNS                    // EDNS
 }
 
 // What to (and not to) display
 type Displays struct {
-	// Comments   bool
-	Question   bool // QUESTION SECTION
-	Answer     bool // ANSWER SECTION
-	Authority  bool // AUTHORITY SECTION
-	Additional bool // ADDITIONAL SECTION
-	Statistics bool // Query time, message size, etc.
+	Comments       bool
+	Question       bool // QUESTION SECTION
+	Answer         bool // ANSWER SECTION
+	Authority      bool // AUTHORITY SECTION
+	Additional     bool // ADDITIONAL SECTION
+	Statistics     bool // Query time, message size, etc.
+	UcodeTranslate bool // Translate Punycode back to Unicode
 }
+
+type EDNS struct {
+	EnableEDNS bool   // Enable EDNS
+	Cookie     bool   // Enable EDNS cookie
+	DNSSEC     bool   // Enable DNSSEC
+	BufSize    uint16 // Set UDP buffer size
+	Version    uint8  // Set EDNS version
+	Expire     bool   // Set EDNS expiration
+	KeepOpen   bool   // TCP keep alive
+	Nsid       bool   // Show EDNS nsid
+	ZFlag      uint16 // EDNS flags
+	Padding    bool   // EDNS padding
+	// Subnet     EDNS_SUBNET
+}
+
+// Subnets get their own structure because complicated
+// type EDNS_SUBNET struct {
+// 	family uint16
+// }
 
 var ErrNotError = errors.New("not an error")

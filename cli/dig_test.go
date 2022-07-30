@@ -21,7 +21,20 @@ func FuzzDig(f *testing.F) {
 		"rdflag", "recurse", "nordflag", "norecurse",
 		"tcflag", "notcflag",
 		"zflag", "nozflag",
+		"qr", "noqr",
+		"ttlunits", "nottlunits",
+		"ttlid", "nottlid",
 		"dnssec", "nodnssec",
+		"edns", "edns=a", "edns=0", "noedns",
+		"expire", "noexpire",
+		"ednsflags", "ednsflags=\"", "ednsflags=1", "noednsflags",
+		"cookie", "nocookeie",
+		"keepopen", "keepalive", "nokeepopen", "nokeepalive",
+		"nsid", "nonsid",
+		"padding", "nopadding",
+		"bufsize=512", "bufsize=a",
+		"time=5", "timeout=a",
+		"retry=a", "tries=3",
 		"tcp", "vc", "notcp", "novc",
 		"ignore", "noignore",
 		"tls", "notls",
@@ -29,15 +42,18 @@ func FuzzDig(f *testing.F) {
 		"https", "nohttps",
 		"quic", "noquic",
 		"short", "noshort",
+		"identify", "noidentify",
 		"json", "nojson",
 		"xml", "noxml",
 		"yaml", "noyaml",
+		"comments", "nocomments",
 		"question", "noquestion",
 		"answer", "noanswer",
 		"authority", "noauthority",
 		"additional", "noadditional",
 		"stats", "nostats",
 		"all", "noall",
+		"idnout", "noidnout",
 		"invalid",
 	}
 	for _, tc := range seeds {
@@ -49,7 +65,7 @@ func FuzzDig(f *testing.F) {
 		opts.Logger = util.InitLogger(0)
 		err := cli.ParseDig(orig, opts)
 		if err != nil {
-			assert.ErrorContains(t, err, "unknown flag")
+			assert.ErrorContains(t, err, "digflags:")
 		}
 	})
 }

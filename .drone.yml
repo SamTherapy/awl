@@ -1,0 +1,124 @@
+---
+{
+   "kind": "pipeline",
+   "name": "1.18-amd64",
+   "platform": {
+      "arch": "amd64"
+   },
+   "steps": [
+      {
+         "commands": [
+            "git submodule update --init --recursive"
+         ],
+         "image": "alpine/git",
+         "name": "submodules"
+      },
+      {
+         "depends_on": [
+            "submodules"
+         ],
+         "image": "rancher/drone-golangci-lint:latest",
+         "name": "lint"
+      },
+      {
+         "commands": [
+            "go test -v -race ./... -cover"
+         ],
+         "depends_on": [
+            "submodules"
+         ],
+         "image": "golang:1.18",
+         "name": "test"
+      }
+   ],
+   "trigger": {
+      "event": {
+         "exclude": [
+            "tag"
+         ]
+      }
+   },
+   "type": "docker"
+}
+---
+{
+   "kind": "pipeline",
+   "name": "1.18-arm64",
+   "platform": {
+      "arch": "arm64"
+   },
+   "steps": [
+      {
+         "commands": [
+            "git submodule update --init --recursive"
+         ],
+         "image": "alpine/git",
+         "name": "submodules"
+      },
+      {
+         "depends_on": [
+            "submodules"
+         ],
+         "image": "rancher/drone-golangci-lint:latest",
+         "name": "lint"
+      },
+      {
+         "commands": [
+            "go test -v -race ./... -cover"
+         ],
+         "depends_on": [
+            "submodules"
+         ],
+         "image": "golang:1.18",
+         "name": "test"
+      }
+   ],
+   "trigger": {
+      "event": {
+         "exclude": [
+            "tag"
+         ]
+      }
+   },
+   "type": "docker"
+}
+---
+{
+   "kind": "pipeline",
+   "name": "release",
+   "steps": [
+      {
+         "commands": [
+            "git fetch --tags",
+            "git submodule update --init --recursive"
+         ],
+         "image": "alpine/git",
+         "name": "fetch"
+      },
+      {
+         "commands": [
+            "go test -race ./... -cover"
+         ],
+         "image": "golang",
+         "name": "test"
+      },
+      {
+         "commands": [
+            "goreleaser release"
+         ],
+         "environment": {
+            "GITEA_TOKEN": {
+               "from_secret": "GITEA_TOKEN"
+            }
+         },
+         "image": "goreleaser/goreleaser",
+         "name": "release"
+      }
+   ],
+   "trigger": {
+      "event": [
+         "tag"
+      ]
+   },
+   "type": "docker"
+}

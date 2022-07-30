@@ -16,7 +16,7 @@ func TestEmpty(t *testing.T) {
 	os.Args = []string{"awl", "-4"}
 	opts, err := cli.ParseCLI("TEST")
 	assert.NilError(t, err)
-	assert.Assert(t, (opts.Port == 53))
+	assert.Equal(t, opts.Port, 53)
 	assert.Assert(t, opts.IPv4)
 	os.Args = old
 }
@@ -26,7 +26,7 @@ func TestTLSPort(t *testing.T) {
 	os.Args = []string{"awl", "-T"}
 	opts, err := cli.ParseCLI("TEST")
 	assert.NilError(t, err)
-	assert.Assert(t, (opts.Port == 853))
+	assert.Equal(t, opts.Port, 853)
 	os.Args = old
 }
 
@@ -42,7 +42,7 @@ func TestInvalidDig(t *testing.T) {
 	old := os.Args
 	os.Args = []string{"awl", "+a"}
 	_, err := cli.ParseCLI("TEST")
-	assert.ErrorContains(t, err, "dig: unknown flag")
+	assert.ErrorContains(t, err, "digflags: unknown flag")
 	os.Args = old
 }
 
@@ -92,7 +92,7 @@ func FuzzFlags(f *testing.F) {
 	}
 
 	f.Fuzz(func(t *testing.T, orig string) {
-		os.Args = []string{orig}
+		os.Args = []string{"awl", orig}
 		//nolint:errcheck // Only make sure the program does not crash
 		cli.ParseCLI("TEST")
 	})

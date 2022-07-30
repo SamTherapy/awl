@@ -45,10 +45,21 @@ func ParseCLI(version string) (Options, error) {
 		ipv6    = flag.Bool("6", false, "force IPv6", flag.OptShorthand('6'))
 		reverse = flag.Bool("reverse", false, "do a reverse lookup", flag.OptShorthand('x'))
 
-		timeout  = flag.Float32("timeout", 1, "Timeout, in `seconds`")
-		retry    = flag.Int("retries", 2, "number of `times` to retry")
-		dnssec   = flag.Bool("dnssec", false, "enable DNSSEC", flag.OptShorthand('D'))
-		truncate = flag.Bool("no-truncate", false, "ignore truncation if a UDP request truncates (default= retry with TCP)")
+		timeout = flag.Float32("timeout", 1, "Timeout, in `seconds`")
+		retry   = flag.Int("retries", 2, "number of `times` to retry")
+
+		edns         = flag.Bool("no-edns", false, "disable EDNS entirely")
+		ednsVer      = flag.Uint8("edns-ver", 0, "set EDNS version")
+		expire       = flag.Bool("expire", false, "set EDNS expire")
+		dnssec       = flag.Bool("dnssec", false, "enable DNSSEC", flag.OptShorthand('D'))
+		nsid         = flag.Bool("nsid", false, "set EDNS NSID", flag.OptShorthand('n'))
+		cookie       = flag.Bool("no-cookie", false, "disable sending EDNS cookie (default: cookie sent)")
+		tcpKeepAlive = flag.Bool("keep-alive", false, "send EDNS TCP keep-alive")
+		udpBufSize   = flag.Uint16("buffer-size", 1232, "set EDNS UDP buffer size", flag.OptShorthand('b'))
+		zflag        = flag.Uint16("zflag", 0, "set EDNS z-flag")
+		padding      = flag.Bool("pad", false, "set EDNS padding")
+
+		truncate = flag.Bool("no-truncate", false, "ignore truncation if a UDP request truncates (default: retry with TCP)")
 
 		tcp      = flag.Bool("tcp", false, "use TCP")
 		dnscrypt = flag.Bool("dnscrypt", false, "use DNSCrypt")
@@ -65,18 +76,19 @@ func ParseCLI(version string) (Options, error) {
 		tc = flag.Bool("tc", false, "set/unset TC (TrunCated) flag (default: not set)")
 		z  = flag.Bool("z", false, "set/unset Z (Zero) flag (default: not set)", flag.OptShorthand('z'))
 
-		short = flag.Bool("short", false, "print just the results, equivalent to dig +short", flag.OptShorthand('s'))
+		short = flag.Bool("short", false, "print just the results", flag.OptShorthand('s'))
 		json  = flag.Bool("json", false, "print the result(s) as JSON", flag.OptShorthand('j'))
 		xml   = flag.Bool("xml", false, "print the result(s) as XML", flag.OptShorthand('X'))
 		yaml  = flag.Bool("yaml", false, "print the result(s) as yaml", flag.OptShorthand('y'))
 
+		noC     = flag.Bool("no-comments", false, "disable printing the comments")
 		noQ     = flag.Bool("no-question", false, "disable printing the question section")
 		noAns   = flag.Bool("no-answer", false, "disable printing the answer section")
 		noAuth  = flag.Bool("no-authority", false, "disable printing the authority section")
 		noAdd   = flag.Bool("no-additional", false, "disable printing the additonal section")
 		noStats = flag.Bool("no-statistics", false, "disable printing the statistics section")
 
-		verbosity   = flag.Int("verbosity", 0, "sets verbosity `level`", flag.OptShorthand('v'), flag.OptNoOptDefVal("2"))
+		verbosity   = flag.Int("verbosity", 1, "sets verbosity `level`", flag.OptShorthand('v'), flag.OptNoOptDefVal("2"))
 		versionFlag = flag.Bool("version", false, "print version information", flag.OptShorthand('V'))
 	)
 
@@ -90,30 +102,32 @@ func ParseCLI(version string) (Options, error) {
 	}
 
 	opts := Options{
-		Logger:   util.InitLogger(*verbosity),
-		Port:     *port,
-		IPv4:     *ipv4,
-		IPv6:     *ipv6,
-		DNSSEC:   *dnssec,
-		Short:    *short,
-		TCP:      *tcp,
-		DNSCrypt: *dnscrypt,
-		TLS:      *tls,
-		HTTPS:    *https,
-		QUIC:     *quic,
-		Truncate: *truncate,
-		AA:       *aa,
-		AD:       *ad,
-		TC:       *tc,
-		Z:        *z,
-		CD:       *cd,
-		QR:       *qr,
-		RD:       *rd,
-		RA:       *ra,
-		Reverse:  *reverse,
-		JSON:     *json,
-		XML:      *xml,
-		YAML:     *yaml,
+		Logger:    util.InitLogger(*verbosity),
+		Port:      *port,
+		IPv4:      *ipv4,
+		IPv6:      *ipv6,
+		Short:     *short,
+		TCP:       *tcp,
+		DNSCrypt:  *dnscrypt,
+		TLS:       *tls,
+		HTTPS:     *https,
+		QUIC:      *quic,
+		Truncate:  *truncate,
+		ShowQuery: false,
+		AA:        *aa,
+		AD:        *ad,
+		TC:        *tc,
+		Z:         *z,
+		CD:        *cd,
+		QR:        *qr,
+		RD:        *rd,
+		RA:        *ra,
+		Reverse:   *reverse,
+		HumanTTL:  false,
+		ShowTTL:   true,
+		JSON:      *json,
+		XML:       *xml,
+		YAML:      *yaml,
 		Request: helpers.Request{
 			Type:    dns.StringToType[strings.ToUpper(*qType)],
 			Class:   dns.StringToClass[strings.ToUpper(*class)],
@@ -122,11 +136,24 @@ func ParseCLI(version string) (Options, error) {
 			Retries: *retry,
 		},
 		Display: Displays{
+			Comments:   !*noC,
 			Question:   !*noQ,
 			Answer:     !*noAns,
 			Authority:  !*noAuth,
 			Additional: !*noAdd,
 			Statistics: !*noStats,
+		},
+		EDNS: EDNS{
+			EnableEDNS: !*edns,
+			Cookie:     !*cookie,
+			DNSSEC:     *dnssec,
+			BufSize:    *udpBufSize,
+			Version:    *ednsVer,
+			Expire:     *expire,
+			KeepOpen:   *tcpKeepAlive,
+			Nsid:       *nsid,
+			ZFlag:      *zflag,
+			Padding:    *padding,
 		},
 	}
 
@@ -142,7 +169,6 @@ func ParseCLI(version string) (Options, error) {
 	// This includes the dig-style (+) options
 	err = ParseMiscArgs(flag.Args(), &opts)
 	if err != nil {
-		opts.Logger.Warn(err)
 		return opts, err
 	}
 	opts.Logger.Info("Dig/Drill flags parsed")
