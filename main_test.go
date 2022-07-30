@@ -8,7 +8,6 @@ import (
 )
 
 func TestMain(t *testing.T) {
-	main()
-	os.Args = []string{"awl", "+yaml", "@dns.froth.zone"}
+	os.Args = []string{"awl", "+yaml", "@1.1.1.1"}
 	main()
 }
