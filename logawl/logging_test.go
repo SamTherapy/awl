@@ -8,7 +8,6 @@ import (
 	"time"
 
 	"git.froth.zone/sam/awl/logawl"
-
 	"gotest.tools/v3/assert"
 )
 
@@ -48,11 +47,17 @@ func TestLogger(t *testing.T) {
 	t.Parallel()
 
 	for i := range logawl.AllLevels {
-		// only test non-exiting log levels
 		switch i {
+		case 0:
+			fn := func() {
+				logger.Error("Test", "E")
+			}
+			var buffer bytes.Buffer
+			logger.Out = &buffer
+			fn()
 		case 1:
 			fn := func() {
-				logger.Info("")
+				logger.Warn("Test")
 			}
 			var buffer bytes.Buffer
 			logger.Out = &buffer
@@ -67,6 +72,7 @@ func TestLogger(t *testing.T) {
 		case 3:
 			fn := func() {
 				logger.Debug("Test")
+				logger.Debug("Test 2")
 			}
 			var buffer bytes.Buffer
 			logger.Out = &buffer
@@ -79,6 +85,6 @@ func TestFmt(t *testing.T) {
 	t.Parallel()
 	ti := time.Now()
 	test := []byte("test")
-	assert.ErrorContains(t, logger.FormatHeader(&test, ti, 0, 9001), "invalid log level") //make sure error is error
-
+	// make sure error is error
+	assert.ErrorContains(t, logger.FormatHeader(&test, ti, 0, 9001), "invalid log level")
 }

@@ -3,7 +3,7 @@
 package conf
 
 import (
-	"fmt"
+	"errors"
 	"strings"
 
 	"github.com/miekg/dns"
@@ -23,7 +23,7 @@ func GetPlan9Config(str string) (*dns.ClientConfig, error) {
 		}
 	}
 	if len(servers) == 0 {
-		return nil, fmt.Errorf("plan9: no DNS servers found")
+		return nil, errPlan9
 	}
 
 	// TODO: read more about how customizable Plan 9 is
@@ -38,3 +38,5 @@ func GetPlan9Config(str string) (*dns.ClientConfig, error) {
 func splitChars(r rune) bool {
 	return r == ' ' || r == '\t'
 }
+
+var errPlan9 = errors.New("plan9Config: no DNS servers found")

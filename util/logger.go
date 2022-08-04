@@ -5,10 +5,10 @@ package util
 import "git.froth.zone/sam/awl/logawl"
 
 // Initialize the logawl instance.
-func InitLogger(verbosity int) (Logger *logawl.Logger) {
-	Logger = logawl.New()
+func InitLogger(verbosity int) (logger *logawl.Logger) {
+	logger = logawl.New()
 
-	Logger.SetLevel(logawl.Level(verbosity))
+	logger.SetLevel(logawl.Level(verbosity))
 
-	return
+	return logger
 }

@@ -8,7 +8,6 @@ import (
 
 	"git.froth.zone/sam/awl/cli"
 	"git.froth.zone/sam/awl/internal/helpers"
-
 	"github.com/miekg/dns"
 )
 
@@ -16,6 +15,7 @@ type StandardResolver struct {
 	opts cli.Options
 }
 
+// LookUp performs a DNS query
 func (r *StandardResolver) LookUp(msg *dns.Msg) (helpers.Response, error) {
 	var (
 		resp helpers.Response
@@ -45,7 +45,7 @@ func (r *StandardResolver) LookUp(msg *dns.Msg) (helpers.Response, error) {
 
 	resp.DNS, resp.RTT, err = dnsClient.Exchange(msg, r.opts.Request.Server)
 	if err != nil {
-		return helpers.Response{}, err
+		return helpers.Response{}, fmt.Errorf("standard: DNS exchange error: %w", err)
 	}
 	r.opts.Logger.Info("Request successful")
 
@@ -55,11 +55,14 @@ func (r *StandardResolver) LookUp(msg *dns.Msg) (helpers.Response, error) {
 		switch {
 		case r.opts.IPv4:
 			dnsClient.Net += "4"
-		case r.opts.IPv4:
+		case r.opts.IPv6:
 			dnsClient.Net += "6"
 		}
 		resp.DNS, resp.RTT, err = dnsClient.Exchange(msg, r.opts.Request.Server)
 	}
+	if err != nil {
+		return helpers.Response{}, fmt.Errorf("standard: DNS exchange error: %w", err)
+	}
 
-	return resp, err
+	return resp, nil
 }

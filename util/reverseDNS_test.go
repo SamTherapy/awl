@@ -6,7 +6,6 @@ import (
 	"testing"
 
 	"git.froth.zone/sam/awl/util"
-
 	"github.com/miekg/dns"
 	"gotest.tools/v3/assert"
 )
@@ -56,5 +55,11 @@ func TestNAPTR(t *testing.T) {
 func TestInvalid(t *testing.T) {
 	t.Parallel()
 	_, err := util.ReverseDNS("AAAAA", 1)
-	assert.ErrorContains(t, err, "no IP found")
+	assert.ErrorContains(t, err, "invalid value AAAAA given")
+}
+
+func TestInvalid2(t *testing.T) {
+	t.Parallel()
+	_, err := util.ReverseDNS("1.0", PTR)
+	assert.ErrorContains(t, err, "could not reverse")
 }

@@ -9,12 +9,12 @@ import (
 
 	"git.froth.zone/sam/awl/conf"
 	"git.froth.zone/sam/awl/util"
-
 	"github.com/miekg/dns"
 	"golang.org/x/net/idna"
 )
 
-// Parse the wildcard arguments, drill style.
+// ParseMiscArgs parses the wildcard arguments, drill style.
+// Only one command is supported at a time, so any extra information overrides previous.
 func ParseMiscArgs(args []string, opts *Options) error {
 	var err error
 
@@ -46,28 +46,34 @@ func ParseMiscArgs(args []string, opts *Options) error {
 			default:
 				opts.Request.Server = arg
 			}
-		case strings.Contains(arg, "."):
-			opts.Logger.Info(arg, "detected as a domain name")
-			opts.Request.Name, err = idna.ToASCII(arg)
-			if err != nil {
-				return err
-			}
-		case ok:
-			opts.Logger.Info(arg, "detected as a type")
-			// If it's a DNS request, it's a DNS request (obviously)
-			opts.Request.Type = r
+
+		// Dig-style +queries
 		case strings.HasPrefix(arg, "+"):
 			opts.Logger.Info(arg, "detected as a dig query")
-			// Dig-style +queries
 			err = ParseDig(strings.ToLower(arg[1:]), opts)
 			if err != nil {
 				return err
 			}
+
+		// Domain names
+		case strings.Contains(arg, "."):
+			opts.Logger.Info(arg, "detected as a domain name")
+			opts.Request.Name, err = idna.ToASCII(arg)
+			if err != nil {
+				return fmt.Errorf("punycode translate error: %w", err)
+			}
+
+		// DNS query type
+		case ok:
+			opts.Logger.Info(arg, "detected as a type")
+			opts.Request.Type = r
+
+		// Domain?
 		default:
 			opts.Logger.Info(arg, "is unknown. Assuming domain")
 			opts.Request.Name, err = idna.ToASCII(arg)
 			if err != nil {
-				return err
+				return fmt.Errorf("punycode translate error: %w", err)
 			}
 		}
 	}
@@ -107,21 +113,23 @@ func ParseMiscArgs(args []string, opts *Options) error {
 				opts.Request.Server = "95.216.99.249"
 			} else {
 				// Make sure that if IPv4 or IPv6 is asked for it actually uses it
+			harmful:
 				for _, srv := range resolv.Servers {
-					if opts.IPv4 {
+					switch {
+					case opts.IPv4:
 						if strings.Contains(srv, ".") {
 							opts.Request.Server = srv
-							break
+							break harmful
 						}
-					} else if opts.IPv6 {
+					case opts.IPv6:
 						if strings.Contains(srv, ":") {
 							opts.Request.Server = srv
-							break
+							break harmful
 						}
-					} else {
+					default:
 						//#nosec -- This isn't used for anything secure
 						opts.Request.Server = resolv.Servers[rand.Intn(len(resolv.Servers))]
-						break
+						break harmful
 					}
 				}
 			}
@@ -137,7 +145,7 @@ func ParseMiscArgs(args []string, opts *Options) error {
 		}
 		opts.Request.Name, err = util.ReverseDNS(opts.Request.Name, opts.Request.Type)
 		if err != nil {
-			return err
+			return fmt.Errorf("reverse DNS error: %w", err)
 		}
 	}
 

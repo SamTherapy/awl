@@ -4,6 +4,7 @@
 package conf
 
 import (
+	"fmt"
 	"strings"
 	"unsafe"
 
@@ -23,7 +24,7 @@ func GetDNSConfig() (*dns.ClientConfig, error) {
 
 	// Windows is an utter fucking trash fire of an operating system.
 	if err := windows.GetAdaptersAddresses(windows.AF_UNSPEC, windows.GAA_FLAG_INCLUDE_PREFIX, 0, (*windows.IpAdapterAddresses)(unsafe.Pointer(&b[0])), &l); err != nil {
-		return nil, err
+		return nil, fmt.Errorf("config, windows: %w", err)
 	}
 	var addresses []*windows.IpAdapterAddresses
 	for addr := (*windows.IpAdapterAddresses)(unsafe.Pointer(&b[0])); addr != nil; addr = addr.Next {

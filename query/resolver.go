@@ -12,10 +12,12 @@ import (
 	"github.com/miekg/dns"
 )
 
+// Main resolver interface
 type Resolver interface {
 	LookUp(*dns.Msg) (helpers.Response, error)
 }
 
+// LoadResolver loads the respective resolver for performing a DNS query
 func LoadResolver(opts cli.Options) (Resolver, error) {
 	switch {
 	case opts.HTTPS:

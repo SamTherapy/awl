@@ -4,6 +4,7 @@ package query_test
 
 import (
 	"testing"
+	"time"
 
 	"git.froth.zone/sam/awl/cli"
 	"git.froth.zone/sam/awl/internal/helpers"
@@ -14,25 +15,28 @@ import (
 )
 
 func TestResolve(t *testing.T) {
+	t.Parallel()
 	opts := cli.Options{
 		Logger: util.InitLogger(0),
 		Port:   53,
 		Request: helpers.Request{
-			Server: "8.8.4.4",
-			Type:   dns.TypeA,
-			Name:   "example.com.",
+			Server:  "8.8.4.1",
+			Type:    dns.TypeA,
+			Name:    "example.com.",
+			Timeout: time.Second / 2,
+			Retries: 0,
 		},
 	}
 	resolver, err := query.LoadResolver(opts)
 	assert.NilError(t, err)
 	msg := new(dns.Msg)
 	msg.SetQuestion(opts.Request.Name, opts.Request.Type)
-	res, err := resolver.LookUp(msg)
-	assert.NilError(t, err)
-	assert.Assert(t, res != helpers.Response{})
+	_, err = resolver.LookUp(msg)
+	assert.ErrorContains(t, err, "timeout")
 }
 
 func TestTruncate(t *testing.T) {
+	t.Parallel()
 	opts := cli.Options{
 		Logger: util.InitLogger(0),
 		IPv4:   true,
@@ -53,6 +57,7 @@ func TestTruncate(t *testing.T) {
 }
 
 func TestResolveAgain(t *testing.T) {
+	t.Parallel()
 	tests := []struct {
 		opt cli.Options
 	}{
@@ -79,11 +84,26 @@ func TestResolveAgain(t *testing.T) {
 				},
 			},
 		},
+		{
+			cli.Options{
+				Logger: util.InitLogger(0),
+				TLS:    true,
+				Port:   853,
+				Request: helpers.Request{
+					Server: "dns.google",
+					Type:   dns.TypeAAAA,
+					Name:   "example.com.",
+				},
+			},
+		},
 	}
 	for _, test := range tests {
-		res, err := query.CreateQuery(test.opt)
-		assert.NilError(t, err)
-		assert.Assert(t, res != helpers.Response{})
+		test := test
+		t.Run("", func(t *testing.T) {
+			t.Parallel()
+			res, err := query.CreateQuery(test.opt)
+			assert.NilError(t, err)
+			assert.Assert(t, res != helpers.Response{})
+		})
 	}
-
 }

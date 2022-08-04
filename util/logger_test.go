@@ -11,6 +11,7 @@ import (
 )
 
 func TestInitLogger(t *testing.T) {
+	t.Parallel()
 	logger := util.InitLogger(0)
 	assert.Equal(t, logger.Level, logawl.Level(0))
 }

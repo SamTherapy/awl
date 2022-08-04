@@ -6,7 +6,6 @@ import (
 	"testing"
 
 	"git.froth.zone/sam/awl/conf"
-
 	"gotest.tools/v3/assert"
 )
 

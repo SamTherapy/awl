@@ -1,9 +1,8 @@
 /*
-awl is a DNS lookup tool written in Go,
-similar to (and heavily inspired by) drill.
+awl is a DNS lookup tool written in Go, similar to (and heavily inspired by) drill.
 
 It runs and displays similar outputs to drill, without any frills.
-Options are given to print with JSON
+Options are given to print with JSON, XML and YAML.
 
 Supports results from DNS-over-[UDP, TCP, TLS, HTTPS, QUIC] servers
 

@@ -3,18 +3,29 @@
 package util
 
 import (
-	"errors"
 	"fmt"
 	"strings"
 
 	"github.com/miekg/dns"
 )
 
+type errReverseDNS struct {
+	addr string
+}
+
+func (e *errReverseDNS) Error() string {
+	return fmt.Sprintf("reverseDNS: invalid value %s given", e.addr)
+}
+
 // Given an IP or phone number, return a canonical string to be queried.
 func ReverseDNS(address string, querInt uint16) (string, error) {
 	query := dns.TypeToString[querInt]
 	if query == "PTR" {
-		return dns.ReverseAddr(address)
+		str, err := dns.ReverseAddr(address)
+		if err != nil {
+			return "", fmt.Errorf("could not reverse: %w", err)
+		}
+		return str, nil
 	} else if query == "NAPTR" {
 		// get rid of characters not needed
 		replacer := strings.NewReplacer("+", "", " ", "", "-", "")
@@ -30,7 +41,7 @@ func ReverseDNS(address string, querInt uint16) (string, error) {
 		return arpa.String(), nil
 	}
 
-	return "", errors.New("ReverseDNS: -x flag given but no IP found")
+	return "", &errReverseDNS{address}
 }
 
 // Reverse a string, return the string in reverse.

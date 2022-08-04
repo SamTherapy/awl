@@ -14,7 +14,6 @@ import (
 	"git.froth.zone/sam/awl/internal/helpers"
 	"git.froth.zone/sam/awl/query"
 	"git.froth.zone/sam/awl/util"
-
 	"github.com/miekg/dns"
 	"gotest.tools/v3/assert"
 )

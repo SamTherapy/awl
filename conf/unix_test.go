@@ -13,7 +13,7 @@ import (
 
 func TestNonWinConfig(t *testing.T) {
 	if runtime.GOOS == "windows" {
-		t.Skip("Not running Windows, skipping")
+		t.Skip("Running Windows, skipping")
 	}
 	conf, err := conf.GetDNSConfig()
 	assert.NilError(t, err)

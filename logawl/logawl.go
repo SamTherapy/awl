@@ -3,7 +3,7 @@
 package logawl
 
 import (
-	"fmt"
+	"errors"
 	"io"
 	"sync"
 	"sync/atomic"
@@ -14,10 +14,10 @@ type (
 	Logger struct {
 		Mu        sync.Mutex
 		Level     Level
+		isDiscard int32
 		Prefix    string
 		Out       io.Writer
 		buf       []byte
-		isDiscard int32
 	}
 )
 
@@ -48,7 +48,7 @@ func (l *Logger) UnMarshalLevel(lv Level) (string, error) {
 	case 3:
 		return "DEBUG ", nil
 	}
-	return "", fmt.Errorf("invalid log level")
+	return "", errInvalidLevel
 }
 
 func (l *Logger) IsLevel(level Level) bool {
@@ -74,3 +74,5 @@ const (
 	// Verbose log level.
 	DebugLevel
 )
+
+var errInvalidLevel = errors.New("invalid log level")

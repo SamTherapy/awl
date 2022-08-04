@@ -11,41 +11,41 @@ import (
 
 // Calling New instantiates Logger
 //
-// Level can be changed to one of the other log levels (FatalLevel, ErrorLevel, InfoLevel, DebugLevel)
+// Level can be changed to one of the other log levels (ErrorLevel, WarnLevel, InfoLevel, DebugLevel).
 func New() *Logger {
 	return &Logger{
 		Out:   os.Stderr,
-		Level: InfoLevel, //Default value is InfoLevel
+		Level: WarnLevel, // Default value is WarnLevel
 	}
 }
 
-// Takes any and prints it out to Logger -> Out (io.Writer (default is std.Err))
+// Takes any and prints it out to Logger -> Out (io.Writer (default is std.Err)).
 func (l *Logger) Println(level Level, v ...any) {
 	if atomic.LoadInt32(&l.isDiscard) != 0 {
 		return
 	}
-	//If verbose is not set --debug etc print _nothing_
+	// If verbose is not set --debug etc print _nothing_
 	if l.IsLevel(level) {
-		switch level { //Goes through log levels and does stuff based on them (Fatal os.Exit...etc)
+		switch level { // Goes through log levels and does stuff based on them (currently nothing)
 		case 0:
-			err := l.Printer(0, fmt.Sprintln(v...)) //Fatal level
+			err := l.Printer(0, fmt.Sprintln(v...)) // Error level
 			if err != nil {
-				fmt.Fprintln(os.Stderr, "FATAL: Logger failed: ", err)
+				fmt.Fprintln(os.Stderr, "Logger failed: ", err)
 			}
 		case 1:
-			err := l.Printer(1, fmt.Sprintln(v...)) //Error level
+			err := l.Printer(1, fmt.Sprintln(v...)) // Warn level
 			if err != nil {
-				fmt.Fprintln(os.Stderr, "FATAL: Logger failed: ", err)
+				fmt.Fprintln(os.Stderr, "Logger failed: ", err)
 			}
 		case 2:
-			err := l.Printer(2, fmt.Sprintln(v...)) //Info level
+			err := l.Printer(2, fmt.Sprintln(v...)) // Info level
 			if err != nil {
-				fmt.Fprintln(os.Stderr, "FATAL: Logger failed: ", err)
+				fmt.Fprintln(os.Stderr, "Logger failed: ", err)
 			}
 		case 3:
-			err := l.Printer(3, fmt.Sprintln(v...)) //Debug level
+			err := l.Printer(3, fmt.Sprintln(v...)) // Debug level
 			if err != nil {
-				fmt.Fprintln(os.Stderr, "FATAL: Logger failed: ", err)
+				fmt.Fprintln(os.Stderr, "Logger failed: ", err)
 			}
 		default:
 			break
@@ -53,7 +53,7 @@ func (l *Logger) Println(level Level, v ...any) {
 	}
 }
 
-// Formats the log header as such <LogLevel> YYYY/MM/DD HH:MM:SS (local time) <the message to log>
+// Formats the log header as such <LogLevel> YYYY/MM/DD HH:MM:SS (local time) <the message to log>.
 func (l *Logger) FormatHeader(buf *[]byte, t time.Time, line int, level Level) error {
 	if lvl, err := l.UnMarshalLevel(level); err == nil {
 		// This is ugly but functional
@@ -77,12 +77,12 @@ func (l *Logger) FormatHeader(buf *[]byte, t time.Time, line int, level Level) e
 		*buf = append(*buf, ':')
 		*buf = append(*buf, ' ')
 	} else {
-		return fmt.Errorf("invalid log level choice")
+		return errInvalidLevel
 	}
 	return nil
 }
 
-// Printer prints the formatted message directly to stdErr
+// Printer prints the formatted message directly to stdErr.
 func (l *Logger) Printer(level Level, s string) error {
 	now := time.Now()
 	var line int
@@ -99,7 +99,10 @@ func (l *Logger) Printer(level Level, s string) error {
 		l.buf = append(l.buf, '\n')
 	}
 	_, err = l.Out.Write(l.buf)
-	return err
+	if err != nil {
+		return fmt.Errorf("logger printing error %w", err)
+	}
+	return nil
 }
 
 // Some line formatting stuff from Golang log stdlib file
@@ -123,22 +126,22 @@ func formatter(buf *[]byte, i int, wid int) {
 	*buf = append(*buf, b[bp:]...)
 }
 
-// Call print directly with Debug level
+// Call print directly with Debug level.
 func (l *Logger) Debug(v ...any) {
 	l.Println(DebugLevel, v...)
 }
 
-// Call print directly with Info level
+// Call print directly with Info level.
 func (l *Logger) Info(v ...any) {
 	l.Println(InfoLevel, v...)
 }
 
-// Call print directly with Warn level
+// Call print directly with Warn level.
 func (l *Logger) Warn(v ...any) {
 	l.Println(WarnLevel, v...)
 }
 
-// Call print directly with Error level
+// Call print directly with Error level.
 func (l *Logger) Error(v ...any) {
 	l.Println(ErrLevel, v...)
 }

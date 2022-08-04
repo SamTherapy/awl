@@ -8,7 +8,6 @@ import (
 
 	"git.froth.zone/sam/awl/cli"
 	"git.froth.zone/sam/awl/util"
-
 	"github.com/miekg/dns"
 	"gotest.tools/v3/assert"
 )
@@ -139,7 +138,6 @@ func TestFlagSetting(t *testing.T) {
 				assert.Assert(t, opts.HTTPS)
 			case 3:
 				assert.Assert(t, opts.QUIC)
-
 			}
 		})
 	}

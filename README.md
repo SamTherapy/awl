@@ -61,6 +61,6 @@ emails? Send a patch to the
 Found a bug or want a new feature? Create an issue
 [here](https://git.froth.zone/sam/awl/issues).
 
-### License
+### Licence
 
-See [LICENSE](./LICENSE)
+See [LICENCE](./LICENCE)

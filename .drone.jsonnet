@@ -2,6 +2,7 @@
 
 local testing(version, arch) = {
   kind: "pipeline",
+  type: "docker",
   name: version + "-" + arch ,
   platform: {
     arch: arch
@@ -16,19 +17,27 @@ local testing(version, arch) = {
     },
     {
       name: "lint",
-      image: "rancher/drone-golangci-lint:latest"
+      image: "rancher/drone-golangci-lint:latest",
+      depends_on: [
+        "submodules",
+      ],
     },
     {
       name: "test",
       image: "golang:" + version,
       commands: [
-        "go test -race ./... -cover"
-      ]
+        "go test -v -race ./... -cover"
+      ],
+      depends_on: [
+        "submodules",
+      ],
     },
   ],
-    trigger: {
+  trigger: {
     event: {
-      exclude: "tag",
+      exclude: [
+        "tag"
+      ],
     }
   },
 };
@@ -36,14 +45,17 @@ local testing(version, arch) = {
 // "Inspired by" https://goreleaser.com/ci/drone/
 local release() = {
   kind: "pipeline",
+  type: "docker",
   name: "release",
   trigger: {
-    event: "tag"
+    event: [
+      "tag"
+    ],
   },
   steps: [
     {
       name: "fetch",
-      image: "docker:git",
+      image: "alpine/git",
       commands : [
         "git fetch --tags",
         "git submodule update --init --recursive"
@@ -67,15 +79,16 @@ local release() = {
       commands: [
         "goreleaser release"
       ],
-      // when: {
-      //   event: "tag"
-      // }
     }
   ]
 };
 
 [
+  testing("1.19", "amd64"),
+  testing("1.19", "arm64"),
   testing("1.18", "amd64"),
   testing("1.18", "arm64"),
+
+  
   release()
 ]

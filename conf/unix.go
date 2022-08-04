@@ -4,6 +4,7 @@
 package conf
 
 import (
+	"fmt"
 	"os"
 	"runtime"
 
@@ -15,7 +16,7 @@ func GetDNSConfig() (*dns.ClientConfig, error) {
 	if runtime.GOOS == "plan9" {
 		dat, err := os.ReadFile("/net/ndb")
 		if err != nil {
-			return nil, err
+			return nil, fmt.Errorf("plan9 ndb: %w", err)
 		}
 		return GetPlan9Config(string(dat))
 	} else {
