@@ -9,6 +9,7 @@ import (
 	"github.com/miekg/dns"
 )
 
+// GetPlan9Config gets DNS information from Plan 9, because it's different from UNIX and Windows.
 // Plan 9 stores its network data in /net/ndb, which seems to be formatted a specific way
 // Yoink it and use it.
 //
@@ -16,12 +17,15 @@ import (
 func GetPlan9Config(str string) (*dns.ClientConfig, error) {
 	str = strings.ReplaceAll(str, "\n", "")
 	spl := strings.FieldsFunc(str, splitChars)
+
 	var servers []string
+
 	for _, option := range spl {
 		if strings.HasPrefix(option, "dns=") {
 			servers = append(servers, strings.TrimPrefix(option, "dns="))
 		}
 	}
+
 	if len(servers) == 0 {
 		return nil, errPlan9
 	}

@@ -15,7 +15,9 @@ func TestWinConfig(t *testing.T) {
 	if runtime.GOOS != "windows" {
 		t.Skip("Not running Windows, skipping")
 	}
+
 	conf, err := conf.GetDNSConfig()
+
 	assert.NilError(t, err)
 	assert.Assert(t, len(conf.Servers) != 0)
 }

@@ -3,12 +3,12 @@
 
 include template.mk
 
-$(PROG):
+$(PROG): $(SOURCES)
 	$(GO) build -o $(PROG) $(GOFLAGS) .
 
 ## install: installs awl and the manpage, RUN AS ROOT
 install: all
-	install -m755 $(PROG) $(PREFIX)/$(BIN)
-	install -m644 doc/$(PROG).1 $(MAN)/man1
+	install -Dm755 $(PROG) $(DESTDIR)$(PREFIX)/$(BIN)/$(PROG)
+	install -Dm644 doc/$(PROG).1 $(DESTDIR)$(MAN)/man1/$(PROG).1
 
 .PHONY: install

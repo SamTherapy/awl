@@ -9,24 +9,31 @@ import (
 	"strings"
 
 	"git.froth.zone/sam/awl/cli"
-	"git.froth.zone/sam/awl/internal/helpers"
 	"git.froth.zone/sam/awl/query"
+	"git.froth.zone/sam/awl/util"
 )
 
 var version = "DEV"
 
 func main() {
-	opts, err := cli.ParseCLI(version)
-	if err != nil {
+	if opts, code, err := run(); err != nil {
 		// TODO: Make not ew
 		if errors.Is(err, cli.ErrNotError) || strings.Contains(err.Error(), "help requested") {
 			os.Exit(0)
+		} else {
+			opts.Logger.Error(err)
+			os.Exit(code)
 		}
-		opts.Logger.Error(err)
-		os.Exit(1)
+	}
+}
+
+func run() (opts util.Options, code int, err error) {
+	opts, err = cli.ParseCLI(version)
+	if err != nil {
+		return opts, 1, fmt.Errorf("parse: %w", err)
 	}
 
-	var resp helpers.Response
+	var resp util.Response
 
 	// Retry queries if a query fails
 	for i := 0; i < opts.Request.Retries; i++ {
@@ -40,20 +47,20 @@ func main() {
 
 	// Query failed, make it fail
 	if err != nil {
-		opts.Logger.Error(err)
-		os.Exit(9)
+		return opts, 9, fmt.Errorf("query: %w", err)
 	}
 
 	var str string
 	if opts.JSON || opts.XML || opts.YAML {
 		str, err = query.PrintSpecial(resp.DNS, opts)
 		if err != nil {
-			opts.Logger.Error("Special print:", err)
-			os.Exit(10)
+			return opts, 10, fmt.Errorf("format print: %w", err)
 		}
 	} else {
 		str = query.ToString(resp, opts)
 	}
 
 	fmt.Println(str)
+
+	return opts, 0, nil
 }

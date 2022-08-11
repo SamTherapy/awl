@@ -1,5 +1,5 @@
 /*
-LogAwl is a package for custom logging needs
+Package logawl is a package for custom logging needs
 
 LogAwl extends the standard log library with support for log levels
 This is _different_ from the syslog package in the standard library because you do not define a file
@@ -19,7 +19,8 @@ because awl is a cli utility it writes directly to std err.
 // You may also set the log level on the fly with
 //
 //	Logger.SetLevel(3)
-// This allows you to change the default level (Info) and prevent log messages from being posted at higher verbosity levels
+// This allows you to change the default level (Info)
+// and prevent log messages from being posted at higher verbosity levels
 // for example if
 //	Logger.SetLevel(3)
 // is not called and you call

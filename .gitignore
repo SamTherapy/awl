@@ -23,5 +23,6 @@ coverage/*
 !coverage/.gitkeep
 
 awl
+doc/awl.1
 
 .dccache

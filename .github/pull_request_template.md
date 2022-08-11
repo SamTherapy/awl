@@ -6,4 +6,4 @@ Please check the following:
 2. Make sure that you test and format your contributions: `make test && make lint`
 3. Describe what your pull request does and which issue you're targeting (if any)
 
--->  
+-->

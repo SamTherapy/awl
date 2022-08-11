@@ -3,6 +3,7 @@
 package cli
 
 import (
+	"errors"
 	"fmt"
 	"os"
 	"runtime"
@@ -10,7 +11,6 @@ import (
 	"strings"
 	"time"
 
-	"git.froth.zone/sam/awl/internal/helpers"
 	"git.froth.zone/sam/awl/util"
 	"github.com/miekg/dns"
 	flag "github.com/stefansundin/go-zflag"
@@ -18,7 +18,7 @@ import (
 
 // ParseCLI parses arguments given from the CLI and passes them into an `Options`
 // struct.
-func ParseCLI(version string) (Options, error) {
+func ParseCLI(version string) (util.Options, error) {
 	flag.CommandLine = flag.NewFlagSet(os.Args[0], flag.ContinueOnError)
 
 	flag.Usage = func() {
@@ -57,7 +57,7 @@ func ParseCLI(version string) (Options, error) {
 		cookie       = flag.Bool("no-cookie", false, "disable sending EDNS cookie (default: cookie sent)")
 		tcpKeepAlive = flag.Bool("keep-alive", false, "send EDNS TCP keep-alive")
 		udpBufSize   = flag.Uint16("buffer-size", 1232, "set EDNS UDP buffer size", flag.OptShorthand('b'))
-		zflag        = flag.String("zflag", "0", "set EDNS z-flag")
+		mbzflag      = flag.String("zflag", "0", "set EDNS z-flag")
 		subnet       = flag.String("subnet", "", "set EDNS subnet")
 		padding      = flag.Bool("pad", false, "set EDNS padding")
 
@@ -69,14 +69,17 @@ func ParseCLI(version string) (Options, error) {
 		https    = flag.Bool("https", false, "use DNS-over-HTTPS", flag.OptShorthand('H'))
 		quic     = flag.Bool("quic", false, "use DNS-over-QUIC", flag.OptShorthand('Q'))
 
-		aa = flag.Bool("aa", false, "set/unset AA (Authoratative Answer) flag (default: not set)")
-		ad = flag.Bool("ad", false, "set/unset AD (Authenticated Data) flag (default: not set)")
-		cd = flag.Bool("cd", false, "set/unset CD (Checking Disabled) flag (default: not set)")
-		qr = flag.Bool("qr", false, "set/unset QR (QueRy) flag (default: not set)")
-		rd = flag.Bool("rd", true, "set/unset RD (Recursion Desired) flag (default: set)", flag.OptDisablePrintDefault(true))
-		ra = flag.Bool("ra", false, "set/unset RA (Recursion Available) flag (default: not set)")
-		tc = flag.Bool("tc", false, "set/unset TC (TrunCated) flag (default: not set)")
-		z  = flag.Bool("z", false, "set/unset Z (Zero) flag (default: not set)", flag.OptShorthand('z'))
+		tlsHost  = flag.String("tls-host", "", "Server name to use for TLS verification")
+		noVerify = flag.Bool("tls-no-verify", false, "Disable TLS cert verification")
+
+		aaflag = flag.Bool("aa", false, "set/unset AA (Authoratative Answer) flag (default: not set)")
+		adflag = flag.Bool("ad", false, "set/unset AD (Authenticated Data) flag (default: not set)")
+		cdflag = flag.Bool("cd", false, "set/unset CD (Checking Disabled) flag (default: not set)")
+		qrflag = flag.Bool("qr", false, "set/unset QR (QueRy) flag (default: not set)")
+		rdflag = flag.Bool("rd", true, "set/unset RD (Recursion Desired) flag (default: set)", flag.OptDisablePrintDefault(true))
+		raflag = flag.Bool("ra", false, "set/unset RA (Recursion Available) flag (default: not set)")
+		tcflag = flag.Bool("tc", false, "set/unset TC (TrunCated) flag (default: not set)")
+		zflag  = flag.Bool("z", false, "set/unset Z (Zero) flag (default: not set)", flag.OptShorthand('z'))
 
 		short = flag.Bool("short", false, "print just the results", flag.OptShorthand('s'))
 		json  = flag.Bool("json", false, "print the result(s) as JSON", flag.OptShorthand('j'))
@@ -99,52 +102,53 @@ func ParseCLI(version string) (Options, error) {
 	flag.CommandLine.SortFlags = false
 
 	// Parse the flags
-	err := flag.CommandLine.Parse(os.Args[1:])
-	if err != nil {
-		return Options{Logger: util.InitLogger(*verbosity)}, fmt.Errorf("flag parse error: %w", err)
+	if err := flag.CommandLine.Parse(os.Args[1:]); err != nil {
+		return util.Options{Logger: util.InitLogger(*verbosity)}, fmt.Errorf("flag: %w", err)
 	}
 
 	// TODO: DRY, dumb dumb.
-	mbz, err := strconv.ParseInt(*zflag, 0, 16)
+	mbz, err := strconv.ParseInt(*mbzflag, 0, 16)
 	if err != nil {
-		return Options{Logger: util.InitLogger(*verbosity)}, fmt.Errorf("EDNS MBZ error: %w", err)
+		return util.Options{Logger: util.InitLogger(*verbosity)}, fmt.Errorf("EDNS MBZ: %w", err)
 	}
 
-	opts := Options{
-		Logger:    util.InitLogger(*verbosity),
-		Port:      *port,
-		IPv4:      *ipv4,
-		IPv6:      *ipv6,
-		Short:     *short,
-		TCP:       *tcp,
-		DNSCrypt:  *dnscrypt,
-		TLS:       *tls,
-		HTTPS:     *https,
-		QUIC:      *quic,
-		Truncate:  *truncate,
-		ShowQuery: false,
-		AA:        *aa,
-		AD:        *ad,
-		TC:        *tc,
-		Z:         *z,
-		CD:        *cd,
-		QR:        *qr,
-		RD:        *rd,
-		RA:        *ra,
-		Reverse:   *reverse,
-		HumanTTL:  false,
-		ShowTTL:   true,
-		JSON:      *json,
-		XML:       *xml,
-		YAML:      *yaml,
-		Request: helpers.Request{
+	opts := util.Options{
+		Logger:      util.InitLogger(*verbosity),
+		Port:        *port,
+		IPv4:        *ipv4,
+		IPv6:        *ipv6,
+		Short:       *short,
+		TCP:         *tcp,
+		DNSCrypt:    *dnscrypt,
+		TLS:         *tls,
+		TLSHost:     *tlsHost,
+		TLSNoVerify: *noVerify,
+		HTTPS:       *https,
+		QUIC:        *quic,
+		Truncate:    *truncate,
+		ShowQuery:   false,
+		AA:          *aaflag,
+		AD:          *adflag,
+		TC:          *tcflag,
+		Z:           *zflag,
+		CD:          *cdflag,
+		QR:          *qrflag,
+		RD:          *rdflag,
+		RA:          *raflag,
+		Reverse:     *reverse,
+		HumanTTL:    false,
+		ShowTTL:     true,
+		JSON:        *json,
+		XML:         *xml,
+		YAML:        *yaml,
+		Request: util.Request{
 			Type:    dns.StringToType[strings.ToUpper(*qType)],
 			Class:   dns.StringToClass[strings.ToUpper(*class)],
 			Name:    *query,
 			Timeout: time.Duration(*timeout * float32(time.Second)),
 			Retries: *retry,
 		},
-		Display: Displays{
+		Display: util.Displays{
 			Comments:   !*noC,
 			Question:   !*noQ,
 			Opt:        !*noOpt,
@@ -153,7 +157,7 @@ func ParseCLI(version string) (Options, error) {
 			Additional: !*noAdd,
 			Statistics: !*noStats,
 		},
-		EDNS: EDNS{
+		EDNS: util.EDNS{
 			EnableEDNS: !*edns,
 			Cookie:     !*cookie,
 			DNSSEC:     *dnssec,
@@ -169,9 +173,8 @@ func ParseCLI(version string) (Options, error) {
 
 	// TODO: DRY
 	if *subnet != "" {
-		err := parseSubnet(*subnet, &opts)
-		if err != nil {
-			return opts, err
+		if err = util.ParseSubnet(*subnet, &opts); err != nil {
+			return opts, fmt.Errorf("%w", err)
 		}
 	}
 
@@ -180,6 +183,7 @@ func ParseCLI(version string) (Options, error) {
 
 	if *versionFlag {
 		fmt.Printf("awl version %s, built with %s\n", version, runtime.Version())
+
 		return opts, ErrNotError
 	}
 
@@ -189,6 +193,7 @@ func ParseCLI(version string) (Options, error) {
 	if err != nil {
 		return opts, err
 	}
+
 	opts.Logger.Info("Dig/Drill flags parsed")
 	opts.Logger.Debug(fmt.Sprintf("%+v", opts))
 
@@ -199,6 +204,7 @@ func ParseCLI(version string) (Options, error) {
 			opts.Port = 53
 		}
 	}
+
 	opts.Logger.Info("Port set to", opts.Port)
 
 	// Set timeout to 0.5 seconds if set below 0.5
@@ -211,4 +217,17 @@ func ParseCLI(version string) (Options, error) {
 	}
 
 	return opts, nil
+}
+
+// ErrNotError is for returning not error.
+var ErrNotError = errors.New("not an error")
+
+var errNoArg = errors.New("no argument given")
+
+type errInvalidArg struct {
+	arg string
+}
+
+func (e *errInvalidArg) Error() string {
+	return fmt.Sprintf("digflags: invalid argument %s", e.arg)
 }

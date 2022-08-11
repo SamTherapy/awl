@@ -11,42 +11,49 @@ import (
 	"strings"
 	"time"
 
-	"git.froth.zone/sam/awl/cli"
+	"git.froth.zone/sam/awl/util"
 	"github.com/miekg/dns"
 	"golang.org/x/net/idna"
 	"gopkg.in/yaml.v3"
 )
 
-func PrintSpecial(msg *dns.Msg, opts cli.Options) (string, error) {
+// PrintSpecial is for printing as JSON, XML or YAML.
+// As of now JSON and XML use the stdlib version.
+func PrintSpecial(msg *dns.Msg, opts util.Options) (string, error) {
 	formatted, err := MakePrintable(msg, opts)
 	if err != nil {
 		return "", err
 	}
+
 	switch {
 	case opts.JSON:
 		opts.Logger.Info("Printing as JSON")
-		json, err := json.MarshalIndent(formatted, " ", "  ")
-		return string(json), err
 
+		json, err := json.MarshalIndent(formatted, " ", "  ")
+
+		return string(json), err
 	case opts.XML:
 		opts.Logger.Info("Printing as XML")
-		xml, err := xml.MarshalIndent(formatted, " ", "  ")
-		return string(xml), err
 
+		xml, err := xml.MarshalIndent(formatted, " ", "  ")
+
+		return string(xml), err
 	case opts.YAML:
 		opts.Logger.Info("Printing as YAML")
-		yaml, err := yaml.Marshal(formatted)
-		return string(yaml), err
 
+		yaml, err := yaml.Marshal(formatted)
+
+		return string(yaml), err
 	default:
 		return "", errInvalidFormat
 	}
 }
 
 // MakePrintable takes a DNS message and makes it nicer to be printed as JSON,YAML,
-// and XML. Little is changed beyond naming
-func MakePrintable(msg *dns.Msg, opts cli.Options) (*Message, error) {
+// and XML. Little is changed beyond naming.
+func MakePrintable(msg *dns.Msg, opts util.Options) (*Message, error) {
 	var err error
+
 	ret := Message{
 		Header: msg.MsgHdr,
 	}
@@ -56,11 +63,12 @@ func MakePrintable(msg *dns.Msg, opts cli.Options) (*Message, error) {
 		if opts.Display.UcodeTranslate {
 			name, err = idna.ToUnicode(question.Name)
 			if err != nil {
-				return nil, fmt.Errorf("punycode: error translating to unicode: %w", err)
+				return nil, fmt.Errorf("punycode to unicode: %w", err)
 			}
 		} else {
 			name = question.Name
 		}
+
 		ret.Question = append(ret.Question, Question{
 			Name:  name,
 			Type:  dns.TypeToString[question.Qtype],
@@ -70,10 +78,12 @@ func MakePrintable(msg *dns.Msg, opts cli.Options) (*Message, error) {
 
 	for _, answer := range msg.Answer {
 		temp := strings.Split(answer.String(), "\t")
+
 		var (
 			ttl  string
 			name string
 		)
+
 		if opts.ShowTTL {
 			if opts.HumanTTL {
 				ttl = (time.Duration(answer.Header().Ttl) * time.Second).String()
@@ -81,14 +91,16 @@ func MakePrintable(msg *dns.Msg, opts cli.Options) (*Message, error) {
 				ttl = strconv.Itoa(int(answer.Header().Ttl))
 			}
 		}
+
 		if opts.Display.UcodeTranslate {
 			name, err = idna.ToUnicode(answer.Header().Name)
 			if err != nil {
-				return nil, fmt.Errorf("punycode: error translating to unicode: %w", err)
+				return nil, fmt.Errorf("punycode to unicode: %w", err)
 			}
 		} else {
 			name = answer.Header().Name
 		}
+
 		ret.Answer = append(ret.Answer, Answer{
 			RRHeader: RRHeader{
 				Name:     name,
@@ -103,10 +115,12 @@ func MakePrintable(msg *dns.Msg, opts cli.Options) (*Message, error) {
 
 	for _, ns := range msg.Ns {
 		temp := strings.Split(ns.String(), "\t")
+
 		var (
 			ttl  string
 			name string
 		)
+
 		if opts.ShowTTL {
 			if opts.HumanTTL {
 				ttl = (time.Duration(ns.Header().Ttl) * time.Second).String()
@@ -114,14 +128,16 @@ func MakePrintable(msg *dns.Msg, opts cli.Options) (*Message, error) {
 				ttl = strconv.Itoa(int(ns.Header().Ttl))
 			}
 		}
+
 		if opts.Display.UcodeTranslate {
 			name, err = idna.ToUnicode(ns.Header().Name)
 			if err != nil {
-				return nil, fmt.Errorf("punycode: error translating to unicode: %w", err)
+				return nil, fmt.Errorf("punycode to unicode: %w", err)
 			}
 		} else {
 			name = ns.Header().Name
 		}
+
 		ret.Ns = append(ret.Ns, Answer{
 			RRHeader: RRHeader{
 				Name:     name,
@@ -139,10 +155,12 @@ func MakePrintable(msg *dns.Msg, opts cli.Options) (*Message, error) {
 			continue
 		} else {
 			temp := strings.Split(additional.String(), "\t")
+
 			var (
 				ttl  string
 				name string
 			)
+
 			if opts.ShowTTL {
 				if opts.HumanTTL {
 					ttl = (time.Duration(additional.Header().Ttl) * time.Second).String()
@@ -150,14 +168,16 @@ func MakePrintable(msg *dns.Msg, opts cli.Options) (*Message, error) {
 					ttl = strconv.Itoa(int(additional.Header().Ttl))
 				}
 			}
+
 			if opts.Display.UcodeTranslate {
 				name, err = idna.ToUnicode(additional.Header().Name)
 				if err != nil {
-					return nil, fmt.Errorf("punycode: error translating to unicode: %w", err)
+					return nil, fmt.Errorf("punycode to unicode: %w", err)
 				}
 			} else {
 				name = additional.Header().Name
 			}
+
 			ret.Extra = append(ret.Extra, Answer{
 				RRHeader: RRHeader{
 					Name:     name,

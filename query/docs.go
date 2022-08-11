@@ -1,2 +1,2 @@
-// Package for the special query types
+// Package query is for the various query types.
 package query

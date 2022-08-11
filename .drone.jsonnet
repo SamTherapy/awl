@@ -26,7 +26,17 @@ local testing(version, arch) = {
       name: "test",
       image: "golang:" + version,
       commands: [
-        "go test -v -race ./... -cover"
+        "make test-ci"
+      ],
+      depends_on: [
+        "submodules",
+      ],
+    },
+    {
+      name: "fuzz",
+      image: "golang:" + version,
+      commands: [
+        "make fuzz",
       ],
       depends_on: [
         "submodules",
@@ -65,7 +75,7 @@ local release() = {
       name: "test",
       image: "golang",
       commands: [
-        "go test -race ./... -cover"
+        "make test"
       ]
     },
     {
@@ -89,6 +99,5 @@ local release() = {
   testing("1.18", "amd64"),
   testing("1.18", "arm64"),
 
-  
   release()
 ]

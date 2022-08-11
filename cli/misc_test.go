@@ -14,13 +14,14 @@ import (
 
 func TestParseArgs(t *testing.T) {
 	t.Parallel()
+
 	args := []string{
 		"go.dev",
 		"AAAA",
 		"@1.1.1.1",
 		"+ignore",
 	}
-	opts := new(cli.Options)
+	opts := new(util.Options)
 	opts.Logger = util.InitLogger(0)
 	err := cli.ParseMiscArgs(args, opts)
 	assert.NilError(t, err)
@@ -32,8 +33,9 @@ func TestParseArgs(t *testing.T) {
 
 func TestParseNoInput(t *testing.T) {
 	t.Parallel()
+
 	args := []string{}
-	opts := new(cli.Options)
+	opts := new(util.Options)
 	opts.Logger = util.InitLogger(0)
 	err := cli.ParseMiscArgs(args, opts)
 	assert.NilError(t, err)
@@ -43,10 +45,11 @@ func TestParseNoInput(t *testing.T) {
 
 func TestParseA(t *testing.T) {
 	t.Parallel()
+
 	args := []string{
 		"golang.org.",
 	}
-	opts := new(cli.Options)
+	opts := new(util.Options)
 	opts.Logger = util.InitLogger(0)
 	err := cli.ParseMiscArgs(args, opts)
 	assert.NilError(t, err)
@@ -56,8 +59,9 @@ func TestParseA(t *testing.T) {
 
 func TestParsePTR(t *testing.T) {
 	t.Parallel()
+
 	args := []string{"8.8.8.8"}
-	opts := new(cli.Options)
+	opts := new(util.Options)
 	opts.Logger = util.InitLogger(0)
 	opts.Reverse = true
 	err := cli.ParseMiscArgs(args, opts)
@@ -67,8 +71,9 @@ func TestParsePTR(t *testing.T) {
 
 func TestParseInvalidPTR(t *testing.T) {
 	t.Parallel()
+
 	args := []string{"8.88.8"}
-	opts := new(cli.Options)
+	opts := new(util.Options)
 	opts.Logger = util.InitLogger(0)
 	opts.Reverse = true
 	err := cli.ParseMiscArgs(args, opts)
@@ -77,6 +82,7 @@ func TestParseInvalidPTR(t *testing.T) {
 
 func TestDefaultServer(t *testing.T) {
 	t.Parallel()
+
 	tests := []struct {
 		in   string
 		want string
@@ -86,12 +92,13 @@ func TestDefaultServer(t *testing.T) {
 		{"HTTPS", "https://dns.cloudflare.com/dns-query"},
 		{"QUIC", "dns.adguard.com"},
 	}
+
 	for _, test := range tests {
 		test := test
 		t.Run(test.in, func(t *testing.T) {
 			t.Parallel()
 			args := []string{}
-			opts := new(cli.Options)
+			opts := new(util.Options)
 			opts.Logger = util.InitLogger(0)
 			switch test.in {
 			case "DNSCRYPT":
@@ -112,6 +119,7 @@ func TestDefaultServer(t *testing.T) {
 
 func TestFlagSetting(t *testing.T) {
 	t.Parallel()
+
 	tests := []struct {
 		in []string
 	}{
@@ -120,11 +128,12 @@ func TestFlagSetting(t *testing.T) {
 		{[]string{"@https://dns.cloudflare.com/dns-query"}},
 		{[]string{"@quic://dns.adguard.com"}},
 	}
+
 	for i, test := range tests {
 		test := test
 		i := i
 		t.Run(strconv.Itoa(i), func(t *testing.T) {
-			opts := new(cli.Options)
+			opts := new(util.Options)
 			opts.Logger = util.InitLogger(0)
 			t.Parallel()
 			err := cli.ParseMiscArgs(test.in, opts)
@@ -151,14 +160,16 @@ func FuzzParseArgs(f *testing.F) {
 		"+ignore",
 		"e",
 	}
+
 	for _, tc := range cases {
 		f.Add(tc)
 	}
+
 	f.Fuzz(func(t *testing.T, arg string) {
 		args := []string{arg}
-		opts := new(cli.Options)
+		opts := new(util.Options)
 		opts.Logger = util.InitLogger(0)
-		//nolint:errcheck // Only make sure the program does not crash
+		//nolint:errcheck,gosec // Only make sure the program does not crash
 		cli.ParseMiscArgs(args, opts)
 	})
 }

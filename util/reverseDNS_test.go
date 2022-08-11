@@ -17,6 +17,7 @@ var (
 
 func TestIPv4(t *testing.T) {
 	t.Parallel()
+
 	act, err := util.ReverseDNS("8.8.4.4", PTR)
 	assert.NilError(t, err)
 	assert.Equal(t, act, "4.4.8.8.in-addr.arpa.", "IPv4 reverse")
@@ -24,6 +25,7 @@ func TestIPv4(t *testing.T) {
 
 func TestIPv6(t *testing.T) {
 	t.Parallel()
+
 	act, err := util.ReverseDNS("2606:4700:4700::1111", PTR)
 	assert.NilError(t, err)
 	assert.Equal(t, act, "1.1.1.1.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.7.4.0.0.7.4.6.0.6.2.ip6.arpa.", "IPv6 reverse")
@@ -31,6 +33,7 @@ func TestIPv6(t *testing.T) {
 
 func TestNAPTR(t *testing.T) {
 	t.Parallel()
+
 	tests := []struct {
 		in   string
 		want string
@@ -54,12 +57,14 @@ func TestNAPTR(t *testing.T) {
 
 func TestInvalid(t *testing.T) {
 	t.Parallel()
+
 	_, err := util.ReverseDNS("AAAAA", 1)
 	assert.ErrorContains(t, err, "invalid value AAAAA given")
 }
 
 func TestInvalid2(t *testing.T) {
 	t.Parallel()
+
 	_, err := util.ReverseDNS("1.0", PTR)
-	assert.ErrorContains(t, err, "could not reverse")
+	assert.ErrorContains(t, err, "PTR reverse")
 }

@@ -1,13 +1,18 @@
 # SPDX-License-Identifier: BSD-3-Clause
 # Template for the BSD/GNU makefiles
 
-HASH ?= `git describe --always --dirty || echo "UNKNOWN"`
-VER ?= "git-$(HASH)"
+HASH ?= `git describe --always --dirty --broken || echo "UNKNOWN"`
+VERSION ?= "git-$(HASH)"
+
+SOURCES ?= $(shell find . -name "*.go" -type f ! -name '*_test*')
+TEST_SOURCES ?= $(shell find . -name "*_test.go" -type f)
 
 CGO_ENABLED ?= 0
 GO ?= go
+TEST ?= $(GO) test -v -race
 COVER ?= $(GO) tool cover
-GOFLAGS ?= -ldflags "-s -w -X=main.version=$(VER)" -trimpath
+GOFLAGS ?= -ldflags "-s -w -X=main.version=$(VERSION)" -trimpath
+DESTDIR :=
 
 PREFIX ?= /usr/local
 BIN ?= bin
@@ -20,14 +25,24 @@ PROG ?= awl
 # hehe
 all: $(PROG) doc/$(PROG).1
 
-doc/$(PROG).1: doc/wiki/$(PROG).1.md
-	@cp doc/awl.1 doc/awl.bak
-	$(SCDOC) <doc/wiki/$(PROG).1.md >doc/$(PROG).1 && rm doc/awl.bak || mv doc/awl.bak doc/awl.1
+doc/$(PROG).1: doc/$(PROG).1.scd
+	$(SCDOC) <doc/$(PROG).1.scd >doc/$(PROG).1
 
 
 ## test: run go test
-test:
+test: $(TEST_SOURCES)
 	$(GO) test -cover -coverprofile=coverage/coverage.out ./...
+
+test-ci:
+	$(TEST)
+
+## fuzz: runs fuzz tests
+fuzz:
+	cd cli
+	$(TEST) -fuzz=FuzzFlags -fuzztime 10000x
+	$(TEST) -fuzz=FuzzDig -fuzztime 10000x
+	$(TEST) -fuzz=FuzzParseArgs -fuzztime 10000x
+	cd ..
 
 coverage/coverage.out: test
 	$(COVER) -func=coverage/coverage.out
@@ -44,11 +59,12 @@ vet:
 
 ## lint: lint awl, using fmt, vet and golangci-lint
 lint: fmt vet
-	-golangci-lint run --fix
+	golangci-lint run --fix
 
 ## clean: clean the build files
 clean:
 	$(GO) clean
+	rm doc/$(PROG).1
 
 ## help: Prints this help message
 help:

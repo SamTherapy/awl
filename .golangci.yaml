@@ -1,0 +1,77 @@
+# Refer to golangci-lint's example config file for more options and information:
+# https://github.com/golangci/golangci-lint/blob/master/.golangci.example.yml
+
+run:
+  timeout: 5m
+  modules-download-mode: readonly
+  skip-dirs:
+    - "coverage"
+    - ".github"
+
+linters:
+  enable:
+    - errcheck
+    - errorlint
+    - gci
+    - gocritic
+    - goconst
+    - godot
+    - goimports
+    - govet
+    - gocritic
+    - goerr113
+    - gofmt
+    - gofumpt
+    - gosec
+    - maintidx
+    - makezero
+    - misspell
+    - nlreturn
+    - nolintlint
+    - prealloc
+    - predeclared
+    - revive
+    - staticcheck
+    # - testpackage
+    - whitespace
+    - wrapcheck
+    - wsl
+
+linters-settings:
+  govet:
+    check-shadowing: true
+    enable-all: true
+    disable-all: false
+  revive:
+    ignore-generated-header: false
+    severity: warning
+    confidence: 0.8
+    errorCode: 1
+    warningCode: 1
+    rules:
+      # rules can be uncommented after https://github.com/golangci/golangci-lint/issues/2997 is fixed
+      - name: blank-imports
+      - name: context-as-argument
+      # - name: context-keys-type
+      - name: dot-imports
+      - name: duplicated-imports
+      - name: error-return
+      - name: error-strings
+      - name: error-naming
+      # - name: errorf
+      - name: exported
+      - name: if-return
+      - name: increment-decrement
+      # - name: modifies-value-receiver
+      - name: package-comments
+      - name: range
+      - name: receiver-naming
+      # - name: time-naming
+      # - name: unexported-return
+      # - name: var-declaration
+      - name: var-naming
+
+issues:
+  exclude-use-default: false
+  max-issues-per-linter: 0
+  max-same-issues: 0

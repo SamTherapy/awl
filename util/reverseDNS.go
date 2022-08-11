@@ -17,14 +17,15 @@ func (e *errReverseDNS) Error() string {
 	return fmt.Sprintf("reverseDNS: invalid value %s given", e.addr)
 }
 
-// Given an IP or phone number, return a canonical string to be queried.
+// ReverseDNS is given an IP or phone number and returns a canonical string to be queried.
 func ReverseDNS(address string, querInt uint16) (string, error) {
 	query := dns.TypeToString[querInt]
 	if query == "PTR" {
 		str, err := dns.ReverseAddr(address)
 		if err != nil {
-			return "", fmt.Errorf("could not reverse: %w", err)
+			return "", fmt.Errorf("PTR reverse: %w", err)
 		}
+
 		return str, nil
 	} else if query == "NAPTR" {
 		// get rid of characters not needed
@@ -38,6 +39,7 @@ func ReverseDNS(address string, querInt uint16) (string, error) {
 			fmt.Fprintf(&arpa, "%c.", c)
 		}
 		arpa.WriteString("e164.arpa.")
+
 		return arpa.String(), nil
 	}
 
@@ -50,5 +52,6 @@ func reverse(s string) string {
 	for i, j := 0, len(rns)-1; i < j; i, j = i+1, j-1 {
 		rns[i], rns[j] = rns[j], rns[i]
 	}
+
 	return string(rns)
 }

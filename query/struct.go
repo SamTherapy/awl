@@ -7,28 +7,29 @@ import (
 	"strings"
 	"time"
 
-	"git.froth.zone/sam/awl/cli"
-	"git.froth.zone/sam/awl/internal/helpers"
+	"git.froth.zone/sam/awl/util"
 	"github.com/miekg/dns"
 )
 
-// Overall DNS response message
+// Message is for overall DNS responses.
+//
+//nolint:fieldalignment // IMO this looks better when printed like this
 type Message struct {
-	Header   dns.MsgHdr `json:"header,omitempty" xml:"header,omitempty" yaml:",omitempty"`
 	Question []Question `json:"question,omitempty" xml:"question,omitempty" yaml:",omitempty"`
 	Answer   []Answer   `json:"answer,omitempty" xml:"answer,omitempty" yaml:",omitempty"`
 	Ns       []Answer   `json:"ns,omitempty" xml:"ns,omitempty" yaml:",omitempty"`
 	Extra    []Answer   `json:"extra,omitempty" xml:"extra,omitempty" yaml:",omitempty"`
+	Header   dns.MsgHdr `json:"header,omitempty" xml:"header,omitempty" yaml:",omitempty"`
 }
 
-// DNS Query
+// Question is a DNS Query.
 type Question struct {
 	Name  string `json:"name,omitempty" xml:"name,omitempty" yaml:",omitempty"`
 	Type  string `json:"type,omitempty" xml:"type,omitempty" yaml:",omitempty"`
 	Class string `json:"class,omitempty" xml:"class,omitempty" yaml:",omitempty"`
 }
 
-// DNS Resource Headers
+// RRHeader is for DNS Resource Headers.
 type RRHeader struct {
 	Name     string `json:"name,omitempty" xml:"name,omitempty" yaml:",omitempty"`
 	Type     string `json:"type,omitempty" xml:"type,omitempty" yaml:",omitempty"`
@@ -37,21 +38,26 @@ type RRHeader struct {
 	Rdlength uint16 `json:"-" xml:"-" yaml:"-"`
 }
 
-// DNS Response
+// Answer is for a DNS Response.
+//
+//nolint:fieldalignment // IMO this looks better when printed like this
 type Answer struct {
-	RRHeader `json:"header,omitempty" xml:"header,omitempty" yaml:"header,omitempty"`
 	Value    string `json:"response,omitempty" xml:"response,omitempty" yaml:"response,omitempty"`
+	RRHeader `json:"header,omitempty" xml:"header,omitempty" yaml:"header,omitempty"`
 }
 
 // ToString turns the response into something that looks a lot like dig
 //
 // Much of this is taken from https://github.com/miekg/dns/blob/master/msg.go#L900
-func ToString(res helpers.Response, opts cli.Options) string {
+func ToString(res util.Response, opts util.Options) string {
 	if res.DNS == nil {
 		return "<nil> MsgHdr"
 	}
-	var s string
-	var opt *dns.OPT
+
+	var (
+		s   string
+		opt *dns.OPT
+	)
 
 	if !opts.Short {
 		if opts.Display.Comments {
@@ -61,26 +67,31 @@ func ToString(res helpers.Response, opts cli.Options) string {
 			s += "AUTHORITY: " + strconv.Itoa(len(res.DNS.Ns)) + ", "
 			s += "ADDITIONAL: " + strconv.Itoa(len(res.DNS.Extra)) + "\n"
 			opt = res.DNS.IsEdns0()
+
 			if opt != nil && opts.Display.Opt {
 				// OPT PSEUDOSECTION
 				s += opt.String() + "\n"
 			}
 		}
+
 		if opts.Display.Question {
 			if len(res.DNS.Question) > 0 {
 				if opts.Display.Comments {
 					s += "\n;; QUESTION SECTION:\n"
 				}
+
 				for _, r := range res.DNS.Question {
 					s += r.String() + "\n"
 				}
 			}
 		}
+
 		if opts.Display.Answer {
 			if len(res.DNS.Answer) > 0 {
 				if opts.Display.Comments {
 					s += "\n;; ANSWER SECTION:\n"
 				}
+
 				for _, r := range res.DNS.Answer {
 					if r != nil {
 						s += r.String() + "\n"
@@ -88,11 +99,13 @@ func ToString(res helpers.Response, opts cli.Options) string {
 				}
 			}
 		}
+
 		if opts.Display.Authority {
 			if len(res.DNS.Ns) > 0 {
 				if opts.Display.Comments {
 					s += "\n;; AUTHORITY SECTION:\n"
 				}
+
 				for _, r := range res.DNS.Ns {
 					if r != nil {
 						s += r.String() + "\n"
@@ -100,11 +113,13 @@ func ToString(res helpers.Response, opts cli.Options) string {
 				}
 			}
 		}
+
 		if opts.Display.Additional {
 			if len(res.DNS.Extra) > 0 && (opt == nil || len(res.DNS.Extra) > 1) {
 				if opts.Display.Comments {
 					s += "\n;; ADDITIONAL SECTION:\n"
 				}
+
 				for _, r := range res.DNS.Extra {
 					if r != nil && r.Header().Rrtype != dns.TypeOPT {
 						s += r.String() + "\n"
@@ -112,10 +127,12 @@ func ToString(res helpers.Response, opts cli.Options) string {
 				}
 			}
 		}
+
 		if opts.Display.Statistics {
 			s += "\n;; Query time: " + res.RTT.String()
 			// Add extra information to server string
 			var extra string
+
 			switch {
 			case opts.TCP:
 				extra = ":" + strconv.Itoa(opts.Port) + " (TCP)"
@@ -138,14 +155,15 @@ func ToString(res helpers.Response, opts cli.Options) string {
 		for i, resp := range res.DNS.Answer {
 			temp := strings.Split(resp.String(), "\t")
 			s += temp[len(temp)-1]
+
 			if opts.Identify {
 				s += " from server " + opts.Request.Server + " in " + res.RTT.String()
 			}
+
 			// Don't print newline on last line
 			if i != len(res.DNS.Answer)-1 {
 				s += "\n"
 			}
-
 		}
 	}
 

@@ -12,6 +12,7 @@ import (
 
 func FuzzDig(f *testing.F) {
 	f.Log("ParseDig Fuzzing")
+
 	seeds := []string{
 		"aaflag", "aaonly", "noaaflag", "noaaonly",
 		"adflag", "noadflag",
@@ -59,15 +60,15 @@ func FuzzDig(f *testing.F) {
 		"idnout", "noidnout",
 		"invalid",
 	}
+
 	for _, tc := range seeds {
 		f.Add(tc)
 	}
 
 	f.Fuzz(func(t *testing.T, orig string) {
-		opts := new(cli.Options)
+		opts := new(util.Options)
 		opts.Logger = util.InitLogger(0)
-		err := cli.ParseDig(orig, opts)
-		if err != nil {
+		if err := cli.ParseDig(orig, opts); err != nil {
 			assert.ErrorContains(t, err, "digflags:")
 		}
 	})

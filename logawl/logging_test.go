@@ -24,10 +24,11 @@ func TestLogawl(t *testing.T) {
 
 func TestUnmarshalLevels(t *testing.T) {
 	t.Parallel()
+
 	m := make(map[int]string)
-	var err error
 
 	for i := range logawl.AllLevels {
+		var err error
 		m[i], err = logger.UnMarshalLevel(logawl.Level(i))
 		assert.NilError(t, err)
 	}
@@ -52,30 +53,42 @@ func TestLogger(t *testing.T) {
 			fn := func() {
 				logger.Error("Test", "E")
 			}
+
 			var buffer bytes.Buffer
+
 			logger.Out = &buffer
+
 			fn()
 		case 1:
 			fn := func() {
 				logger.Warn("Test")
 			}
+
 			var buffer bytes.Buffer
+
 			logger.Out = &buffer
+
 			fn()
 		case 2:
 			fn := func() {
 				logger.Info("Test")
 			}
+
 			var buffer bytes.Buffer
+
 			logger.Out = &buffer
+
 			fn()
 		case 3:
 			fn := func() {
 				logger.Debug("Test")
 				logger.Debug("Test 2")
 			}
+
 			var buffer bytes.Buffer
+
 			logger.Out = &buffer
+
 			fn()
 		}
 	}
@@ -83,6 +96,7 @@ func TestLogger(t *testing.T) {
 
 func TestFmt(t *testing.T) {
 	t.Parallel()
+
 	ti := time.Now()
 	test := []byte("test")
 	// make sure error is error

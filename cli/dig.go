@@ -7,18 +7,21 @@ import (
 	"strconv"
 	"strings"
 	"time"
+
+	"git.froth.zone/sam/awl/util"
 )
 
 // ParseDig parses commands from the popular DNS tool dig.
 // All dig commands are taken from https://man.openbsd.org/dig.1 as the source of their functionality.
 //
 // [no]flags are supported just as flag are and are disabled as such.
-func ParseDig(arg string, opts *Options) error {
+func ParseDig(arg string, opts *util.Options) error {
 	// returns true if the flag starts with a no
 	isNo := !strings.HasPrefix(arg, "no")
 	if !isNo {
 		arg = strings.TrimPrefix(arg, "no")
 	}
+
 	opts.Logger.Info("Setting", arg)
 
 	switch arg {
@@ -118,85 +121,100 @@ func ParseDig(arg string, opts *Options) error {
 		opts.Display.UcodeTranslate = isNo
 
 	default:
-		// Recursive switch statements WOO
-		arg := strings.Split(arg, "=")
-		switch arg[0] {
-		case "time", "timeout":
-			if len(arg) > 1 && arg[1] != "" {
-				timeout, err := strconv.Atoi(arg[1])
-				if err != nil {
-					return fmt.Errorf("digflags: Invalid timeout value: %w", err)
-				}
-
-				opts.Request.Timeout = time.Duration(timeout)
-			} else {
-				return fmt.Errorf("digflags: Invalid timeout value: %w", errNoArg)
-			}
-
-		case "retry", "tries":
-			if len(arg) > 1 && arg[1] != "" {
-				tries, err := strconv.Atoi(arg[1])
-				if err != nil {
-					return fmt.Errorf("digflags: Invalid retry value: %w", err)
-				}
-				opts.Request.Retries = tries
-
-				// TODO: Is there a better way to do this?
-				if arg[0] == "tries" {
-					opts.Request.Retries++
-				}
-			} else {
-				return fmt.Errorf("digflags: Invalid retry value: %w", errNoArg)
-			}
-
-		case "bufsize":
-			if len(arg) > 1 && arg[1] != "" {
-				size, err := strconv.Atoi(arg[1])
-				if err != nil {
-					return fmt.Errorf("digflags: Invalid UDP buffer size value: %w", err)
-				}
-				opts.EDNS.BufSize = uint16(size)
-			} else {
-				return fmt.Errorf("digflags: Invalid UDP buffer size value: %w", errNoArg)
-			}
-
-		case "ednsflags":
-			if len(arg) > 1 && arg[1] != "" {
-				ver, err := strconv.ParseInt(arg[1], 0, 16)
-				if err != nil {
-					return fmt.Errorf("digflags: Invalid EDNS flag: %w", err)
-				}
-				// Ignore setting DO bit
-				opts.EDNS.ZFlag = uint16(ver & 0x7FFF)
-			} else {
-				opts.EDNS.ZFlag = 0
-			}
-
-		case "edns":
-			opts.EDNS.EnableEDNS = isNo
-			if len(arg) > 1 && arg[1] != "" {
-				ver, err := strconv.Atoi(arg[1])
-				if err != nil {
-					return fmt.Errorf("digflags: Invalid EDNS version: %w", err)
-				}
-				opts.EDNS.Version = uint8(ver)
-			} else {
-				opts.EDNS.Version = 0
-			}
-
-		case "subnet":
-			if len(arg) > 1 && arg[1] != "" {
-				err := parseSubnet(arg[1], opts)
-				if err != nil {
-					return fmt.Errorf("digflags: Invalid EDNS Subnet: %w", err)
-				}
-			} else {
-				return fmt.Errorf("digflags: Invalid EDNS Subnet: %w", errNoArg)
-			}
-
-		default:
-			return &errInvalidArg{arg[0]}
+		if err := parseDigEq(isNo, arg, opts); err != nil {
+			return err
 		}
 	}
+
+	return nil
+}
+
+// For flags that contain "=".
+func parseDigEq(startNo bool, arg string, opts *util.Options) error {
+	// Recursive switch statements WOO
+	arg, val, isSplit := strings.Cut(arg, "=")
+	switch arg {
+	case "time", "timeout":
+		if isSplit && val != "" {
+			timeout, err := strconv.Atoi(val)
+			if err != nil {
+				return fmt.Errorf("digflags: timeout : %w", err)
+			}
+
+			opts.Request.Timeout = time.Duration(timeout)
+		} else {
+			return fmt.Errorf("digflags: timeout: %w", errNoArg)
+		}
+
+	case "retry", "tries":
+		if isSplit && val != "" {
+			tries, err := strconv.Atoi(val)
+			if err != nil {
+				return fmt.Errorf("digflags: retry: %w", err)
+			}
+
+			opts.Request.Retries = tries
+
+			// TODO: Is there a better way to do this?
+			if arg == "tries" {
+				opts.Request.Retries++
+			}
+		} else {
+			return fmt.Errorf("digflags: retry: %w", errNoArg)
+		}
+
+	case "bufsize":
+		if isSplit && val != "" {
+			size, err := strconv.Atoi(val)
+			if err != nil {
+				return fmt.Errorf("digflags: EDNS UDP: %w", err)
+			}
+
+			opts.EDNS.BufSize = uint16(size)
+		} else {
+			return fmt.Errorf("digflags: EDNS UDP: %w", errNoArg)
+		}
+
+	case "ednsflags":
+		if isSplit && val != "" {
+			ver, err := strconv.ParseInt(val, 0, 16)
+			if err != nil {
+				return fmt.Errorf("digflags: EDNS flag: %w", err)
+			}
+
+			// Ignore setting DO bit
+			opts.EDNS.ZFlag = uint16(ver & 0x7FFF)
+		} else {
+			opts.EDNS.ZFlag = 0
+		}
+
+	case "edns":
+		opts.EDNS.EnableEDNS = startNo
+
+		if isSplit && val != "" {
+			ver, err := strconv.Atoi(val)
+			if err != nil {
+				return fmt.Errorf("digflags: EDNS version: %w", err)
+			}
+
+			opts.EDNS.Version = uint8(ver)
+		} else {
+			opts.EDNS.Version = 0
+		}
+
+	case "subnet":
+		if isSplit && val != "" {
+			err := util.ParseSubnet(val, opts)
+			if err != nil {
+				return fmt.Errorf("digflags: EDNS Subnet: %w", err)
+			}
+		} else {
+			return fmt.Errorf("digflags: EDNS Subnet: %w", errNoArg)
+		}
+
+	default:
+		return &errInvalidArg{arg}
+	}
+
 	return nil
 }

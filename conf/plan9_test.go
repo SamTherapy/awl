@@ -11,6 +11,7 @@ import (
 
 func TestGetPlan9Config(t *testing.T) {
 	t.Parallel()
+
 	ndbs := []struct {
 		in   string
 		want string

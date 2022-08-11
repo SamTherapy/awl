@@ -17,37 +17,48 @@ import (
 https://gist.github.com/moloch--/9fb1c8497b09b45c840fe93dd23b1e98
 */
 
-// WindowsDnsClientConfig - returns all DNS server addresses using windows fuckery.
+// GetDNSConfig (Windows version) returns all DNS server addresses using windows fuckery.
+//
+// Here be dragons.
 func GetDNSConfig() (*dns.ClientConfig, error) {
-	l := uint32(20000)
-	b := make([]byte, l)
+	length := uint32(20000)
+	byt := make([]byte, length)
 
 	// Windows is an utter fucking trash fire of an operating system.
-	if err := windows.GetAdaptersAddresses(windows.AF_UNSPEC, windows.GAA_FLAG_INCLUDE_PREFIX, 0, (*windows.IpAdapterAddresses)(unsafe.Pointer(&b[0])), &l); err != nil {
+	//nolint:gosec // This is necessary unless we want to drop 1.18
+	if err := windows.GetAdaptersAddresses(windows.AF_UNSPEC, windows.GAA_FLAG_INCLUDE_PREFIX, 0, (*windows.IpAdapterAddresses)(unsafe.Pointer(&byt[0])), &length); err != nil {
 		return nil, fmt.Errorf("config, windows: %w", err)
 	}
+
 	var addresses []*windows.IpAdapterAddresses
-	for addr := (*windows.IpAdapterAddresses)(unsafe.Pointer(&b[0])); addr != nil; addr = addr.Next {
+	//nolint:gosec // This is necessary unless we want to drop 1.18
+	for addr := (*windows.IpAdapterAddresses)(unsafe.Pointer(&byt[0])); addr != nil; addr = addr.Next {
 		addresses = append(addresses, addr)
 	}
 
 	resolvers := map[string]bool{}
+
 	for _, addr := range addresses {
 		for next := addr.FirstUnicastAddress; next != nil; next = next.Next {
 			if addr.OperStatus != windows.IfOperStatusUp {
 				continue
 			}
+
 			if next.Address.IP() != nil {
 				for dnsServer := addr.FirstDnsServerAddress; dnsServer != nil; dnsServer = dnsServer.Next {
 					ip := dnsServer.Address.IP()
+
 					if ip.IsMulticast() || ip.IsLinkLocalMulticast() || ip.IsLinkLocalUnicast() || ip.IsUnspecified() {
 						continue
 					}
+
 					if ip.To16() != nil && strings.HasPrefix(ip.To16().String(), "fec0:") {
 						continue
 					}
+
 					resolvers[ip.String()] = true
 				}
+
 				break
 			}
 		}

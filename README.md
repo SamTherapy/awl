@@ -17,7 +17,6 @@ newer RFC query types, such as DNS-over-HTTPS and DNS-over-QUIC.
 - [Feature wiki](https://git.froth.zone/sam/awl/wiki/Supported)
 - [Manpage](https://git.froth.zone/sam/awl/wiki/awl.1)
 
-
 ## Building and installing
 
 ### From releases
@@ -31,7 +30,6 @@ Dependencies:
 
 - Go >= 1.18
 - GNU/BSD make or Plan 9 mk
-- [scdoc](https://git.sr.ht/~sircmpwn/scdoc) (optional, for manpage)
 
 Make sure to recursively clone the repo:
 

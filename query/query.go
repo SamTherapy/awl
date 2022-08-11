@@ -6,13 +6,19 @@ import (
 	"fmt"
 	"strconv"
 
-	"git.froth.zone/sam/awl/cli"
-	"git.froth.zone/sam/awl/internal/helpers"
+	"git.froth.zone/sam/awl/util"
 	"github.com/dchest/uniuri"
 	"github.com/miekg/dns"
 )
 
-func CreateQuery(opts cli.Options) (helpers.Response, error) {
+const (
+	tcp = "tcp"
+	udp = "udp"
+)
+
+// CreateQuery creates a DNS query from the options given.
+// It sets query flags and EDNS flags from the respective options.
+func CreateQuery(opts util.Options) (util.Response, error) {
 	req := new(dns.Msg)
 	req.SetQuestion(opts.Request.Name, opts.Request.Type)
 	req.Question[0].Qclass = opts.Request.Class
@@ -40,37 +46,45 @@ func CreateQuery(opts cli.Options) (helpers.Response, error) {
 			e.Code = dns.EDNS0COOKIE
 			e.Cookie = uniuri.NewLenChars(8, []byte("1234567890abcdef"))
 			o.Option = append(o.Option, e)
+
 			opts.Logger.Info("Setting EDNS cookie to", e.Cookie)
 		}
 
 		if opts.EDNS.Expire {
 			o.Option = append(o.Option, new(dns.EDNS0_EXPIRE))
+
 			opts.Logger.Info("Setting EDNS Expire option")
 		}
 
 		if opts.EDNS.KeepOpen {
 			o.Option = append(o.Option, new(dns.EDNS0_TCP_KEEPALIVE))
+
 			opts.Logger.Info("Setting EDNS TCP Keepalive option")
 		}
 
 		if opts.EDNS.Nsid {
 			o.Option = append(o.Option, new(dns.EDNS0_NSID))
+
 			opts.Logger.Info("Setting EDNS NSID option")
 		}
 
 		if opts.EDNS.Padding {
 			o.Option = append(o.Option, new(dns.EDNS0_PADDING))
+
 			opts.Logger.Info("Setting EDNS padding")
 		}
 
 		o.SetUDPSize(opts.BufSize)
+
 		opts.Logger.Info("EDNS UDP buffer set to", opts.BufSize)
 
 		o.SetZ(opts.EDNS.ZFlag)
+
 		opts.Logger.Info("EDNS Z flag set to", opts.EDNS.ZFlag)
 
 		if opts.EDNS.DNSSEC {
 			o.SetDo()
+
 			opts.Logger.Info("EDNS DNSSEC OK set")
 		}
 
@@ -84,39 +98,45 @@ func CreateQuery(opts cli.Options) (helpers.Response, error) {
 		opts.Logger.Warn("DNSSEC implies EDNS, EDNS enabled")
 		opts.Logger.Info("DNSSEC enabled, UDP buffer set to 1232")
 	}
+
 	opts.Logger.Debug(req)
 
 	if !opts.Short {
 		if opts.ShowQuery {
 			opts.Logger.Info("Printing constructed query")
+
 			var (
 				str string
 				err error
 			)
+
 			if opts.JSON || opts.XML || opts.YAML {
 				str, err = PrintSpecial(req, opts)
 				if err != nil {
-					return helpers.Response{}, err
+					return util.Response{}, err
 				}
 			} else {
 				temp := opts.Display.Statistics
 				opts.Display.Statistics = false
-				str = ToString(helpers.Response{
+				str = ToString(util.Response{
 					DNS: req,
 					RTT: 0,
 				}, opts)
 				opts.Display.Statistics = temp
-				str += "\n;; QUERY SIZE: " + strconv.Itoa(req.Len())
+				str += "\n;; QUERY SIZE: " + strconv.Itoa(req.Len()) + "\n"
 			}
+
 			fmt.Println(str)
+
 			opts.ShowQuery = false
 		}
 	}
 
 	resolver, err := LoadResolver(opts)
 	if err != nil {
-		return helpers.Response{}, err
+		return util.Response{}, err
 	}
+
 	opts.Logger.Info("Query successfully loaded")
 
 	//nolint:wrapcheck // Error wrapping not needed here

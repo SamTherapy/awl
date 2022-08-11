@@ -5,8 +5,6 @@ package query_test
 import (
 	"testing"
 
-	"git.froth.zone/sam/awl/cli"
-	"git.froth.zone/sam/awl/internal/helpers"
 	"git.froth.zone/sam/awl/query"
 	"git.froth.zone/sam/awl/util"
 	"github.com/miekg/dns"
@@ -15,32 +13,30 @@ import (
 
 func TestCreateQ(t *testing.T) {
 	t.Parallel()
-	in := []cli.Options{
+
+	in := []util.Options{
 		{
 			Logger:    util.InitLogger(0),
 			Port:      53,
-			QR:        false,
 			Z:         true,
-			RD:        false,
 			ShowQuery: true,
 			YAML:      true,
 
-			Request: helpers.Request{
+			Request: util.Request{
 				Server: "8.8.4.4",
 				Type:   dns.TypeA,
 				Name:   "example.com.",
 			},
-			Display: cli.Displays{
-				Comments:       true,
-				Question:       true,
-				Opt:            true,
-				Answer:         true,
-				Authority:      true,
-				Additional:     true,
-				Statistics:     true,
-				UcodeTranslate: false,
+			Display: util.Displays{
+				Comments:   true,
+				Question:   true,
+				Opt:        true,
+				Answer:     true,
+				Authority:  true,
+				Additional: true,
+				Statistics: true,
 			},
-			EDNS: cli.EDNS{
+			EDNS: util.EDNS{
 				EnableEDNS: true,
 				DNSSEC:     true,
 				Cookie:     true,
@@ -52,18 +48,16 @@ func TestCreateQ(t *testing.T) {
 		{
 			Logger:    util.InitLogger(0),
 			Port:      53,
-			QR:        false,
 			Z:         true,
-			RD:        false,
 			ShowQuery: true,
 			XML:       true,
 
-			Request: helpers.Request{
+			Request: util.Request{
 				Server: "8.8.4.4",
 				Type:   dns.TypeA,
 				Name:   "example.com.",
 			},
-			Display: cli.Displays{
+			Display: util.Displays{
 				Comments:       true,
 				Question:       true,
 				Opt:            true,
@@ -73,26 +67,52 @@ func TestCreateQ(t *testing.T) {
 				Statistics:     true,
 				UcodeTranslate: true,
 			},
-			EDNS: cli.EDNS{
-				EnableEDNS: false,
-				DNSSEC:     false,
-				Cookie:     false,
-				Expire:     false,
-				KeepOpen:   false,
-				Nsid:       false,
+		},
+		{
+			Logger: util.InitLogger(0),
+			Port:   853,
+			// Z:         true,
+			ShowQuery: true,
+			JSON:      true,
+			QUIC:      true,
+
+			Request: util.Request{
+				Server: "dns.adguard.com",
+				Type:   dns.TypeA,
+				Name:   "example.com.",
+			},
+			Display: util.Displays{
+				Comments:   true,
+				Question:   true,
+				Opt:        true,
+				Answer:     true,
+				Authority:  true,
+				Additional: true,
+				Statistics: true,
+			},
+			EDNS: util.EDNS{
+				EnableEDNS: true,
+				DNSSEC:     true,
+				Cookie:     true,
+				Expire:     true,
+				Nsid:       true,
 			},
 		},
 	}
+
 	for _, opt := range in {
 		opt := opt
+
 		t.Run("", func(t *testing.T) {
 			t.Parallel()
 			res, err := query.CreateQuery(opt)
 			assert.NilError(t, err)
-			assert.Assert(t, res != helpers.Response{})
+			assert.Assert(t, res != util.Response{})
+
 			str, err := query.PrintSpecial(res.DNS, opt)
 			assert.NilError(t, err)
 			assert.Assert(t, str != "")
+
 			str = query.ToString(res, opt)
 			assert.Assert(t, str != "")
 		})

@@ -1,0 +1,24 @@
+on: push
+
+jobs:
+  test-gha:
+    strategy:
+      fail-fast: true
+      matrix:
+        platform: [macos-latest, windows-latest]
+        goVer: [1.18 1.19]
+    runs-on: ${{ matrix.platform }}
+    steps:
+      - name: Set up Go
+        uses: actions/setup-go@v3
+        with:
+          go-version: ${{ matrix.goVer }}
+
+      - name: Checkout repository
+        uses: actions/checkout@v3
+
+      - name: Checkout submodules
+        uses: git submodule update --init --recursive
+
+      - name: Test
+        run: go test -race -v ./...
