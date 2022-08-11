@@ -6,7 +6,7 @@ jobs:
       fail-fast: true
       matrix:
         platform: [macos-latest, windows-latest]
-        goVer: [1.18 1.19]
+        goVer: [1.18, 1.19]
     runs-on: ${{ matrix.platform }}
     steps:
       - name: Set up Go
