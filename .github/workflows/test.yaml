@@ -2,13 +2,13 @@ name: Test
 on: push
 
 jobs:
-  test-gha:
+  test:
     strategy:
       fail-fast: true
       matrix:
-        platform: [macos-latest, windows-latest]
+        platform: [macos, windows]
         goVer: [1.18, 1.19]
-    runs-on: ${{ matrix.platform }}
+    runs-on: ${{ matrix.platform }}-latest
     steps:
       - name: Set up Go
         uses: actions/setup-go@v3
