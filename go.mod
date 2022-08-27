@@ -5,7 +5,7 @@ go 1.18
 require (
 	github.com/ameshkov/dnscrypt/v2 v2.2.3
 	github.com/dchest/uniuri v0.0.0-20200228104902-7aecb25e1fe5
-	github.com/lucas-clemente/quic-go v0.28.1
+	github.com/lucas-clemente/quic-go v0.29.0
 	github.com/miekg/dns v1.1.50
 	github.com/stefansundin/go-zflag v1.1.1
 	golang.org/x/net v0.0.0-20220826154423-83b083e8dc8b
@@ -18,8 +18,10 @@ require (
 	github.com/aead/chacha20 v0.0.0-20180709150244-8b13a72661da // indirect
 	github.com/aead/poly1305 v0.0.0-20180717145839-3fee0db0b635 // indirect
 	github.com/ameshkov/dnsstamps v1.0.3 // indirect
-	github.com/google/go-cmp v0.5.5 // indirect
-	github.com/marten-seemann/qtls-go1-19 v0.1.0-beta.1 // indirect
+	github.com/golang/mock v1.6.0 // indirect
+	github.com/google/go-cmp v0.5.8 // indirect
+	github.com/marten-seemann/qtls-go1-19 v0.1.0 // indirect
+	golang.org/x/exp v0.0.0-20220722155223-a9213eeb770e // indirect
 )
 
 require (
