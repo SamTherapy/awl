@@ -3,7 +3,7 @@ module git.froth.zone/sam/awl
 go 1.18
 
 require (
-	github.com/ameshkov/dnscrypt/v2 v2.2.3
+	github.com/ameshkov/dnscrypt/v2 v2.2.5
 	github.com/dchest/uniuri v0.0.0-20200228104902-7aecb25e1fe5
 	github.com/lucas-clemente/quic-go v0.29.0
 	github.com/miekg/dns v1.1.50
@@ -34,7 +34,7 @@ require (
 	github.com/nxadm/tail v1.4.8 // indirect
 	github.com/onsi/ginkgo v1.16.5 // indirect
 	github.com/stretchr/testify v1.8.0 // indirect
-	golang.org/x/crypto v0.0.0-20220722155217-630584e8d5aa // indirect
+	golang.org/x/crypto v0.0.0-20220826181053-bd7e27e6170d // indirect
 	golang.org/x/mod v0.6.0-dev.0.20220419223038-86c51ed26bb4 // indirect
 	golang.org/x/sys v0.0.0-20220825204002-c680a09ffe64
 	golang.org/x/text v0.3.7 // indirect
