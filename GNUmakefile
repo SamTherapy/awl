@@ -12,9 +12,8 @@ endif
 $(PROG): $(SOURCES)
 	$(GO) build -o $(EXE) $(GOFLAGS) .
 
-
-ifeq ($(OS),Windows_NT)
 ## install: installs awl
+ifeq ($(OS),Windows_NT)
 install:
 	$(GO) install $(GOFLAGS) .
 else

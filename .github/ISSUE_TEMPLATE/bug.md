@@ -17,7 +17,9 @@ Steps to reproduce the behavior:
 A clear and concise description of what you expected to happen.
 
 **Screenshots / Logs**
+```
 Add `-v=4` and add the debug logs to the report here:
+```
 
 **System information (please complete the following information):**
 

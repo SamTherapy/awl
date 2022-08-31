@@ -1,20 +1,30 @@
 // SPDX-License-Identifier: BSD-3-Clause
+//go:build plan9
 
 package conf
 
 import (
 	"errors"
+	"fmt"
+	"os"
 	"strings"
 
 	"github.com/miekg/dns"
 )
 
-// GetPlan9Config gets DNS information from Plan 9, because it's different from UNIX and Windows.
+// GetDNSConfig gets DNS information from Plan 9, because it's different from UNIX and Windows.
 // Plan 9 stores its network data in /net/ndb, which seems to be formatted a specific way
 // Yoink it and use it.
 //
 // See ndb(7).
-func GetPlan9Config(str string) (*dns.ClientConfig, error) {
+func GetDNSConfig() (*dns.ClientConfig, error) {
+	dat, err := os.ReadFile("/net/ndb")
+	if err != nil {
+		return nil, fmt.Errorf("read ndb: %w", err)
+	}
+
+	str := string(dat)
+
 	str = strings.ReplaceAll(str, "\n", "")
 	spl := strings.FieldsFunc(str, splitChars)
 

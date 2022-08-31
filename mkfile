@@ -6,7 +6,7 @@ PROG = awl
 
 CGO_ENABLED = 0
 
-$PROG: 
+$PROG:
   $GO build -ldflags="-s -w -X=main.version=PLAN9" -o $PROG .
 
 install:
@@ -26,3 +26,5 @@ lint: fmt vet
 
 clean:
   $GO clean
+
+nuke: clean

@@ -24,17 +24,21 @@ newer RFC query types, such as DNS-over-HTTPS and DNS-over-QUIC.
 Grab a prebuilt binary from the
 [release](https://git.froth.zone/sam/awl/releases) section.
 
+### Package Managers
+
+- AUR: [awl-dns-git](https://aur.archlinux.org/packages/awl-dns-git)
+
 ### From source
 
 Dependencies:
 
 - Go >= 1.18
-- GNU/BSD make or Plan 9 mk
+- GNU/BSD make or Plan 9 mk (if using the makefile/mkfile)
 
-Make sure to recursively clone the repo:
+Using `go install` (recommended):
 
 ```sh
-git clone --recursive https://git.froth.zone/sam/awl
+go install git.froth.zone/sam/awl@latest
 ```
 
 Using the makefile:
@@ -42,12 +46,6 @@ Using the makefile:
 ```sh
 make
 sudo make install
-```
-
-Alternatively, using `go install`:
-
-```sh
-go install git.froth.zone/sam/awl@latest
 ```
 
 ## Contributing

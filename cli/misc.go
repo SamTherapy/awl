@@ -16,8 +16,6 @@ import (
 // ParseMiscArgs parses the wildcard arguments, drill style.
 // Only one command is supported at a time, so any extra information overrides previous.
 func ParseMiscArgs(args []string, opts *util.Options) error {
-	var err error
-
 	for _, arg := range args {
 		r, ok := dns.StringToType[strings.ToUpper(arg)]
 
@@ -31,7 +29,7 @@ func ParseMiscArgs(args []string, opts *util.Options) error {
 			switch {
 			case strings.HasPrefix(arg, "tls://"):
 				opts.TLS = true
-				opts.Request.Server = arg[6:]
+				opts.Request.Server = strings.TrimPrefix(opts.Request.Server, "tls://")
 				opts.Logger.Info("DNS-over-TLS implicitly set")
 			case strings.HasPrefix(arg, "https://"):
 				opts.HTTPS = true
@@ -39,7 +37,7 @@ func ParseMiscArgs(args []string, opts *util.Options) error {
 				opts.Logger.Info("DNS-over-HTTPS implicitly set")
 			case strings.HasPrefix(arg, "quic://"):
 				opts.QUIC = true
-				opts.Request.Server = arg[7:]
+				opts.Request.Server = strings.TrimPrefix(opts.Request.Server, "quic://")
 				opts.Logger.Info("DNS-over-QUIC implicitly set.")
 			case strings.HasPrefix(arg, "sdns://"):
 				opts.DNSCrypt = true
@@ -52,14 +50,15 @@ func ParseMiscArgs(args []string, opts *util.Options) error {
 		// Dig-style +queries
 		case strings.HasPrefix(arg, "+"):
 			opts.Logger.Info(arg, "detected as a dig query")
-			err = ParseDig(strings.ToLower(arg[1:]), opts)
 
-			if err != nil {
+			if err := ParseDig(strings.ToLower(arg[1:]), opts); err != nil {
 				return err
 			}
 
 		// Domain names
 		case strings.Contains(arg, "."):
+			var err error
+
 			opts.Logger.Info(arg, "detected as a domain name")
 			opts.Request.Name, err = idna.ToASCII(arg)
 
@@ -74,6 +73,8 @@ func ParseMiscArgs(args []string, opts *util.Options) error {
 
 		// Domain?
 		default:
+			var err error
+
 			opts.Logger.Info(arg, "is unknown. Assuming domain")
 			opts.Request.Name, err = idna.ToASCII(arg)
 
@@ -89,16 +90,14 @@ func ParseMiscArgs(args []string, opts *util.Options) error {
 		opts.Request.Name = "."
 
 		if opts.Request.Type == 0 {
+			opts.Logger.Info("Query not specified, making an \"NS\" query")
 			opts.Request.Type = dns.StringToType["NS"]
 		}
-	} else {
+	} else if opts.Request.Type == 0 {
 		opts.Logger.Info("Query not specified, making an \"A\" query")
-
-		if opts.Request.Type == 0 {
-			opts.Request.Type = dns.StringToType["A"]
-		}
+		opts.Request.Type = dns.StringToType["A"]
 	}
-	//
+
 	if opts.Request.Server == "" {
 		opts.Logger.Info("Server not specified, selecting a default")
 		// Set "defaults" for each if there is no input
@@ -113,7 +112,7 @@ func ParseMiscArgs(args []string, opts *util.Options) error {
 		case opts.QUIC:
 			opts.Request.Server = "dns.adguard.com"
 		default:
-			//nolint:govet // This shadow is intentional
+			var err error
 			resolv, err := conf.GetDNSConfig()
 
 			if err != nil {
@@ -150,8 +149,10 @@ func ParseMiscArgs(args []string, opts *util.Options) error {
 
 	opts.Logger.Info("DNS server set to", opts.Request.Server)
 
-	// Make reverse adresses proper addresses
+	// Make reverse addresses proper addresses
 	if opts.Reverse {
+		var err error
+
 		opts.Logger.Info("Making reverse DNS query proper *.arpa domain")
 
 		if dns.TypeToString[opts.Request.Type] == "A" {
@@ -168,7 +169,7 @@ func ParseMiscArgs(args []string, opts *util.Options) error {
 	if !strings.HasSuffix(opts.Request.Name, ".") {
 		opts.Request.Name = fmt.Sprintf("%s.", opts.Request.Name)
 
-		opts.Logger.Debug("Domain made canonical")
+		opts.Logger.Info("Domain made canonical")
 	}
 
 	return nil

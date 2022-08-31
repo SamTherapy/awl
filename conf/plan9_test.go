@@ -1,4 +1,5 @@
 // SPDX-License-Identifier: BSD-3-Clause
+//go:build plan9
 
 package conf_test
 
@@ -11,6 +12,9 @@ import (
 
 func TestGetPlan9Config(t *testing.T) {
 	t.Parallel()
+	if runtime.GOOS != "plan9" {
+		t.Skip("Not running Plan 9, skipping")
+	}
 
 	ndbs := []struct {
 		in   string

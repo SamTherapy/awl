@@ -1,5 +1,7 @@
 // SPDX-License-Identifier: BSD-3-Clause
-//go:build !windows
+//go:build unix || (!windows && !plan9 && !js && !zos)
+
+// FIXME: Can remove the or on the preprocessor when Go 1.18 becomes obsolete
 
 package conf_test
 
@@ -12,8 +14,8 @@ import (
 )
 
 func TestNonWinConfig(t *testing.T) {
-	if runtime.GOOS == "windows" {
-		t.Skip("Running Windows, skipping")
+	if runtime.GOOS == "windows" || runtime.GOOS == "plan9" {
+		t.Skip("Not running Unix-like, skipping")
 	}
 
 	conf, err := conf.GetDNSConfig()

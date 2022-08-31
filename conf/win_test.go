@@ -12,6 +12,8 @@ import (
 )
 
 func TestWinConfig(t *testing.T) {
+	t.Parallel()
+
 	if runtime.GOOS != "windows" {
 		t.Skip("Not running Windows, skipping")
 	}
