@@ -17,6 +17,11 @@ jobs:
       - name: Checkout submodules
         run: git submodule update --init --recursive
 
+      - name: Set up Go
+        uses: actions/setup-go@v3
+        with:
+          go-version: 1.19
+
       - name: Release with GoReleaser
         uses: goreleaser/goreleaser-action@v3
         with:

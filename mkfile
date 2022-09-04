@@ -4,27 +4,31 @@
 GO = go
 PROG = awl
 
+GOFLAGS = -ldflags=-s -ldflags=-w -ldflags=-X=main.version=PLAN9 -trimpath
+
 CGO_ENABLED = 0
 
-$PROG:
-  $GO build -ldflags="-s -w -X=main.version=PLAN9" -o $PROG .
+all:V: $PROG
 
-install:
-  $GO install -ldflags="-s -w -X=main.version=PLAN9" .
+$PROG:
+  $GO build $GOFLAGS -o $target .
+
+install:V:
+  $GO install $GOFLAGS  .
   cp doc/$PROG.1 /sys/man/1/$PROG
 
-test:
-  $GO test -cover -coverprofile=coverage/coverage.out ./...
+test:V:
+  $GO test -v -cover ./...
 
-fmt:
+fmt:V:
   gofmt -w -s .
 
-vet:
+vet:V:
   $GO vet ./...
 
-lint: fmt vet
+lint:V: fmt vet
 
-clean:
+clean:V:
   $GO clean
 
-nuke: clean
+nuke:V: clean

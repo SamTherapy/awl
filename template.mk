@@ -8,24 +8,34 @@ TEST_SOURCES ?= $(shell find . -name "*_test.go" -type f)
 
 CGO_ENABLED ?= 0
 GO ?= go
-TEST ?= $(GO) test -race
+TEST ?= $(GO) test -race -cover
 COVER ?= $(GO) tool cover
-GOFLAGS ?= -ldflags "-s -w -X=main.version=$(HASH)" -trimpath
+GOFLAGS ?= -ldflags="-s -w -X=main.version=$(HASH)" -trimpath
 DESTDIR :=
 
 PREFIX ?= /usr/local
 BIN ?= bin
+SHARE ?= share
 
 SCDOC ?= scdoc
-MAN ?= $(PREFIX)/share/man
+MAN ?= $(PREFIX)/$(SHARE)/man
 
 PROG ?= awl
 
 # hehe
 all: $(PROG) doc/$(PROG).1
 
+$(PROG): $(SOURCES)
+	$(GO) build -o $(EXE) $(GOFLAGS) .
+
 doc/$(PROG).1: doc/$(PROG).1.scd
-	$(SCDOC) <doc/$(PROG).1.scd >doc/$(PROG).1
+	$(SCDOC) <$< >$@
+
+doc/wiki/$(PROG).1.md: doc/$(PROG).1
+	pandoc --from man --to gfm -o $@ $<
+
+## update_doc: update documentation (requires pandoc)
+update_doc: doc/wiki/$(PROG).1.md
 
 .PHONY: fmt
 fmt:
@@ -42,25 +52,24 @@ lint: fmt vet
 
 ## test: run go test
 test: $(TEST_SOURCES)
-	$(TEST) -cover -coverprofile=coverage/coverage.out ./...
+	$(TEST) -v -coverprofile=coverage/coverage.out ./...
 
+.PHONY: test-ci
 test-ci:
-	$(TEST) -v
+	$(TEST) ./...
 
 ## fuzz: runs fuzz tests
 fuzz: $(TEST_SOURCES)
-	cd cli
-	$(TEST) -fuzz=FuzzFlags -fuzztime 10000x
-	$(TEST) -fuzz=FuzzDig -fuzztime 10000x
-	$(TEST) -fuzz=FuzzParseArgs -fuzztime 10000x
-	cd ..
+	$(TEST) -fuzz=FuzzFlags -fuzztime 10000x ./cli
+	$(TEST) -fuzz=FuzzDig -fuzztime 10000x ./cli
+	$(TEST) -fuzz=FuzzParseArgs -fuzztime 5000x ./cli
 
 .PHONY: full_test
 full_test: test fuzz
 
 coverage/coverage.out: test
-	$(COVER) -func=coverage/coverage.out
-	$(COVER) -html=coverage/coverage.out -o coverage/cover.html
+	$(COVER) -func=$@
+	$(COVER) -html=$@ -o coverage/cover.html
 
 ## cover: generates test coverage, output as HTML
 cover: coverage/coverage.out
@@ -69,7 +78,8 @@ cover: coverage/coverage.out
 .PHONY: clean
 clean:
 	$(GO) clean
-	rm doc/$(PROG).1
+# Ignore errors if you remove something that doesn't exist
+	rm -f doc/$(PROG).1
 
 ## help: Prints this help message
 .PHONY: help

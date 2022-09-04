@@ -1,3 +1,5 @@
+// SPDX-License-Identifier: BSD-3-Clause
+
 /*
 Package conf contains helper functions for getting local nameservers
 

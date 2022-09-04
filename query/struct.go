@@ -12,8 +12,6 @@ import (
 )
 
 // Message is for overall DNS responses.
-//
-//nolint:fieldalignment // IMO this looks better when printed like this
 type Message struct {
 	Question []Question `json:"question,omitempty" xml:"question,omitempty" yaml:",omitempty"`
 	Answer   []Answer   `json:"answer,omitempty" xml:"answer,omitempty" yaml:",omitempty"`
@@ -39,8 +37,6 @@ type RRHeader struct {
 }
 
 // Answer is for a DNS Response.
-//
-//nolint:fieldalignment // IMO this looks better when printed like this
 type Answer struct {
 	Value    string `json:"response,omitempty" xml:"response,omitempty" yaml:"response,omitempty"`
 	RRHeader `json:"header,omitempty" xml:"header,omitempty" yaml:"header,omitempty"`

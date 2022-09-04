@@ -117,8 +117,8 @@ func ParseMiscArgs(args []string, opts *util.Options) error {
 
 			if err != nil {
 				// :^)
-				opts.Logger.Warn("Could not query system for server. Using default")
-				opts.Request.Server = "95.216.99.249"
+				opts.Logger.Warn("Could not query system for server. Using localhost")
+				opts.Request.Server = "127.0.0.1"
 			} else {
 				// Make sure that if IPv4 or IPv6 is asked for it actually uses it
 			harmful:

@@ -74,9 +74,9 @@ func CreateQuery(opts util.Options) (util.Response, error) {
 			opts.Logger.Info("Setting EDNS padding")
 		}
 
-		o.SetUDPSize(opts.BufSize)
+		o.SetUDPSize(opts.EDNS.BufSize)
 
-		opts.Logger.Info("EDNS UDP buffer set to", opts.BufSize)
+		opts.Logger.Info("EDNS UDP buffer set to", opts.EDNS.BufSize)
 
 		o.SetZ(opts.EDNS.ZFlag)
 

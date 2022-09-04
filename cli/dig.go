@@ -117,7 +117,7 @@ func ParseDig(arg string, opts *util.Options) error {
 		opts.Display.Authority = isNo
 		opts.Display.Additional = isNo
 		opts.Display.Statistics = isNo
-	case "idnout":
+	case "idnin", "idnout":
 		opts.Display.UcodeTranslate = isNo
 
 	default:

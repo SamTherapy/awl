@@ -1,3 +1,5 @@
+// SPDX-License-Identifier: BSD-3-Clause
+
 /*
 awl is a DNS lookup tool written in Go, similar to (and heavily inspired by) drill.
 

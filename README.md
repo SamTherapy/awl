@@ -34,6 +34,7 @@ Dependencies:
 
 - Go >= 1.18
 - GNU/BSD make or Plan 9 mk (if using the makefile/mkfile)
+- scdoc (optional, for man page)
 
 Using `go install` (recommended):
 
@@ -45,7 +46,7 @@ Using the makefile:
 
 ```sh
 make
-sudo make install
+make && sudo make install
 ```
 
 ## Contributing
@@ -59,4 +60,4 @@ Found a bug or want a new feature? Create an issue
 
 ### Licence
 
-See [LICENCE](./LICENCE)
+Revised BSD, See [LICENCE](./LICENCE)

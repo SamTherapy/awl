@@ -3,12 +3,12 @@
 
 include template.mk
 
-$(PROG): $(SOURCES)
-	$(GO) build -o $(PROG) $(GOFLAGS) .
+EXE := $(PROG)
 
-## install: installs awl and the manpage, RUN AS ROOT
+## install: installs awl
+.PHONY: install
 install: all
 	install -Dm755 $(PROG) $(DESTDIR)$(PREFIX)/$(BIN)/$(PROG)
 	install -Dm644 doc/$(PROG).1 $(DESTDIR)$(MAN)/man1/$(PROG).1
-
-.PHONY: install
+# completions need to go in one specific place :)
+	install -Dm644 completions/zsh.zsh $(DESTDIR)/$(PREFIX)/$(SHARE)/zsh/site-functions/_$(PROG)

@@ -42,13 +42,13 @@ func (l *Logger) level() Level {
 // UnMarshalLevel unmarshalls the int value of level for writing the header.
 func (l *Logger) UnMarshalLevel(lv Level) (string, error) {
 	switch lv {
-	case 0:
+	case ErrLevel:
 		return "ERROR ", nil
-	case 1:
+	case WarnLevel:
 		return "WARN ", nil
-	case 2:
+	case InfoLevel:
 		return "INFO ", nil
-	case 3:
+	case DebugLevel:
 		return "DEBUG ", nil
 	}
 

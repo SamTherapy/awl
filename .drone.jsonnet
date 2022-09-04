@@ -9,17 +9,17 @@ local testing(version, arch) = {
   },
   steps: [
     {
-      name: "submodules",
-      image: "alpine/git",
+      name: "compile",
+      image: "golang:" + version,
       commands: [
-        "git submodule update --init --recursive"
-      ]
+        "make awl"
+      ],
     },
     {
       name: "lint",
       image: "rancher/drone-golangci-lint:latest",
       depends_on: [
-        "submodules",
+        "compile",
       ],
     },
     {
@@ -29,7 +29,7 @@ local testing(version, arch) = {
         "make test-ci"
       ],
       depends_on: [
-        "submodules",
+        "lint",
       ],
     },
     {
@@ -39,7 +39,7 @@ local testing(version, arch) = {
         "make fuzz",
       ],
       depends_on: [
-        "submodules",
+        "lint",
       ],
     },
   ],
@@ -68,7 +68,6 @@ local release() = {
       image: "alpine/git",
       commands : [
         "git fetch --tags",
-        "git submodule update --init --recursive"
       ]
     },
     {
@@ -95,9 +94,9 @@ local release() = {
 
 [
   testing("1.19", "amd64"),
-  testing("1.19", "arm64"),
-  testing("1.18", "amd64"),
-  testing("1.18", "arm64"),
+  // testing("1.19", "arm64"),
+  // testing("1.18", "amd64"),
+  // testing("1.18", "arm64"),
 
   release()
 ]

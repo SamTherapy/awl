@@ -35,14 +35,14 @@ func ParseCLI(version string) (util.Options, error) {
 		flag.PrintDefaults()
 	}
 
-	// CLI flag
+	// CLI flags
 	var (
 		port  = flag.Int("port", 0, "`port` to make DNS query (default: 53 for UDP/TCP, 853 for TLS/QUIC)", flag.OptShorthand('p'), flag.OptDisablePrintDefault(true))
 		query = flag.String("query", "", "domain name to `query` (default: .)", flag.OptShorthand('q'))
 		class = flag.String("class", "IN", "DNS `class` to query", flag.OptShorthand('c'))
 		qType = flag.String("qType", "", "`type` to query (default: A)", flag.OptShorthand('t'))
 
-		ipv4    = flag.Bool("4", false, "force IPv4", flag.OptShorthandStr("4"))
+		ipv4    = flag.Bool("4", false, "force IPv4", flag.OptShorthand('4'))
 		ipv6    = flag.Bool("6", false, "force IPv6", flag.OptShorthand('6'))
 		reverse = flag.Bool("reverse", false, "do a reverse lookup", flag.OptShorthand('x'))
 
@@ -57,7 +57,7 @@ func ParseCLI(version string) (util.Options, error) {
 		cookie       = flag.Bool("no-cookie", false, "disable sending EDNS cookie (default: cookie sent)")
 		tcpKeepAlive = flag.Bool("keep-alive", false, "send EDNS TCP keep-alive")
 		udpBufSize   = flag.Uint16("buffer-size", 1232, "set EDNS UDP buffer size", flag.OptShorthand('b'))
-		mbzflag      = flag.String("zflag", "0", "set EDNS z-flag")
+		mbzflag      = flag.String("zflag", "0", "set EDNS z-flag `value`")
 		subnet       = flag.String("subnet", "", "set EDNS subnet")
 		padding      = flag.Bool("pad", false, "set EDNS padding")
 
