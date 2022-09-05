@@ -58,6 +58,7 @@ func FuzzDig(f *testing.F) {
 		"stats", "nostats",
 		"all", "noall",
 		"idnout", "noidnout",
+		"class", "noclass",
 		"invalid",
 	}
 
@@ -66,6 +67,10 @@ func FuzzDig(f *testing.F) {
 	}
 
 	f.Fuzz(func(t *testing.T, orig string) {
+		// Get rid of outputs
+		// os.Stdout = os.NewFile(0, os.DevNull)
+		// os.Stderr = os.NewFile(0, os.DevNull)
+
 		opts := new(util.Options)
 		opts.Logger = util.InitLogger(0)
 		if err := cli.ParseDig(orig, opts); err != nil {

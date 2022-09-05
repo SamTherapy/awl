@@ -3,12 +3,15 @@
 package query
 
 import (
+	"errors"
+	"fmt"
 	"strconv"
 	"strings"
 	"time"
 
 	"git.froth.zone/sam/awl/util"
 	"github.com/miekg/dns"
+	"golang.org/x/net/idna"
 )
 
 // Message is for overall DNS responses.
@@ -45,9 +48,9 @@ type Answer struct {
 // ToString turns the response into something that looks a lot like dig
 //
 // Much of this is taken from https://github.com/miekg/dns/blob/master/msg.go#L900
-func ToString(res util.Response, opts util.Options) string {
+func ToString(res util.Response, opts util.Options) (string, error) {
 	if res.DNS == nil {
-		return "<nil> MsgHdr"
+		return "<nil> MsgHdr", errNoMessage
 	}
 
 	var (
@@ -77,7 +80,12 @@ func ToString(res util.Response, opts util.Options) string {
 				}
 
 				for _, r := range res.DNS.Question {
-					s += r.String() + "\n"
+					str, err := stringParse(r.String(), false, opts)
+					if err != nil {
+						return "", fmt.Errorf("%w", err)
+					}
+
+					s += str + "\n"
 				}
 			}
 		}
@@ -90,7 +98,12 @@ func ToString(res util.Response, opts util.Options) string {
 
 				for _, r := range res.DNS.Answer {
 					if r != nil {
-						s += r.String() + "\n"
+						str, err := stringParse(r.String(), true, opts)
+						if err != nil {
+							return "", fmt.Errorf("%w", err)
+						}
+
+						s += str + "\n"
 					}
 				}
 			}
@@ -104,7 +117,12 @@ func ToString(res util.Response, opts util.Options) string {
 
 				for _, r := range res.DNS.Ns {
 					if r != nil {
-						s += r.String() + "\n"
+						str, err := stringParse(r.String(), true, opts)
+						if err != nil {
+							return "", fmt.Errorf("%w", err)
+						}
+
+						s += str + "\n"
 					}
 				}
 			}
@@ -118,7 +136,12 @@ func ToString(res util.Response, opts util.Options) string {
 
 				for _, r := range res.DNS.Extra {
 					if r != nil && r.Header().Rrtype != dns.TypeOPT {
-						s += r.String() + "\n"
+						str, err := stringParse(r.String(), true, opts)
+						if err != nil {
+							return "", fmt.Errorf("%w", err)
+						}
+
+						s += str + "\n"
 					}
 				}
 			}
@@ -163,5 +186,58 @@ func ToString(res util.Response, opts util.Options) string {
 		}
 	}
 
-	return s
+	return s, nil
 }
+
+func stringParse(str string, isAns bool, opts util.Options) (string, error) {
+	split := strings.Split(str, "\t")
+
+	// Make edits if so requested
+
+	// TODO: make less ew?
+	// This exists because the question section should be left alone EXCEPT for punycode.
+
+	if isAns {
+		if !opts.ShowTTL {
+			// Remove from existence
+			split = append(split[:1], split[2:]...)
+		}
+
+		if !opts.ShowClass {
+			// Position depends on if the TTL is there or not.
+			if opts.ShowTTL {
+				split = append(split[:2], split[3:]...)
+			} else {
+				split = append(split[:1], split[2:]...)
+			}
+		}
+
+		if opts.HumanTTL {
+			ttl, _ := strconv.Atoi(split[1])
+			split[1] = (time.Duration(ttl) * time.Second).String()
+		}
+	}
+
+	if opts.Display.UcodeTranslate {
+		var (
+			err  error
+			semi string
+		)
+
+		if strings.HasPrefix(split[0], ";") {
+			split[0] = strings.TrimPrefix(split[0], ";")
+			semi = ";"
+		}
+
+		split[0], err = idna.ToUnicode(split[0])
+		if err != nil {
+			return "", fmt.Errorf("punycode: %w", err)
+		}
+
+		split[0] = semi + split[0]
+	}
+
+	return strings.Join(split, "\t"), nil
+}
+
+var errNoMessage = errors.New("no message")

@@ -11,6 +11,9 @@ import (
 )
 
 func TestMain(t *testing.T) { //nolint: paralleltest // Race conditions
+	os.Stdout = os.NewFile(0, os.DevNull)
+	os.Stderr = os.NewFile(0, os.DevNull)
+
 	old := os.Args
 
 	os.Args = []string{"awl", "+yaml", "@1.1.1.1"}
@@ -30,6 +33,8 @@ func TestMain(t *testing.T) { //nolint: paralleltest // Race conditions
 
 func TestHelp(t *testing.T) {
 	old := os.Args
+	os.Stdout = os.NewFile(0, os.DevNull)
+	os.Stderr = os.NewFile(0, os.DevNull)
 
 	os.Args = []string{"awl", "-h"}
 

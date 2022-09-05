@@ -48,8 +48,10 @@ func ParseDig(arg string, opts *util.Options) error {
 		opts.ShowQuery = isNo
 	case "ttlunits":
 		opts.HumanTTL = isNo
-	case "ttlid":
+	case "ttl", "ttlid":
 		opts.ShowTTL = isNo
+	case "class":
+		opts.ShowClass = isNo
 
 	// EDNS queries
 	case "dnssec":

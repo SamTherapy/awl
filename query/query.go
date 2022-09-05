@@ -118,10 +118,15 @@ func CreateQuery(opts util.Options) (util.Response, error) {
 			} else {
 				temp := opts.Display.Statistics
 				opts.Display.Statistics = false
-				str = ToString(util.Response{
-					DNS: req,
-					RTT: 0,
-				}, opts)
+				str, err = ToString(
+					util.Response{
+						DNS: req,
+						RTT: 0,
+					}, opts)
+				if err != nil {
+					return util.Response{}, err
+				}
+
 				opts.Display.Statistics = temp
 				str += "\n;; QUERY SIZE: " + strconv.Itoa(req.Len()) + "\n"
 			}

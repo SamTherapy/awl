@@ -21,6 +21,7 @@ type Options struct {
 	Display     Displays
 	TC          bool
 	ShowTTL     bool
+	ShowClass   bool
 	ShowQuery   bool
 	AA          bool
 	AD          bool

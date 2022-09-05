@@ -13,7 +13,7 @@ import (
 	"golang.org/x/net/idna"
 )
 
-// ParseMiscArgs parses the wildcard arguments, drill style.
+// ParseMiscArgs parses the wildcard arguments, dig style.
 // Only one command is supported at a time, so any extra information overrides previous.
 func ParseMiscArgs(args []string, opts *util.Options) error {
 	for _, arg := range args {

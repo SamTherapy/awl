@@ -110,10 +110,12 @@ func TestCreateQ(t *testing.T) {
 			assert.Assert(t, res != util.Response{})
 
 			str, err := query.PrintSpecial(res.DNS, opt)
+
 			assert.NilError(t, err)
 			assert.Assert(t, str != "")
 
-			str = query.ToString(res, opt)
+			str, err = query.ToString(res, opt)
+			assert.NilError(t, err)
 			assert.Assert(t, str != "")
 		})
 	}

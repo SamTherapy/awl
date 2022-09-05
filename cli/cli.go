@@ -36,6 +36,8 @@ func ParseCLI(version string) (util.Options, error) {
 	}
 
 	// CLI flags
+	//
+	// Remember, when adding a flag edit the manpage and the completions :)
 	var (
 		port  = flag.Int("port", 0, "`port` to make DNS query (default: 53 for UDP/TCP, 853 for TLS/QUIC)", flag.OptShorthand('p'), flag.OptDisablePrintDefault(true))
 		query = flag.String("query", "", "domain name to `query` (default: .)", flag.OptShorthand('q'))
@@ -51,14 +53,14 @@ func ParseCLI(version string) (util.Options, error) {
 
 		edns         = flag.Bool("no-edns", false, "disable EDNS entirely")
 		ednsVer      = flag.Uint8("edns-ver", 0, "set EDNS version")
-		expire       = flag.Bool("expire", false, "set EDNS expire")
 		dnssec       = flag.Bool("dnssec", false, "enable DNSSEC", flag.OptShorthand('D'))
+		expire       = flag.Bool("expire", false, "set EDNS expire")
 		nsid         = flag.Bool("nsid", false, "set EDNS NSID", flag.OptShorthand('n'))
 		cookie       = flag.Bool("no-cookie", false, "disable sending EDNS cookie (default: cookie sent)")
 		tcpKeepAlive = flag.Bool("keep-alive", false, "send EDNS TCP keep-alive")
 		udpBufSize   = flag.Uint16("buffer-size", 1232, "set EDNS UDP buffer size", flag.OptShorthand('b'))
 		mbzflag      = flag.String("zflag", "0", "set EDNS z-flag `value`")
-		subnet       = flag.String("subnet", "", "set EDNS subnet")
+		subnet       = flag.String("subnet", "", "set EDNS client subnet")
 		padding      = flag.Bool("pad", false, "set EDNS padding")
 
 		truncate = flag.Bool("no-truncate", false, "ignore truncation if a UDP request truncates (default: retry with TCP)")

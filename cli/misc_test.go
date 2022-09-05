@@ -166,6 +166,8 @@ func FuzzParseArgs(f *testing.F) {
 	}
 
 	f.Fuzz(func(t *testing.T, arg string) {
+		// Get rid of outputs
+
 		args := []string{arg}
 		opts := new(util.Options)
 		opts.Logger = util.InitLogger(0)

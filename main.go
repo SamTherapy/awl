@@ -57,7 +57,10 @@ func run() (opts util.Options, code int, err error) {
 			return opts, 10, fmt.Errorf("format print: %w", err)
 		}
 	} else {
-		str = query.ToString(resp, opts)
+		str, err = query.ToString(resp, opts)
+		if err != nil {
+			return opts, 15, fmt.Errorf("standard print: %w", err)
+		}
 	}
 
 	fmt.Println(str)

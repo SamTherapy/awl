@@ -114,9 +114,7 @@ func TestRealPrint(t *testing.T) {
 			ShowQuery: true,
 			RD:        true,
 			Verbosity: 0,
-			ShowTTL:   true,
-			Identify:  true,
-			YAML:      false,
+			ShowTTL:   false,
 			Display: util.Displays{
 				Comments:       true,
 				Question:       true,
@@ -177,11 +175,13 @@ func TestRealPrint(t *testing.T) {
 			assert.NilError(t, err)
 
 			if test.JSON || test.XML || test.YAML {
-				str, err := query.PrintSpecial(resp.DNS, test)
+				str := ""
+				str, err = query.PrintSpecial(resp.DNS, test)
 				assert.NilError(t, err)
 				assert.Assert(t, str != "")
 			}
-			str := query.ToString(resp, test)
+			str, err := query.ToString(resp, test)
+			assert.NilError(t, err)
 			assert.Assert(t, str != "")
 		})
 	}
@@ -197,5 +197,8 @@ func TestBadFormat(t *testing.T) {
 func TestEmpty(t *testing.T) {
 	t.Parallel()
 
-	assert.Assert(t, query.ToString(util.Response{}, util.Options{}) == "<nil> MsgHdr")
+	str, err := query.ToString(util.Response{}, util.Options{})
+
+	assert.Error(t, err, "no message")
+	assert.Assert(t, str == "<nil> MsgHdr")
 }

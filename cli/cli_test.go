@@ -12,7 +12,7 @@ import (
 )
 
 func TestEmpty(t *testing.T) {
-	old := os.Args
+	args := os.Args
 	os.Args = []string{"awl", "-4"}
 
 	opts, err := cli.ParseCLI("TEST")
@@ -21,11 +21,11 @@ func TestEmpty(t *testing.T) {
 	assert.Equal(t, opts.Port, 53)
 	assert.Assert(t, opts.IPv4)
 
-	os.Args = old
+	os.Args = args
 }
 
 func TestTLSPort(t *testing.T) {
-	old := os.Args
+	args := os.Args
 	os.Args = []string{"awl", "-T"}
 
 	opts, err := cli.ParseCLI("TEST")
@@ -33,11 +33,11 @@ func TestTLSPort(t *testing.T) {
 	assert.NilError(t, err)
 	assert.Equal(t, opts.Port, 853)
 
-	os.Args = old
+	os.Args = args
 }
 
 func TestSubnet(t *testing.T) {
-	old := os.Args
+	args := os.Args
 	os.Args = []string{"awl", "--subnet", "127.0.0.1/32"}
 
 	opts, err := cli.ParseCLI("TEST")
@@ -45,7 +45,7 @@ func TestSubnet(t *testing.T) {
 	assert.NilError(t, err)
 	assert.Equal(t, opts.EDNS.Subnet.Family, uint16(1))
 
-	os.Args = old
+	os.Args = args
 
 	os.Args = []string{"awl", "--subnet", "0"}
 
@@ -53,7 +53,7 @@ func TestSubnet(t *testing.T) {
 	assert.NilError(t, err)
 	assert.Equal(t, opts.EDNS.Subnet.Family, uint16(1))
 
-	os.Args = old
+	os.Args = args
 
 	os.Args = []string{"awl", "--subnet", "::/0"}
 
@@ -61,58 +61,71 @@ func TestSubnet(t *testing.T) {
 	assert.NilError(t, err)
 	assert.Equal(t, opts.EDNS.Subnet.Family, uint16(2))
 
-	os.Args = old
+	os.Args = args
 
 	os.Args = []string{"awl", "--subnet", "/"}
 
 	opts, err = cli.ParseCLI("TEST")
 	assert.ErrorContains(t, err, "EDNS subnet")
 
-	os.Args = old
+	os.Args = args
 }
 
 func TestMBZ(t *testing.T) { //nolint: paralleltest // Race conditions
-	old := os.Args
+	args := os.Args
 	os.Args = []string{"awl", "--zflag", "G"}
 
 	_, err := cli.ParseCLI("TEST")
 
 	assert.ErrorContains(t, err, "EDNS MBZ")
 
-	os.Args = old
+	os.Args = args
 }
 
 func TestInvalidFlag(t *testing.T) { //nolint: paralleltest // Race conditions
-	old := os.Args
+	args := os.Args
+	stdout := os.Stdout
+	stderr := os.Stderr
+
+	os.Stdout = os.NewFile(0, os.DevNull)
+	os.Stderr = os.NewFile(0, os.DevNull)
+
 	os.Args = []string{"awl", "--treebug"}
 
 	_, err := cli.ParseCLI("TEST")
 
 	assert.ErrorContains(t, err, "unknown flag")
 
-	os.Args = old
+	os.Args = args
+	os.Stdout = stdout
+	os.Stderr = stderr
 }
 
 func TestInvalidDig(t *testing.T) { //nolint: paralleltest // Race conditions
-	old := os.Args
+	args := os.Args
 	os.Args = []string{"awl", "+a"}
 
 	_, err := cli.ParseCLI("TEST")
 
 	assert.ErrorContains(t, err, "digflags: invalid argument")
 
-	os.Args = old
+	os.Args = args
 }
 
 func TestVersion(t *testing.T) { //nolint: paralleltest // Race conditions
-	old := os.Args
+	args := os.Args
+	stdout := os.Stdout
+	stderr := os.Stderr
+
 	os.Args = []string{"awl", "--version"}
 
-	_, err := cli.ParseCLI("TEST")
+	_, err := cli.ParseCLI("test")
 
 	assert.ErrorType(t, err, cli.ErrNotError)
 
-	os.Args = old
+	os.Args = args
+	os.Stdout = stdout
+	os.Stderr = stderr
 }
 
 func TestTimeout(t *testing.T) { //nolint: paralleltest // Race conditions
@@ -121,7 +134,7 @@ func TestTimeout(t *testing.T) { //nolint: paralleltest // Race conditions
 		{"awl", "--timeout", "0"},
 	}
 	for _, test := range args {
-		old := os.Args
+		args := os.Args
 		os.Args = test
 
 		opt, err := cli.ParseCLI("TEST")
@@ -129,7 +142,7 @@ func TestTimeout(t *testing.T) { //nolint: paralleltest // Race conditions
 		assert.NilError(t, err)
 		assert.Equal(t, opt.Request.Timeout, time.Second/2)
 
-		os.Args = old
+		os.Args = args
 	}
 }
 
@@ -140,7 +153,7 @@ func TestRetries(t *testing.T) { //nolint: paralleltest // Race conditions
 		{"awl", "--retries", "-2"},
 	}
 	for _, test := range args {
-		old := os.Args
+		args := os.Args
 		os.Args = test
 
 		opt, err := cli.ParseCLI("TEST")
@@ -148,21 +161,24 @@ func TestRetries(t *testing.T) { //nolint: paralleltest // Race conditions
 		assert.NilError(t, err)
 		assert.Equal(t, opt.Request.Retries, 0)
 
-		os.Args = old
+		os.Args = args
 	}
 }
 
 func FuzzFlags(f *testing.F) {
 	testcases := []string{"git.froth.zone", "", "!12345", "google.com.edu.org.fr"}
+
 	for _, tc := range testcases {
 		f.Add(tc)
 	}
 
 	f.Fuzz(func(t *testing.T, orig string) {
-		old := os.Args
+		// Get rid of outputs
+
+		args := os.Args
 		os.Args = []string{"awl", orig}
 		//nolint:errcheck,gosec // Only make sure the program does not crash
 		cli.ParseCLI("TEST")
-		os.Args = old
+		os.Args = args
 	})
 }

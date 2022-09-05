@@ -32,10 +32,11 @@ linters:
     - predeclared
     - revive
     - staticcheck
-    #- testpackage
     - whitespace
     - wrapcheck
     - wsl
+  disable:
+    - structcheck
 
 linters-settings:
   govet:

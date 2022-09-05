@@ -19,7 +19,11 @@ builds:
 universal_binaries:
   - replace: true
 archives:
-  - replacements:
+  -
+    files:
+      - LICENCE
+      - completions/**
+    replacements:
       darwin: macOS
       linux: Linux
       windows: Windows
