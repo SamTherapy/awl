@@ -16,8 +16,10 @@ builds:
     goarch:
       - amd64
       - arm64
+
 universal_binaries:
   - replace: true
+
 archives:
   -
     files:
@@ -31,15 +33,36 @@ archives:
     format_overrides:
       - goos: windows
         format: zip
+
 checksum:
   name_template: "checksums.txt"
+
 snapshot:
   name_template: "{{ incpatch .Version }}-next"
+
 changelog:
   sort: asc
+
+  groups:
+    - title: 'Dependency Updates'
+      regexp: "^.*fix\\(deps\\)*:+.*$"
+      order: 2
+    - title: 'Features'
+      regexp: "^.*feat[(\\w)]*:+.*$"
+      order: 0
+    - title: 'Bug fixes'
+      regexp: "^.*fix[(\\w)]*:+.*$"
+      order: 1
+    - title: 'Other'
+      order: 999
+
   filters:
     exclude:
-      - "^docs:"
+      - "SKIP CI"
       - "^test:"
+      - "^docs?:"
+      - "typo"
+      - "^ci:"
+
 gitea_urls:
   api: https://git.froth.zone/api/v1/
