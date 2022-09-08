@@ -36,7 +36,7 @@ local testing(version, arch) = {
       name: "fuzz",
       image: "golang:" + version,
       commands: [
-        "make fuzz",
+        "make fuzz-ci",
       ],
       depends_on: [
         "lint",

@@ -62,7 +62,12 @@ test-ci:
 fuzz: $(TEST_SOURCES)
 	$(TEST) -fuzz=FuzzFlags -fuzztime 10000x ./cli
 	$(TEST) -fuzz=FuzzDig -fuzztime 10000x ./cli
-	$(TEST) -fuzz=FuzzParseArgs -fuzztime 5000x ./cli
+	$(TEST) -fuzz=FuzzParseArgs -fuzztime 10000x ./cli
+
+fuzz-ci: $(TEST_SOURCES)
+	$(TEST) -fuzz=FuzzFlags -fuzztime 1000x ./cli
+	$(TEST) -fuzz=FuzzDig -fuzztime 1000x ./cli
+	$(TEST) -fuzz=FuzzParseArgs -fuzztime 1000x ./cli
 
 .PHONY: full_test
 full_test: test fuzz
