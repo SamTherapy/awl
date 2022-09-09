@@ -33,7 +33,7 @@ local -a alts args
   '*+'{no,}'identify[print IP and port of responder]'
   '*+'{no,}'comments[print comment lines in output]'
   '*+'{no,}'stats[print statistics]'
-  '*+padding[set padding block size]:size [0]'
+  '*+padding[set padding block size]'
   '*+'{no,}'qr[print query as it was sent]'
   '*+'{no,}'question[print question section of a query]'
   '*+'{no,}'raflag[set RA flag in the query]'
@@ -74,7 +74,7 @@ _arguments -s -C $args \
   '*-6+[force IPv6 only]' \
   '*-'{x,-reverse}'+[reverse lookup]' \
   '*--timeout+[timeout in seconds]:number [1]' \
-  '*--retry+[specify number of UDP query retries]:number [2]' \
+  '*--retries+[specify number of query retries]:number [2]' \
   '*--no-edns+[disable EDNS]' \
   '*--edns-ver+[specify EDNS version for query]:version (0-255) [0]' \
   '*-'{D,-dnssec}'+[enable DNSSEC]' \

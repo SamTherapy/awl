@@ -36,11 +36,11 @@ func run() (opts util.Options, code int, err error) {
 	var resp util.Response
 
 	// Retry queries if a query fails
-	for i := 0; i < opts.Request.Retries; i++ {
+	for i := 0; i <= opts.Request.Retries; i++ {
 		resp, err = query.CreateQuery(opts)
 		if err == nil {
 			break
-		} else {
+		} else if i != opts.Request.Retries {
 			opts.Logger.Warn("Retrying request, error:", err)
 		}
 	}

@@ -159,7 +159,7 @@ func parseDigEq(startNo bool, arg string, opts *util.Options) error {
 
 			// TODO: Is there a better way to do this?
 			if arg == "tries" {
-				opts.Request.Retries++
+				opts.Request.Retries--
 			}
 		} else {
 			return fmt.Errorf("digflags: retry: %w", errNoArg)
