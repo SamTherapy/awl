@@ -13,6 +13,7 @@ import (
 )
 
 // GetDNSConfig gets DNS information from Plan 9, because it's different from UNIX and Windows.
+//
 // Plan 9 stores its network data in /net/ndb, which seems to be formatted a specific way
 // Yoink it and use it.
 //

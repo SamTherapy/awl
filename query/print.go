@@ -3,6 +3,7 @@
 package query
 
 import (
+	"encoding/hex"
 	"encoding/json"
 	"encoding/xml"
 	"errors"
@@ -178,7 +179,7 @@ func MakePrintable(msg *dns.Msg, opts util.Options) (*Message, error) {
 				name = additional.Header().Name
 			}
 
-			ret.Extra = append(ret.Extra, Answer{
+			ret.Additional = append(ret.Additional, Answer{
 				RRHeader: RRHeader{
 					Name:     name,
 					Type:     dns.TypeToString[additional.Header().Rrtype],
@@ -191,7 +192,133 @@ func MakePrintable(msg *dns.Msg, opts util.Options) (*Message, error) {
 		}
 	}
 
+	opt := msg.IsEdns0()
+	if opt != nil && opts.Display.Opt {
+		ret.Opt, err = parseOpt(*opt)
+		if err != nil {
+			return nil, fmt.Errorf("edns print: %w", err)
+		}
+	}
+
 	return &ret, nil
+}
+
+func parseOpt(rr dns.OPT) ([]Opts, error) {
+	ret := []Opts{}
+	// Most of this is taken from https://github.com/miekg/dns/blob/master/edns.go#L76
+
+	ret = append(ret, Opts{
+		Name:  "Version",
+		Value: strconv.Itoa(int(rr.Version())),
+	})
+
+	if rr.Do() {
+		ret = append(ret, Opts{
+			Name:  "Flags",
+			Value: "do",
+		})
+	} else {
+		ret = append(ret, Opts{
+			Name:  "Flags",
+			Value: "",
+		})
+	}
+
+	if rr.Hdr.Ttl&0x7FFF != 0 {
+		ret = append(ret, Opts{
+			Name:  "MBZ",
+			Value: fmt.Sprintf("0x%04x", rr.Hdr.Ttl&0x7FFF),
+		})
+	}
+
+	ret = append(ret, Opts{
+		Name:  "UDP Buffer Size",
+		Value: strconv.Itoa(int(rr.UDPSize())),
+	})
+
+	for _, opt := range rr.Option {
+		switch opt.(type) {
+		case *dns.EDNS0_NSID:
+			str := opt.String()
+
+			hex, err := hex.DecodeString(str)
+			if err != nil {
+				return nil, fmt.Errorf("%w", err)
+			}
+
+			ret = append(ret, Opts{
+				Name:  "NSID",
+				Value: fmt.Sprintf("%s (%s)", str, string(hex)),
+			})
+		case *dns.EDNS0_SUBNET:
+			ret = append(ret, Opts{
+				Name:  "Subnet",
+				Value: opt.String(),
+			})
+		case *dns.EDNS0_COOKIE:
+			ret = append(ret, Opts{
+				Name:  "Cookie",
+				Value: opt.String(),
+			})
+		case *dns.EDNS0_EXPIRE:
+			ret = append(ret, Opts{
+				Name:  "Expire",
+				Value: opt.String(),
+			})
+		case *dns.EDNS0_TCP_KEEPALIVE:
+			ret = append(ret, Opts{
+				Name:  "TCP Keepalive",
+				Value: opt.String(),
+			})
+		case *dns.EDNS0_UL:
+			ret = append(ret, Opts{
+				Name:  "Update Lease",
+				Value: opt.String(),
+			})
+		case *dns.EDNS0_LLQ:
+			ret = append(ret, Opts{
+				Name:  "Long Lived Queries",
+				Value: opt.String(),
+			})
+		case *dns.EDNS0_DAU:
+			ret = append(ret, Opts{
+				Name:  "DNSSEC Algorithm Understood",
+				Value: opt.String(),
+			})
+		case *dns.EDNS0_DHU:
+			ret = append(ret, Opts{
+				Name:  "DS Hash Understood",
+				Value: opt.String(),
+			})
+		case *dns.EDNS0_N3U:
+			ret = append(ret, Opts{
+				Name:  "NSEC3 Hash Understood",
+				Value: opt.String(),
+			})
+		case *dns.EDNS0_LOCAL:
+			ret = append(ret, Opts{
+				Name:  "Local OPT",
+				Value: opt.String(),
+			})
+		case *dns.EDNS0_PADDING:
+			ret = append(ret, Opts{
+				Name:  "Padding",
+				Value: opt.String(),
+			})
+		case *dns.EDNS0_EDE:
+			ret = append(ret, Opts{
+				Name:  "EDE",
+				Value: opt.String(),
+			})
+		case *dns.EDNS0_ESU:
+			ret = append(ret, Opts{
+				Name:  "ESU",
+				Value: opt.String(),
+			})
+		}
+	}
+
+	return ret, nil
 }
 
 var errInvalidFormat = errors.New("this should never happen")

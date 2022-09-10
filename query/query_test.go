@@ -37,12 +37,16 @@ func TestCreateQ(t *testing.T) {
 				Statistics: true,
 			},
 			EDNS: util.EDNS{
+				ZFlag:      1,
+				BufSize:    1500,
 				EnableEDNS: true,
-				DNSSEC:     true,
 				Cookie:     true,
+				DNSSEC:     true,
 				Expire:     true,
 				KeepOpen:   true,
 				Nsid:       true,
+				Padding:    true,
+				Version:    0,
 			},
 		},
 		{

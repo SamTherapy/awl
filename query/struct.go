@@ -15,28 +15,37 @@ import (
 )
 
 // Message is for overall DNS responses.
+//
+//nolint:govet // Better output is worth 32 bytes.
 type Message struct {
-	Question []Question `json:"question,omitempty" xml:"question,omitempty" yaml:",omitempty"`
-	Answer   []Answer   `json:"answer,omitempty" xml:"answer,omitempty" yaml:",omitempty"`
-	Ns       []Answer   `json:"ns,omitempty" xml:"ns,omitempty" yaml:",omitempty"`
-	Extra    []Answer   `json:"extra,omitempty" xml:"extra,omitempty" yaml:",omitempty"`
-	Header   dns.MsgHdr `json:"header,omitempty" xml:"header,omitempty" yaml:",omitempty"`
+	Header     dns.MsgHdr `json:"header,omitempty" xml:"header,omitempty" yaml:",omitempty"`
+	Opt        []Opts     `json:"opt,omitempty" xml:"opt,omitempty" yaml:"opt,omitempty"`
+	Question   []Question `json:"question,omitempty" xml:"question,omitempty" yaml:",omitempty"`
+	Answer     []Answer   `json:"answer,omitempty" xml:"answer,omitempty" yaml:",omitempty"`
+	Ns         []Answer   `json:"ns,omitempty" xml:"ns,omitempty" yaml:",omitempty"`
+	Additional []Answer   `json:"additional,omitempty" xml:"additional,omitempty" yaml:",omitempty"`
 }
 
 // Question is a DNS Query.
 type Question struct {
 	Name  string `json:"name,omitempty" xml:"name,omitempty" yaml:",omitempty"`
-	Type  string `json:"type,omitempty" xml:"type,omitempty" yaml:",omitempty"`
 	Class string `json:"class,omitempty" xml:"class,omitempty" yaml:",omitempty"`
+	Type  string `json:"type,omitempty" xml:"type,omitempty" yaml:",omitempty"`
 }
 
 // RRHeader is for DNS Resource Headers.
 type RRHeader struct {
 	Name     string `json:"name,omitempty" xml:"name,omitempty" yaml:",omitempty"`
-	Type     string `json:"type,omitempty" xml:"type,omitempty" yaml:",omitempty"`
-	Class    string `json:"class,omitempty" xml:"class,omitempty" yaml:",omitempty"`
 	TTL      string `json:"ttl,omitempty" xml:"ttl,omitempty" yaml:",omitempty"`
+	Class    string `json:"class,omitempty" xml:"class,omitempty" yaml:",omitempty"`
+	Type     string `json:"type,omitempty" xml:"type,omitempty" yaml:",omitempty"`
 	Rdlength uint16 `json:"-" xml:"-" yaml:"-"`
+}
+
+// Opts is for the OPT pseudosection, nearly exclusively for EDNS.
+type Opts struct {
+	Name  string `json:"name,omitempty" xml:"name,omitempty" yaml:",omitempty"`
+	Value string `json:"value" xml:"value" yaml:""`
 }
 
 // Answer is for a DNS Response.
@@ -212,7 +221,7 @@ func stringParse(str string, isAns bool, opts util.Options) (string, error) {
 			}
 		}
 
-		if opts.HumanTTL {
+		if opts.ShowTTL && opts.HumanTTL {
 			ttl, _ := strconv.Atoi(split[1])
 			split[1] = (time.Duration(ttl) * time.Second).String()
 		}

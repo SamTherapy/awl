@@ -10,7 +10,7 @@ import (
 	"github.com/miekg/dns"
 )
 
-// Options is the grand CLI options structure.
+// Options is the grand structure for all query options.
 type Options struct {
 	Logger  *logawl.Logger
 	TLSHost string
