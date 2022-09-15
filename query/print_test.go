@@ -16,15 +16,16 @@ func TestRealPrint(t *testing.T) {
 
 	opts := []util.Options{
 		{
-			Logger:    util.InitLogger(0),
-			Port:      53,
-			TCP:       true,
-			ShowQuery: true,
-			RD:        true,
-			ShowTTL:   true,
-			HumanTTL:  true,
-			JSON:      true,
-			Display: util.Displays{
+			Logger: util.InitLogger(0),
+
+			TCP: true,
+
+			HeaderFlags: util.HeaderFlags{
+				RD: true,
+			},
+
+			JSON: true,
+			Display: util.Display{
 				Comments:       true,
 				Question:       true,
 				Answer:         true,
@@ -32,9 +33,13 @@ func TestRealPrint(t *testing.T) {
 				Additional:     true,
 				Statistics:     true,
 				UcodeTranslate: true,
+				TTL:            true,
+				HumanTTL:       true,
+				ShowQuery:      true,
 			},
 			Request: util.Request{
 				Server: "a.gtld-servers.net",
+				Port:   53,
 				Type:   dns.StringToType["NS"],
 				Class:  1,
 				Name:   "google.com.",
@@ -44,17 +49,18 @@ func TestRealPrint(t *testing.T) {
 			},
 		},
 		{
-			Logger:    util.InitLogger(0),
-			Port:      53,
-			TCP:       true,
-			ShowQuery: true,
-			RD:        true,
+			Logger: util.InitLogger(0),
+
+			TCP: true,
+			HeaderFlags: util.HeaderFlags{
+				RD: true,
+			},
 			Verbosity: 0,
-			ShowTTL:   true,
-			Short:     true,
-			Identify:  true,
-			YAML:      false,
-			Display: util.Displays{
+
+			Short:    true,
+			Identify: true,
+			YAML:     false,
+			Display: util.Display{
 				Comments:       true,
 				Question:       true,
 				Answer:         true,
@@ -62,9 +68,12 @@ func TestRealPrint(t *testing.T) {
 				Additional:     true,
 				Statistics:     true,
 				UcodeTranslate: true,
+				TTL:            true,
+				ShowQuery:      true,
 			},
 			Request: util.Request{
 				Server:  "ns1.google.com",
+				Port:    53,
 				Type:    dns.StringToType["NS"],
 				Class:   1,
 				Name:    "google.com.",
@@ -76,16 +85,14 @@ func TestRealPrint(t *testing.T) {
 			},
 		},
 		{
-			Logger:    util.InitLogger(0),
-			Port:      53,
-			HTTPS:     true,
-			ShowQuery: true,
-			RD:        true,
-			ShowTTL:   true,
-			HumanTTL:  true,
-			Identify:  true,
-			XML:       true,
-			Display: util.Displays{
+			Logger: util.InitLogger(0),
+			HTTPS:  true,
+			HeaderFlags: util.HeaderFlags{
+				RD: true,
+			},
+			Identify: true,
+			XML:      true,
+			Display: util.Display{
 				Comments:       true,
 				Question:       true,
 				Answer:         true,
@@ -93,9 +100,13 @@ func TestRealPrint(t *testing.T) {
 				Additional:     true,
 				Statistics:     true,
 				UcodeTranslate: false,
+				TTL:            true,
+				HumanTTL:       true,
+				ShowQuery:      true,
 			},
 			Request: util.Request{
 				Server:  "https://dns.froth.zone/dns-query",
+				Port:    443,
 				Type:    dns.StringToType["NS"],
 				Class:   1,
 				Name:    "freecumextremist.com.",
@@ -108,14 +119,13 @@ func TestRealPrint(t *testing.T) {
 			},
 		},
 		{
-			Logger:    util.InitLogger(0),
-			Port:      853,
-			TLS:       true,
-			ShowQuery: true,
-			RD:        true,
+			Logger: util.InitLogger(0),
+			TLS:    true,
+			HeaderFlags: util.HeaderFlags{
+				RD: true,
+			},
 			Verbosity: 0,
-			ShowTTL:   false,
-			Display: util.Displays{
+			Display: util.Display{
 				Comments:       true,
 				Question:       true,
 				Answer:         true,
@@ -123,25 +133,29 @@ func TestRealPrint(t *testing.T) {
 				Additional:     true,
 				Statistics:     true,
 				UcodeTranslate: true,
+				TTL:            false,
+				ShowQuery:      true,
 			},
 			Request: util.Request{
 				Server: "dns.google",
+				Port:   853,
 				Type:   dns.StringToType["NS"],
 				Class:  1,
 				Name:   "freecumextremist.com.",
 			},
 		},
 		{
-			Logger:    util.InitLogger(0),
-			Port:      53,
-			TCP:       true,
-			ShowQuery: true,
-			AA:        true,
-			RD:        true,
+			Logger: util.InitLogger(0),
+			TCP:    true,
+
+			HeaderFlags: util.HeaderFlags{
+				AA: true,
+				RD: true,
+			},
 			Verbosity: 0,
-			ShowTTL:   true,
-			YAML:      true,
-			Display: util.Displays{
+
+			YAML: true,
+			Display: util.Display{
 				Comments:       true,
 				Question:       true,
 				Answer:         true,
@@ -149,9 +163,12 @@ func TestRealPrint(t *testing.T) {
 				Additional:     true,
 				Statistics:     true,
 				UcodeTranslate: false,
+				TTL:            true,
+				ShowQuery:      true,
 			},
 			Request: util.Request{
 				Server:  "rin.froth.zone",
+				Port:    53,
 				Type:    dns.StringToType["A"],
 				Class:   1,
 				Name:    "froth.zone.",
@@ -176,7 +193,7 @@ func TestRealPrint(t *testing.T) {
 
 			if test.JSON || test.XML || test.YAML {
 				str := ""
-				str, err = query.PrintSpecial(resp.DNS, test)
+				str, err = query.PrintSpecial(resp, test)
 				assert.NilError(t, err)
 				assert.Assert(t, str != "")
 			}
@@ -190,7 +207,7 @@ func TestRealPrint(t *testing.T) {
 func TestBadFormat(t *testing.T) {
 	t.Parallel()
 
-	_, err := query.PrintSpecial(new(dns.Msg), util.Options{})
+	_, err := query.PrintSpecial(util.Response{DNS: new(dns.Msg)}, util.Options{})
 	assert.ErrorContains(t, err, "never happen")
 }
 

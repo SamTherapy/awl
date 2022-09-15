@@ -9,18 +9,8 @@ local testing(version, arch) = {
   },
   steps: [
     {
-      name: "compile",
-      image: "golang:" + version,
-      commands: [
-        "make awl"
-      ],
-    },
-    {
       name: "lint",
       image: "rancher/drone-golangci-lint:latest",
-      depends_on: [
-        "compile",
-      ],
     },
     {
       name: "test",
@@ -74,7 +64,7 @@ local release() = {
       name: "test",
       image: "golang",
       commands: [
-        "make test"
+        "make test-ci"
       ]
     },
     {

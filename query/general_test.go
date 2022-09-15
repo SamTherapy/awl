@@ -17,9 +17,9 @@ func TestResolve(t *testing.T) {
 
 	opts := util.Options{
 		Logger: util.InitLogger(0),
-		Port:   53,
 		Request: util.Request{
 			Server:  "8.8.4.1",
+			Port:    53,
 			Type:    dns.TypeA,
 			Name:    "example.com.",
 			Timeout: time.Second / 2,
@@ -42,9 +42,9 @@ func TestTruncate(t *testing.T) {
 	opts := util.Options{
 		Logger: util.InitLogger(0),
 		IPv4:   true,
-		Port:   5301,
 		Request: util.Request{
 			Server: "madns.binarystar.systems",
+			Port:   5301,
 			Type:   dns.TypeTXT,
 			Name:   "limit.txt.example.",
 		},
@@ -70,9 +70,10 @@ func TestResolveAgain(t *testing.T) {
 			util.Options{
 				Logger: util.InitLogger(0),
 				TCP:    true,
-				Port:   53,
+
 				Request: util.Request{
 					Server: "8.8.4.4",
+					Port:   53,
 					Type:   dns.TypeA,
 					Name:   "example.com.",
 				},
@@ -81,9 +82,9 @@ func TestResolveAgain(t *testing.T) {
 		{
 			util.Options{
 				Logger: util.InitLogger(0),
-				Port:   53,
 				Request: util.Request{
 					Server: "8.8.4.4",
+					Port:   53,
 					Type:   dns.TypeAAAA,
 					Name:   "example.com.",
 				},
@@ -93,9 +94,9 @@ func TestResolveAgain(t *testing.T) {
 			util.Options{
 				Logger: util.InitLogger(0),
 				TLS:    true,
-				Port:   853,
 				Request: util.Request{
 					Server: "dns.google",
+					Port:   853,
 					Type:   dns.TypeAAAA,
 					Name:   "example.com.",
 				},

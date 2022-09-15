@@ -16,18 +16,20 @@ func TestCreateQ(t *testing.T) {
 
 	in := []util.Options{
 		{
-			Logger:    util.InitLogger(0),
-			Port:      53,
-			Z:         true,
-			ShowQuery: true,
-			YAML:      true,
+			Logger: util.InitLogger(0),
+			HeaderFlags: util.HeaderFlags{
+				Z: true,
+			},
+
+			YAML: true,
 
 			Request: util.Request{
 				Server: "8.8.4.4",
+				Port:   53,
 				Type:   dns.TypeA,
 				Name:   "example.com.",
 			},
-			Display: util.Displays{
+			Display: util.Display{
 				Comments:   true,
 				Question:   true,
 				Opt:        true,
@@ -35,6 +37,7 @@ func TestCreateQ(t *testing.T) {
 				Authority:  true,
 				Additional: true,
 				Statistics: true,
+				ShowQuery:  true,
 			},
 			EDNS: util.EDNS{
 				ZFlag:      1,
@@ -50,18 +53,19 @@ func TestCreateQ(t *testing.T) {
 			},
 		},
 		{
-			Logger:    util.InitLogger(0),
-			Port:      53,
-			Z:         true,
-			ShowQuery: true,
-			XML:       true,
+			Logger: util.InitLogger(0),
+			HeaderFlags: util.HeaderFlags{
+				Z: true,
+			},
+			XML: true,
 
 			Request: util.Request{
 				Server: "8.8.4.4",
+				Port:   53,
 				Type:   dns.TypeA,
 				Name:   "example.com.",
 			},
-			Display: util.Displays{
+			Display: util.Display{
 				Comments:       true,
 				Question:       true,
 				Opt:            true,
@@ -70,22 +74,21 @@ func TestCreateQ(t *testing.T) {
 				Additional:     true,
 				Statistics:     true,
 				UcodeTranslate: true,
+				ShowQuery:      true,
 			},
 		},
 		{
 			Logger: util.InitLogger(0),
-			Port:   853,
-			// Z:         true,
-			ShowQuery: true,
-			JSON:      true,
-			QUIC:      true,
+			JSON:   true,
+			QUIC:   true,
 
 			Request: util.Request{
 				Server: "dns.adguard.com",
+				Port:   853,
 				Type:   dns.TypeA,
 				Name:   "example.com.",
 			},
-			Display: util.Displays{
+			Display: util.Display{
 				Comments:   true,
 				Question:   true,
 				Opt:        true,
@@ -93,6 +96,7 @@ func TestCreateQ(t *testing.T) {
 				Authority:  true,
 				Additional: true,
 				Statistics: true,
+				ShowQuery:  true,
 			},
 			EDNS: util.EDNS{
 				EnableEDNS: true,
@@ -113,7 +117,7 @@ func TestCreateQ(t *testing.T) {
 			assert.NilError(t, err)
 			assert.Assert(t, res != util.Response{})
 
-			str, err := query.PrintSpecial(res.DNS, opt)
+			str, err := query.PrintSpecial(res, opt)
 
 			assert.NilError(t, err)
 			assert.Assert(t, str != "")

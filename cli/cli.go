@@ -5,7 +5,6 @@ package cli
 import (
 	"errors"
 	"fmt"
-	"os"
 	"runtime"
 	"strconv"
 	"strings"
@@ -18,8 +17,8 @@ import (
 
 // ParseCLI parses arguments given from the CLI and passes them into an `Options`
 // struct.
-func ParseCLI(version string) (util.Options, error) {
-	flag.CommandLine = flag.NewFlagSet(os.Args[0], flag.ContinueOnError)
+func ParseCLI(args []string, version string) (util.Options, error) {
+	flag.CommandLine = flag.NewFlagSet(args[0], flag.ContinueOnError)
 
 	flag.Usage = func() {
 		fmt.Println(`awl - drill, writ small
@@ -104,7 +103,7 @@ func ParseCLI(version string) (util.Options, error) {
 	flag.CommandLine.SortFlags = false
 
 	// Parse the flags
-	if err := flag.CommandLine.Parse(os.Args[1:]); err != nil {
+	if err := flag.CommandLine.Parse(args[1:]); err != nil {
 		return util.Options{Logger: util.InitLogger(*verbosity)}, fmt.Errorf("flag: %w", err)
 	}
 
@@ -116,7 +115,6 @@ func ParseCLI(version string) (util.Options, error) {
 
 	opts := util.Options{
 		Logger:      util.InitLogger(*verbosity),
-		Port:        *port,
 		IPv4:        *ipv4,
 		IPv6:        *ipv6,
 		Short:       *short,
@@ -128,29 +126,29 @@ func ParseCLI(version string) (util.Options, error) {
 		HTTPS:       *https,
 		QUIC:        *quic,
 		Truncate:    *truncate,
-		ShowQuery:   false,
-		AA:          *aaflag,
-		AD:          *adflag,
-		TC:          *tcflag,
-		Z:           *zflag,
-		CD:          *cdflag,
-		QR:          *qrflag,
-		RD:          *rdflag,
-		RA:          *raflag,
 		Reverse:     *reverse,
-		HumanTTL:    false,
-		ShowTTL:     true,
 		JSON:        *json,
 		XML:         *xml,
 		YAML:        *yaml,
+		HeaderFlags: util.HeaderFlags{
+			AA: *aaflag,
+			AD: *adflag,
+			TC: *tcflag,
+			Z:  *zflag,
+			CD: *cdflag,
+			QR: *qrflag,
+			RD: *rdflag,
+			RA: *raflag,
+		},
 		Request: util.Request{
 			Type:    dns.StringToType[strings.ToUpper(*qType)],
 			Class:   dns.StringToClass[strings.ToUpper(*class)],
 			Name:    *query,
 			Timeout: time.Duration(*timeout * float32(time.Second)),
 			Retries: *retry,
+			Port:    *port,
 		},
-		Display: util.Displays{
+		Display: util.Display{
 			Comments:   !*noC,
 			Question:   !*noQ,
 			Opt:        !*noOpt,
@@ -158,6 +156,9 @@ func ParseCLI(version string) (util.Options, error) {
 			Authority:  !*noAuth,
 			Additional: !*noAdd,
 			Statistics: !*noStats,
+			HumanTTL:   false,
+			ShowQuery:  false,
+			TTL:        true,
 		},
 		EDNS: util.EDNS{
 			EnableEDNS: !*edns,
@@ -199,15 +200,15 @@ func ParseCLI(version string) (util.Options, error) {
 	opts.Logger.Info("Dig/Drill flags parsed")
 	opts.Logger.Debug(fmt.Sprintf("%+v", opts))
 
-	if opts.Port == 0 {
+	if opts.Request.Port == 0 {
 		if opts.TLS || opts.QUIC {
-			opts.Port = 853
+			opts.Request.Port = 853
 		} else {
-			opts.Port = 53
+			opts.Request.Port = 53
 		}
 	}
 
-	opts.Logger.Info("Port set to", opts.Port)
+	opts.Logger.Info("Port set to", opts.Request.Port)
 
 	// Set timeout to 0.5 seconds if set below 0.5
 	if opts.Request.Timeout < (time.Second / 2) {
@@ -217,6 +218,9 @@ func ParseCLI(version string) (util.Options, error) {
 	if opts.Request.Retries < 0 {
 		opts.Request.Retries = 0
 	}
+
+	opts.Logger.Info("Options fully populated")
+	opts.Logger.Debug(fmt.Sprintf("%+v", opts))
 
 	return opts, nil
 }

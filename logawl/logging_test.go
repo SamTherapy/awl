@@ -52,6 +52,7 @@ func TestLogger(t *testing.T) {
 		case 0:
 			fn := func() {
 				logger.Error("Test", "E")
+				logger.Errorf("%s", "Test")
 			}
 
 			var buffer bytes.Buffer
@@ -62,6 +63,7 @@ func TestLogger(t *testing.T) {
 		case 1:
 			fn := func() {
 				logger.Warn("Test")
+				logger.Warnf("%s", "Test")
 			}
 
 			var buffer bytes.Buffer
@@ -72,6 +74,7 @@ func TestLogger(t *testing.T) {
 		case 2:
 			fn := func() {
 				logger.Info("Test")
+				logger.Infof("%s", "Test")
 			}
 
 			var buffer bytes.Buffer
@@ -83,6 +86,8 @@ func TestLogger(t *testing.T) {
 			fn := func() {
 				logger.Debug("Test")
 				logger.Debug("Test 2")
+				logger.Debugf("%s", "Test")
+				logger.Debugf("%s %d", "Test", 2)
 			}
 
 			var buffer bytes.Buffer

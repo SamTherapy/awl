@@ -22,8 +22,7 @@ func TestQuic(t *testing.T) {
 	opts := util.Options{
 		QUIC:    true,
 		Logger:  util.InitLogger(0),
-		Port:    853,
-		Request: util.Request{Server: "dns.adguard.com"},
+		Request: util.Request{Server: "dns.adguard.com", Port: 853},
 	}
 	testCase := util.Request{Server: "dns.//./,,adguard.com", Type: dns.TypeA, Name: "git.froth.zone"}
 	testCase2 := util.Request{Server: "dns.adguard.com", Type: dns.TypeA, Name: "git.froth.zone"}
@@ -54,7 +53,7 @@ func TestQuic(t *testing.T) {
 			resolver, err := query.LoadResolver(opts)
 			assert.NilError(t, err)
 
-			testCase2.Server = net.JoinHostPort(testCase2.Server, strconv.Itoa(opts.Port))
+			testCase2.Server = net.JoinHostPort(testCase2.Server, strconv.Itoa(opts.Request.Port))
 
 			// if the domain is not canonical, make it canonical
 			if !strings.HasSuffix(testCase2.Name, ".") {
@@ -78,8 +77,7 @@ func TestInvalidQuic(t *testing.T) {
 	opts := util.Options{
 		QUIC:    true,
 		Logger:  util.InitLogger(0),
-		Port:    853,
-		Request: util.Request{Server: "example.com", Type: dns.TypeA, Name: "git.froth.zone", Timeout: 10 * time.Millisecond},
+		Request: util.Request{Server: "example.com", Port: 853, Type: dns.TypeA, Name: "git.froth.zone", Timeout: 10 * time.Millisecond},
 	}
 	resolver, err := query.LoadResolver(opts)
 	assert.NilError(t, err)

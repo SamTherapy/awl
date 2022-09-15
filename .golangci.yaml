@@ -32,6 +32,7 @@ linters:
     - predeclared
     - revive
     - staticcheck
+    - tagliatelle
     - whitespace
     - wrapcheck
     - wsl
@@ -70,6 +71,16 @@ linters-settings:
       - name: unexported-return
       - name: var-declaration
       - name: var-naming
+  linters-settings:
+  tagliatelle:
+    case:
+      use-field-name: false
+      rules:
+        # Any struct tag type can be used.
+        # Support string case: `camel`, `pascal`, `kebab`, `snake`, `goCamel`, `goPascal`, `goKebab`, `goSnake`, `upper`, `lower`
+        json: goCamel
+        yaml: goCamel
+        xml: goCamel
 
 issues:
   exclude-use-default: false

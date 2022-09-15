@@ -102,7 +102,7 @@ func CreateQuery(opts util.Options) (util.Response, error) {
 	opts.Logger.Debug(req)
 
 	if !opts.Short {
-		if opts.ShowQuery {
+		if opts.Display.ShowQuery {
 			opts.Logger.Info("Printing constructed query")
 
 			var (
@@ -111,7 +111,7 @@ func CreateQuery(opts util.Options) (util.Response, error) {
 			)
 
 			if opts.JSON || opts.XML || opts.YAML {
-				str, err = PrintSpecial(req, opts)
+				str, err = PrintSpecial(util.Response{DNS: req}, opts)
 				if err != nil {
 					return util.Response{}, err
 				}
@@ -133,7 +133,7 @@ func CreateQuery(opts util.Options) (util.Response, error) {
 
 			fmt.Println(str)
 
-			opts.ShowQuery = false
+			opts.Display.ShowQuery = false
 		}
 	}
 

@@ -139,9 +139,19 @@ func (l *Logger) Debug(v ...any) {
 	l.Println(DebugLevel, v...)
 }
 
+// Debugf calls print after formatting the string with Debug level.
+func (l *Logger) Debugf(format string, v ...any) {
+	l.Println(ErrLevel, fmt.Sprintf(format, v...))
+}
+
 // Info calls print directly with Info level.
 func (l *Logger) Info(v ...any) {
 	l.Println(InfoLevel, v...)
+}
+
+// Infof calls print after formatting the string with Info level.
+func (l *Logger) Infof(format string, v ...any) {
+	l.Println(ErrLevel, fmt.Sprintf(format, v...))
 }
 
 // Warn calls print directly with Warn level.
@@ -149,7 +159,17 @@ func (l *Logger) Warn(v ...any) {
 	l.Println(WarnLevel, v...)
 }
 
+// Warnf calls print after formatting the string with Warn level.
+func (l *Logger) Warnf(format string, v ...any) {
+	l.Println(WarnLevel, fmt.Sprintf(format, v...))
+}
+
 // Error calls print directly with Error level.
 func (l *Logger) Error(v ...any) {
 	l.Println(ErrLevel, v...)
+}
+
+// Errorf calls print after formatting the string with Error level.
+func (l *Logger) Errorf(format string, v ...any) {
+	l.Println(ErrLevel, fmt.Sprintf(format, v...))
 }

@@ -45,13 +45,13 @@ func ParseDig(arg string, opts *util.Options) error {
 	// End DNS query flags
 
 	case "qr":
-		opts.ShowQuery = isNo
+		opts.Display.ShowQuery = isNo
 	case "ttlunits":
-		opts.HumanTTL = isNo
+		opts.Display.HumanTTL = isNo
 	case "ttl", "ttlid":
-		opts.ShowTTL = isNo
+		opts.Display.TTL = isNo
 	case "class":
-		opts.ShowClass = isNo
+		opts.Display.ShowClass = isNo
 
 	// EDNS queries
 	case "dnssec":

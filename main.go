@@ -17,7 +17,7 @@ import (
 var version = "DEV"
 
 func main() {
-	if opts, code, err := run(); err != nil {
+	if opts, code, err := run(os.Args); err != nil {
 		// TODO: Make not ew
 		if errors.Is(err, cli.ErrNotError) || strings.Contains(err.Error(), "help requested") {
 			os.Exit(0)
@@ -28,8 +28,8 @@ func main() {
 	}
 }
 
-func run() (opts util.Options, code int, err error) {
-	opts, err = cli.ParseCLI(version)
+func run(args []string) (opts util.Options, code int, err error) {
+	opts, err = cli.ParseCLI(args, version)
 	if err != nil {
 		return opts, 1, fmt.Errorf("parse: %w", err)
 	}
@@ -53,7 +53,7 @@ func run() (opts util.Options, code int, err error) {
 
 	var str string
 	if opts.JSON || opts.XML || opts.YAML {
-		str, err = query.PrintSpecial(resp.DNS, opts)
+		str, err = query.PrintSpecial(resp, opts)
 		if err != nil {
 			return opts, 10, fmt.Errorf("format print: %w", err)
 		}
