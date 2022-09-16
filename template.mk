@@ -28,6 +28,12 @@ all: $(PROG) doc/$(PROG).1
 $(PROG): $(SOURCES)
 	$(GO) build -o $(EXE) $(GOFLAGS) .
 
+doc/$(PROG).1: doc/$(PROG).1.scd
+	$(SCDOC) <$? >$@
+
+doc/wiki/$(PROG).1.md: doc/$(PROG).1
+	pandoc --from man --to gfm -o $@ $?
+
 ## update_doc: update documentation (requires pandoc)
 update_doc: doc/wiki/$(PROG).1.md
 
@@ -44,9 +50,12 @@ vet:
 lint: fmt vet
 	golangci-lint run --fix
 
+coverage/coverage.out: $(TEST_SOURCES)
+	$(TEST) -coverprofile=$@ ./...
+
+.PHONY: test
 ## test: run go test
-test: $(TEST_SOURCES)
-	$(TEST) -v -coverprofile=coverage/coverage.out ./...
+test: coverage/coverage.out
 
 .PHONY: test-ci
 test-ci:
@@ -66,12 +75,12 @@ fuzz-ci: $(TEST_SOURCES)
 .PHONY: full_test
 full_test: test fuzz
 
-coverage/coverage.out: test
-	$(COVER) -func=$@
-	$(COVER) -html=$@ -o coverage/cover.html
+coverage/cover.html: coverage/coverage.out
+	$(COVER) -func=$?
+	$(COVER) -html=$? -o $@
 
 ## cover: generates test coverage, output as HTML
-cover: coverage/coverage.out
+cover: coverage/cover.html
 
 ## clean: clean the build files
 .PHONY: clean
@@ -79,6 +88,7 @@ clean:
 	$(GO) clean
 # Ignore errors if you remove something that doesn't exist
 	rm -f doc/$(PROG).1
+	rm -f coverage/cover*
 
 ## help: Prints this help message
 .PHONY: help

@@ -9,13 +9,6 @@ else
 	EXE := $(PROG)
 endif
 
-doc/$(PROG).1: doc/$(PROG).1.scd
-	$(SCDOC) <$< >$@
-
-doc/wiki/$(PROG).1.md: doc/$(PROG).1
-	pandoc --from man --to gfm -o $@ $<
-
-
 ## install: installs awl
 .PHONY: install
 ifeq ($(OS),Windows_NT)
