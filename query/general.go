@@ -52,11 +52,29 @@ func (r *StandardResolver) LookUp(msg *dns.Msg) (util.Response, error) {
 		}
 	}
 
-	r.opts.Logger.Debug("Using", dnsClient.Net, "for making the request")
+	r.opts.Logger.Info("Using", dnsClient.Net, "for making the request")
 
 	resp.DNS, resp.RTT, err = dnsClient.Exchange(msg, r.opts.Request.Server)
 	if err != nil {
 		return util.Response{}, fmt.Errorf("standard: DNS exchange: %w", err)
+	}
+
+	switch dns.RcodeToString[resp.DNS.MsgHdr.Rcode] {
+	case "BADCOOKIE":
+		if !r.opts.BadCookie {
+			fmt.Printf(";; BADCOOKIE, retrying.\n\n")
+
+			msg.Extra = resp.DNS.Extra
+
+			resp.DNS, resp.RTT, err = dnsClient.Exchange(msg, r.opts.Request.Server)
+
+			if err != nil {
+				return util.Response{}, fmt.Errorf("badcookie: DNS exchange: %w", err)
+			}
+		}
+
+	case "NOERR":
+		break
 	}
 
 	r.opts.Logger.Info("Request successful")

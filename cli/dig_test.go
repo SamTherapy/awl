@@ -40,6 +40,7 @@ func FuzzDig(f *testing.F) {
 		"tries=2", "tries=b", "tries",
 		"tcp", "vc", "notcp", "novc",
 		"ignore", "noignore",
+		"badcookie", "nobadcookie",
 		"tls", "notls",
 		"dnscrypt", "nodnscrypt",
 		"https", "nohttps",

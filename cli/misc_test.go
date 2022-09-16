@@ -127,6 +127,8 @@ func TestFlagSetting(t *testing.T) {
 		{[]string{"@tls://dns.google"}},
 		{[]string{"@https://dns.cloudflare.com/dns-query"}},
 		{[]string{"@quic://dns.adguard.com"}},
+		{[]string{"@tcp://dns.froth.zone"}},
+		{[]string{"@udp://dns.example.com"}},
 	}
 
 	for i, test := range tests {
@@ -147,6 +149,10 @@ func TestFlagSetting(t *testing.T) {
 				assert.Assert(t, opts.HTTPS)
 			case 3:
 				assert.Assert(t, opts.QUIC)
+			case 4:
+				assert.Assert(t, opts.TCP)
+			case 5:
+				assert.Assert(t, true)
 			}
 		})
 	}

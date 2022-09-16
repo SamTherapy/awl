@@ -14,7 +14,7 @@ because awl is a cli utility it writes directly to std err.
 // You can call specific logging levels from your new logger using
 //
 //	logger.Debug("Message to log")
-//	logger.Fatal("Message to log")
+//	logger.Warning("Message to log")
 //	logger.Info("Message to log")
 //	logger.Error("Message to log")
 //

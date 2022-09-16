@@ -62,7 +62,8 @@ func ParseCLI(args []string, version string) (util.Options, error) {
 		subnet       = flag.String("subnet", "", "set EDNS client subnet")
 		padding      = flag.Bool("pad", false, "set EDNS padding")
 
-		truncate = flag.Bool("no-truncate", false, "ignore truncation if a UDP request truncates (default: retry with TCP)")
+		badCookie = flag.Bool("no-bad-cookie", false, "ignore BADCOOKIE EDNS responses (default: retry with correct cookie")
+		truncate  = flag.Bool("no-truncate", false, "ignore truncation if a UDP request truncates (default: retry with TCP)")
 
 		tcp      = flag.Bool("tcp", false, "use TCP")
 		dnscrypt = flag.Bool("dnscrypt", false, "use DNSCrypt")
@@ -126,6 +127,7 @@ func ParseCLI(args []string, version string) (util.Options, error) {
 		HTTPS:       *https,
 		QUIC:        *quic,
 		Truncate:    *truncate,
+		BadCookie:   *badCookie,
 		Reverse:     *reverse,
 		JSON:        *json,
 		XML:         *xml,

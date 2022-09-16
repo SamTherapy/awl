@@ -19,7 +19,7 @@ func TestResolve(t *testing.T) {
 		Logger: util.InitLogger(0),
 		Request: util.Request{
 			Server:  "8.8.4.1",
-			Port:    53,
+			Port:    1,
 			Type:    dns.TypeA,
 			Name:    "example.com.",
 			Timeout: time.Second / 2,

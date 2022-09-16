@@ -5,6 +5,12 @@ include template.mk
 
 EXE := $(PROG)
 
+doc/$(PROG).1: doc/$(PROG).1.scd
+	$(SCDOC) <doc/$(PROG).1.scd >$@
+
+doc/wiki/$(PROG).1.md: doc/$(PROG).1
+	pandoc --from man --to gfm -o $@ doc/$(PROG).1
+
 ## install: installs awl
 .PHONY: install
 install: all

@@ -27,6 +27,8 @@ type Options struct {
 	Display Display
 	// Ignore Truncation
 	Truncate bool `json:"ignoreTruncate" example:"false"`
+	// Ignore BADCOOKIE
+	BadCookie bool `json:"ignoreBadCookie" example:"false"`
 	// Print only the answer
 	Short bool `json:"short" example:"false"`
 	// When Short is true, display where the query came from

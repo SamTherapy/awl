@@ -35,64 +35,64 @@ func CreateQuery(opts util.Options) (util.Response, error) {
 
 	// EDNS time :)
 	if opts.EDNS.EnableEDNS {
-		o := new(dns.OPT)
-		o.Hdr.Name = "."
-		o.Hdr.Rrtype = dns.TypeOPT
+		edns := new(dns.OPT)
+		edns.Hdr.Name = "."
+		edns.Hdr.Rrtype = dns.TypeOPT
 
-		o.SetVersion(opts.EDNS.Version)
+		edns.SetVersion(opts.EDNS.Version)
 
 		if opts.EDNS.Cookie {
-			e := new(dns.EDNS0_COOKIE)
-			e.Code = dns.EDNS0COOKIE
-			e.Cookie = uniuri.NewLenChars(8, []byte("1234567890abcdef"))
-			o.Option = append(o.Option, e)
+			cookie := new(dns.EDNS0_COOKIE)
+			cookie.Code = dns.EDNS0COOKIE
+			cookie.Cookie = uniuri.NewLenChars(16, []byte("1234567890abcdef"))
+			edns.Option = append(edns.Option, cookie)
 
-			opts.Logger.Info("Setting EDNS cookie to", e.Cookie)
+			opts.Logger.Info("Setting EDNS cookie to", cookie.Cookie)
 		}
 
 		if opts.EDNS.Expire {
-			o.Option = append(o.Option, new(dns.EDNS0_EXPIRE))
+			edns.Option = append(edns.Option, new(dns.EDNS0_EXPIRE))
 
 			opts.Logger.Info("Setting EDNS Expire option")
 		}
 
 		if opts.EDNS.KeepOpen {
-			o.Option = append(o.Option, new(dns.EDNS0_TCP_KEEPALIVE))
+			edns.Option = append(edns.Option, new(dns.EDNS0_TCP_KEEPALIVE))
 
 			opts.Logger.Info("Setting EDNS TCP Keepalive option")
 		}
 
 		if opts.EDNS.Nsid {
-			o.Option = append(o.Option, new(dns.EDNS0_NSID))
+			edns.Option = append(edns.Option, new(dns.EDNS0_NSID))
 
 			opts.Logger.Info("Setting EDNS NSID option")
 		}
 
 		if opts.EDNS.Padding {
-			o.Option = append(o.Option, new(dns.EDNS0_PADDING))
+			edns.Option = append(edns.Option, new(dns.EDNS0_PADDING))
 
 			opts.Logger.Info("Setting EDNS padding")
 		}
 
-		o.SetUDPSize(opts.EDNS.BufSize)
+		edns.SetUDPSize(opts.EDNS.BufSize)
 
 		opts.Logger.Info("EDNS UDP buffer set to", opts.EDNS.BufSize)
 
-		o.SetZ(opts.EDNS.ZFlag)
+		edns.SetZ(opts.EDNS.ZFlag)
 
 		opts.Logger.Info("EDNS Z flag set to", opts.EDNS.ZFlag)
 
 		if opts.EDNS.DNSSEC {
-			o.SetDo()
+			edns.SetDo()
 
 			opts.Logger.Info("EDNS DNSSEC OK set")
 		}
 
 		if opts.EDNS.Subnet.Address != nil {
-			o.Option = append(o.Option, &opts.EDNS.Subnet)
+			edns.Option = append(edns.Option, &opts.EDNS.Subnet)
 		}
 
-		req.Extra = append(req.Extra, o)
+		req.Extra = append(req.Extra, edns)
 	} else if opts.EDNS.DNSSEC {
 		req.SetEdns0(1232, true)
 		opts.Logger.Warn("DNSSEC implies EDNS, EDNS enabled")

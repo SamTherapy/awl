@@ -13,6 +13,7 @@ local -a alts args
   '*+'{no,}'aaonly[set aa flag in the query]'
   '*+'{no,}'additional[print additional section of a reply]'
   '*+'{no,}'adflag[set the AD (authentic data) bit in the query]'
+  '*+'{no,}'badcookie[retry BADCOOKIE responses]'
   '*+'{no,}'cdflag[set the CD (checking disabled) bit in the query]'
   '*+'{no,}'cookie[add a COOKIE option to the request]'
   '*+edns=[specify EDNS version for query]:version (0-255)'

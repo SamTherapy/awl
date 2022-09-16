@@ -80,6 +80,9 @@ Anything in [brackets] is optional.
 *--no-truncate*, *+ignore*
 	Ignore UDP truncation (by default, awl *retries with TCP*).
 
+*--no-bad-cookie*, *+[no]badcookie*
+	\[Do not\] ignore BADCOOKIE responses
+
 *--tcp*, *+tcp*, *+vc*
 	Use TCP for the query (see RFC 7766).
 

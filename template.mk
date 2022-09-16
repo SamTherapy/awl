@@ -28,12 +28,6 @@ all: $(PROG) doc/$(PROG).1
 $(PROG): $(SOURCES)
 	$(GO) build -o $(EXE) $(GOFLAGS) .
 
-doc/$(PROG).1: doc/$(PROG).1.scd
-	$(SCDOC) <$< >$@
-
-doc/wiki/$(PROG).1.md: doc/$(PROG).1
-	pandoc --from man --to gfm -o $@ $<
-
 ## update_doc: update documentation (requires pandoc)
 update_doc: doc/wiki/$(PROG).1.md
 

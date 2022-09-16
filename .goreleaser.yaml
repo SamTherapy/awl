@@ -13,9 +13,22 @@ builds:
       - linux
       - windows
       - darwin
+      - freebsd
     goarch:
       - amd64
+      - arm
       - arm64
+    ignore:
+      # Windows on ARM, maybe someday
+      - goos: windows
+        goarch: arm64
+      - goos: windows
+        goarch: arm
+
+      - goos: darwin
+        goarch: arm
+      - goos: freebsd
+        goarch: arm
 
 universal_binaries:
   - replace: true

@@ -29,7 +29,7 @@ func ParseMiscArgs(args []string, opts *util.Options) error {
 			switch {
 			case strings.HasPrefix(arg, "tls://"):
 				opts.TLS = true
-				opts.Request.Server = strings.TrimPrefix(opts.Request.Server, "tls://")
+				opts.Request.Server = strings.TrimPrefix(arg, "tls://")
 				opts.Logger.Info("DNS-over-TLS implicitly set")
 			case strings.HasPrefix(arg, "https://"):
 				opts.HTTPS = true
@@ -37,12 +37,18 @@ func ParseMiscArgs(args []string, opts *util.Options) error {
 				opts.Logger.Info("DNS-over-HTTPS implicitly set")
 			case strings.HasPrefix(arg, "quic://"):
 				opts.QUIC = true
-				opts.Request.Server = strings.TrimPrefix(opts.Request.Server, "quic://")
+				opts.Request.Server = strings.TrimPrefix(arg, "quic://")
 				opts.Logger.Info("DNS-over-QUIC implicitly set.")
 			case strings.HasPrefix(arg, "sdns://"):
 				opts.DNSCrypt = true
 				opts.Request.Server = arg
 				opts.Logger.Info("DNSCrypt implicitly set")
+			case strings.HasPrefix(arg, "tcp://"):
+				opts.TCP = true
+				opts.Request.Server = strings.TrimPrefix(arg, "udp://")
+				opts.Logger.Info("TCP implicitly set")
+			case strings.HasPrefix(arg, "udp://"):
+				opts.Request.Server = strings.TrimPrefix(arg, "udp://")
 			default:
 				opts.Request.Server = arg
 			}
@@ -117,7 +123,7 @@ func ParseMiscArgs(args []string, opts *util.Options) error {
 
 			if err != nil {
 				// :^)
-				opts.Logger.Warn("Could not query system for server. Using localhost")
+				opts.Logger.Warn("Could not query system for server. Using localhost\n", "Error:", err)
 				opts.Request.Server = "127.0.0.1"
 			} else {
 				// Make sure that if IPv4 or IPv6 is asked for it actually uses it

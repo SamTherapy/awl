@@ -73,6 +73,8 @@ func ParseDig(arg string, opts *util.Options) error {
 		opts.TCP = isNo
 	case "ignore":
 		opts.Truncate = isNo
+	case "badcookie":
+		opts.BadCookie = !isNo
 	case "tls":
 		opts.TLS = isNo
 	case "dnscrypt":
