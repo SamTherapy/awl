@@ -77,8 +77,7 @@ func TestRealPrint(t *testing.T) {
 				Type:    dns.StringToType["NS"],
 				Class:   1,
 				Name:    "google.com.",
-				Timeout: 0,
-				Retries: 0,
+				Retries: 3,
 			},
 			EDNS: util.EDNS{
 				EnableEDNS: false,
@@ -99,7 +98,7 @@ func TestRealPrint(t *testing.T) {
 				Authority:      true,
 				Additional:     true,
 				Statistics:     true,
-				UcodeTranslate: false,
+				UcodeTranslate: true,
 				TTL:            true,
 				HumanTTL:       true,
 				ShowQuery:      true,
@@ -110,8 +109,7 @@ func TestRealPrint(t *testing.T) {
 				Type:    dns.StringToType["NS"],
 				Class:   1,
 				Name:    "freecumextremist.com.",
-				Timeout: 0,
-				Retries: 0,
+				Retries: 3,
 			},
 			EDNS: util.EDNS{
 				EnableEDNS: false,
@@ -172,8 +170,7 @@ func TestRealPrint(t *testing.T) {
 				Type:    dns.StringToType["A"],
 				Class:   1,
 				Name:    "froth.zone.",
-				Timeout: 0,
-				Retries: 0,
+				Retries: 3,
 			},
 			EDNS: util.EDNS{
 				EnableEDNS: true,

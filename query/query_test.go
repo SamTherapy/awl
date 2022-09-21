@@ -14,115 +14,128 @@ import (
 func TestCreateQ(t *testing.T) {
 	t.Parallel()
 
-	in := []util.Options{
+	tests := []struct {
+		name string
+		opts util.Options
+	}{
 		{
-			Logger: util.InitLogger(0),
-			HeaderFlags: util.HeaderFlags{
-				Z: true,
-			},
-
-			YAML: true,
-
-			Request: util.Request{
-				Server: "8.8.4.4",
-				Port:   53,
-				Type:   dns.TypeA,
-				Name:   "example.com.",
-			},
-			Display: util.Display{
-				Comments:   true,
-				Question:   true,
-				Opt:        true,
-				Answer:     true,
-				Authority:  true,
-				Additional: true,
-				Statistics: true,
-				ShowQuery:  true,
-			},
-			EDNS: util.EDNS{
-				ZFlag:      1,
-				BufSize:    1500,
-				EnableEDNS: true,
-				Cookie:     true,
-				DNSSEC:     true,
-				Expire:     true,
-				KeepOpen:   true,
-				Nsid:       true,
-				Padding:    true,
-				Version:    0,
+			"1",
+			util.Options{
+				Logger: util.InitLogger(0),
+				HeaderFlags: util.HeaderFlags{
+					Z: true,
+				},
+				YAML: true,
+				Request: util.Request{
+					Server:  "8.8.4.4",
+					Port:    53,
+					Type:    dns.TypeA,
+					Name:    "example.com.",
+					Retries: 3,
+				},
+				Display: util.Display{
+					Comments:   true,
+					Question:   true,
+					Opt:        true,
+					Answer:     true,
+					Authority:  true,
+					Additional: true,
+					Statistics: true,
+					ShowQuery:  true,
+				},
+				EDNS: util.EDNS{
+					ZFlag:      1,
+					BufSize:    1500,
+					EnableEDNS: true,
+					Cookie:     true,
+					DNSSEC:     true,
+					Expire:     true,
+					KeepOpen:   true,
+					Nsid:       true,
+					Padding:    true,
+					Version:    0,
+				},
 			},
 		},
 		{
-			Logger: util.InitLogger(0),
-			HeaderFlags: util.HeaderFlags{
-				Z: true,
-			},
-			XML: true,
+			"2",
+			util.Options{
+				Logger: util.InitLogger(0),
+				HeaderFlags: util.HeaderFlags{
+					Z: true,
+				},
+				XML: true,
 
-			Request: util.Request{
-				Server: "8.8.4.4",
-				Port:   53,
-				Type:   dns.TypeA,
-				Name:   "example.com.",
-			},
-			Display: util.Display{
-				Comments:       true,
-				Question:       true,
-				Opt:            true,
-				Answer:         true,
-				Authority:      true,
-				Additional:     true,
-				Statistics:     true,
-				UcodeTranslate: true,
-				ShowQuery:      true,
+				Request: util.Request{
+					Server:  "8.8.4.4",
+					Port:    53,
+					Type:    dns.TypeA,
+					Name:    "example.com.",
+					Retries: 3,
+				},
+				Display: util.Display{
+					Comments:       true,
+					Question:       true,
+					Opt:            true,
+					Answer:         true,
+					Authority:      true,
+					Additional:     true,
+					Statistics:     true,
+					UcodeTranslate: true,
+					ShowQuery:      true,
+				},
 			},
 		},
 		{
-			Logger: util.InitLogger(0),
-			JSON:   true,
-			QUIC:   true,
+			"3",
+			util.Options{
+				Logger: util.InitLogger(0),
+				JSON:   true,
+				QUIC:   true,
 
-			Request: util.Request{
-				Server: "dns.adguard.com",
-				Port:   853,
-				Type:   dns.TypeA,
-				Name:   "example.com.",
-			},
-			Display: util.Display{
-				Comments:   true,
-				Question:   true,
-				Opt:        true,
-				Answer:     true,
-				Authority:  true,
-				Additional: true,
-				Statistics: true,
-				ShowQuery:  true,
-			},
-			EDNS: util.EDNS{
-				EnableEDNS: true,
-				DNSSEC:     true,
-				Cookie:     true,
-				Expire:     true,
-				Nsid:       true,
+				Request: util.Request{
+					Server:  "dns.adguard.com",
+					Port:    853,
+					Type:    dns.TypeA,
+					Name:    "example.com.",
+					Retries: 3,
+				},
+				Display: util.Display{
+					Comments:   true,
+					Question:   true,
+					Opt:        true,
+					Answer:     true,
+					Authority:  true,
+					Additional: true,
+					Statistics: true,
+					ShowQuery:  true,
+				},
+				EDNS: util.EDNS{
+					EnableEDNS: true,
+					DNSSEC:     true,
+					Cookie:     true,
+					Expire:     true,
+					Nsid:       true,
+				},
 			},
 		},
 	}
 
-	for _, opt := range in {
-		opt := opt
+	for _, test := range tests {
+		test := test
 
-		t.Run("", func(t *testing.T) {
+		t.Run(test.name, func(t *testing.T) {
 			t.Parallel()
-			res, err := query.CreateQuery(opt)
+			res, err := query.CreateQuery(test.opts)
 			assert.NilError(t, err)
 			assert.Assert(t, res != util.Response{})
 
-			str, err := query.PrintSpecial(res, opt)
+			str, err := query.PrintSpecial(res, test.opts)
 
 			assert.NilError(t, err)
 			assert.Assert(t, str != "")
 
-			str, err = query.ToString(res, opt)
+			str, err = query.ToString(res, test.opts)
 			assert.NilError(t, err)
 			assert.Assert(t, str != "")
 		})

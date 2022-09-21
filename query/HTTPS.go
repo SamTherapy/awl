@@ -52,7 +52,7 @@ func (r *HTTPSResolver) LookUp(msg *dns.Msg) (util.Response, error) {
 	}
 
 	if res.StatusCode != http.StatusOK {
-		return util.Response{}, &errHTTPStatus{res.StatusCode}
+		return util.Response{}, &ErrHTTPStatus{res.StatusCode}
 	}
 
 	r.opts.Logger.Debug("https: reading response")
@@ -79,10 +79,11 @@ func (r *HTTPSResolver) LookUp(msg *dns.Msg) (util.Response, error) {
 	return resp, nil
 }
 
-type errHTTPStatus struct {
+// ErrHTTPStatus is returned when DoH returns a bad status code.
+type ErrHTTPStatus struct {
 	code int
 }
 
-func (e *errHTTPStatus) Error() string {
+func (e *ErrHTTPStatus) Error() string {
 	return fmt.Sprintf("doh server responded with HTTP %d", e.code)
 }

@@ -3,7 +3,6 @@
 package cli_test
 
 import (
-	"strconv"
 	"testing"
 
 	"git.froth.zone/sam/awl/cli"
@@ -87,7 +86,7 @@ func TestDefaultServer(t *testing.T) {
 		in   string
 		want string
 	}{
-		{"DNSCRYPT", "sdns://AQMAAAAAAAAAETk0LjE0MC4xNC4xNDo1NDQzINErR_JS3PLCu_iZEIbq95zkSV2LFsigxDIuUso_OQhzIjIuZG5zY3J5cHQuZGVmYXVsdC5uczEuYWRndWFyZC5jb20"},
+		{"DNSCrypt", "sdns://AQMAAAAAAAAAETk0LjE0MC4xNC4xNDo1NDQzINErR_JS3PLCu_iZEIbq95zkSV2LFsigxDIuUso_OQhzIjIuZG5zY3J5cHQuZGVmYXVsdC5uczEuYWRndWFyZC5jb20"},
 		{"TLS", "dns.google"},
 		{"HTTPS", "https://dns.cloudflare.com/dns-query"},
 		{"QUIC", "dns.adguard.com"},
@@ -95,13 +94,14 @@ func TestDefaultServer(t *testing.T) {
 
 	for _, test := range tests {
 		test := test
+
 		t.Run(test.in, func(t *testing.T) {
 			t.Parallel()
 			args := []string{}
 			opts := new(util.Options)
 			opts.Logger = util.InitLogger(0)
 			switch test.in {
-			case "DNSCRYPT":
+			case "DNSCrypt":
 				opts.DNSCrypt = true
 			case "TLS":
 				opts.TLS = true
@@ -121,38 +121,48 @@ func TestFlagSetting(t *testing.T) {
 	t.Parallel()
 
 	tests := []struct {
-		in []string
+		in       string
+		expected string
+		over     string
 	}{
-		{[]string{"@sdns://AQMAAAAAAAAAETk0LjE0MC4xNC4xNDo1NDQzINErR_JS3PLCu_iZEIbq95zkSV2LFsigxDIuUso_OQhzIjIuZG5zY3J5cHQuZGVmYXVsdC5uczEuYWRndWFyZC5jb20"}},
-		{[]string{"@tls://dns.google"}},
-		{[]string{"@https://dns.cloudflare.com/dns-query"}},
-		{[]string{"@quic://dns.adguard.com"}},
-		{[]string{"@tcp://dns.froth.zone"}},
-		{[]string{"@udp://dns.example.com"}},
+		{"@sdns://AQMAAAAAAAAAETk0LjE0MC4xNC4xNDo1NDQzINErR_JS3PLCu_iZEIbq95zkSV2LFsigxDIuUso_OQhzIjIuZG5zY3J5cHQuZGVmYXVsdC5uczEuYWRndWFyZC5jb20", "sdns://AQMAAAAAAAAAETk0LjE0MC4xNC4xNDo1NDQzINErR_JS3PLCu_iZEIbq95zkSV2LFsigxDIuUso_OQhzIjIuZG5zY3J5cHQuZGVmYXVsdC5uczEuYWRndWFyZC5jb20", "DNSCrypt"},
+		{"@tls://dns.google", "dns.google", "TLS"},
+		{"@https://dns.cloudflare.com/dns-query", "https://dns.cloudflare.com/dns-query", "HTTPS"},
+		{"@quic://dns.adguard.com", "dns.adguard.com", "QUIC"},
+		{"@tcp://dns.froth.zone", "dns.froth.zone", "TCP"},
+		{"@udp://dns.example.com", "dns.example.com", "UDP"},
 	}
 
-	for i, test := range tests {
+	for _, test := range tests {
 		test := test
-		i := i
-		t.Run(strconv.Itoa(i), func(t *testing.T) {
+
+		t.Run(test.over, func(t *testing.T) {
+			t.Parallel()
+
 			opts := new(util.Options)
 			opts.Logger = util.InitLogger(0)
-			t.Parallel()
-			err := cli.ParseMiscArgs(test.in, opts)
+
+			err := cli.ParseMiscArgs([]string{test.in}, opts)
 			assert.NilError(t, err)
-			switch i {
-			case 0:
+			switch test.over {
+			case "DNSCrypt":
 				assert.Assert(t, opts.DNSCrypt)
-			case 1:
+				assert.Equal(t, opts.Request.Server, test.expected)
+			case "TLS":
 				assert.Assert(t, opts.TLS)
-			case 2:
+				assert.Equal(t, opts.Request.Server, test.expected)
+			case "HTTPS":
 				assert.Assert(t, opts.HTTPS)
-			case 3:
+				assert.Equal(t, opts.Request.Server, test.expected)
+			case "QUIC":
 				assert.Assert(t, opts.QUIC)
-			case 4:
+				assert.Equal(t, opts.Request.Server, test.expected)
+			case "TCP":
 				assert.Assert(t, opts.TCP)
-			case 5:
+				assert.Equal(t, opts.Request.Server, test.expected)
+			case "UDP":
 				assert.Assert(t, true)
+				assert.Equal(t, opts.Request.Server, test.expected)
 			}
 		})
 	}

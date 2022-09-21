@@ -3,10 +3,6 @@
 package query_test
 
 import (
-	"fmt"
-	"net"
-	"strconv"
-	"strings"
 	"testing"
 	"time"
 
@@ -19,72 +15,90 @@ import (
 func TestQuic(t *testing.T) {
 	t.Parallel()
 
-	opts := util.Options{
-		QUIC:    true,
-		Logger:  util.InitLogger(0),
-		Request: util.Request{Server: "dns.adguard.com", Port: 853},
+	tests := []struct {
+		name string
+		opts util.Options
+	}{
+		{
+			"Valid",
+			util.Options{
+				QUIC:   true,
+				Logger: util.InitLogger(0),
+				Request: util.Request{
+					Server:  "dns.adguard.com",
+					Type:    dns.TypeNS,
+					Port:    853,
+					Timeout: 750 * time.Millisecond,
+					Retries: 3,
+				},
+			},
+		},
+		{
+			"Bad domain",
+			util.Options{
+				QUIC:   true,
+				Logger: util.InitLogger(0),
+				Request: util.Request{
+					Server:  "dns.//./,,adguard\a.com",
+					Port:    853,
+					Type:    dns.TypeA,
+					Name:    "git.froth.zone",
+					Timeout: 100 * time.Millisecond,
+					Retries: 0,
+				},
+			},
+		},
+		{
+			"Not canonical",
+			util.Options{
+				QUIC:   true,
+				Logger: util.InitLogger(0),
+				Request: util.Request{
+					Server:  "dns.adguard.com",
+					Port:    853,
+					Type:    dns.TypeA,
+					Name:    "git.froth.zone",
+					Timeout: 100 * time.Millisecond,
+					Retries: 0,
+				},
+			},
+		},
+		{
+			"Invalid query domain",
+			util.Options{
+				QUIC:   true,
+				Logger: util.InitLogger(0),
+				Request: util.Request{
+					Server:  "example.com",
+					Port:    853,
+					Type:    dns.TypeA,
+					Name:    "git.froth.zone",
+					Timeout: 10 * time.Millisecond,
+				},
+			},
+		},
 	}
-	testCase := util.Request{Server: "dns.//./,,adguard.com", Type: dns.TypeA, Name: "git.froth.zone"}
-	testCase2 := util.Request{Server: "dns.adguard.com", Type: dns.TypeA, Name: "git.froth.zone"}
 
-	var testCases []util.Request
+	for _, test := range tests {
+		test := test
 
-	testCases = append(testCases, testCase)
-	testCases = append(testCases, testCase2)
+		t.Run(test.name, func(t *testing.T) {
+			t.Parallel()
 
-	for i := range testCases {
-		switch i {
-		case 0:
-			resolver, err := query.LoadResolver(opts)
+			resolver, err := query.LoadResolver(test.opts)
 			assert.NilError(t, err)
-			// if the domain is not canonical, make it canonical
-			if !strings.HasSuffix(testCase.Name, ".") {
-				testCases[i].Name = fmt.Sprintf("%s.", testCases[i].Name)
-			}
 
 			msg := new(dns.Msg)
-			msg.SetQuestion(testCase.Name, testCase.Type)
-			// msg = msg.SetQuestion(testCase.Name, testCase.Type)
+			msg.SetQuestion(test.opts.Request.Name, test.opts.Request.Type)
+
 			res, err := resolver.LookUp(msg)
 
-			assert.ErrorContains(t, err, "fully qualified")
-			assert.Equal(t, res, util.Response{})
-		case 1:
-			resolver, err := query.LoadResolver(opts)
-			assert.NilError(t, err)
-
-			testCase2.Server = net.JoinHostPort(testCase2.Server, strconv.Itoa(opts.Request.Port))
-
-			// if the domain is not canonical, make it canonical
-			if !strings.HasSuffix(testCase2.Name, ".") {
-				testCase2.Name = fmt.Sprintf("%s.", testCase2.Name)
+			if err == nil {
+				assert.NilError(t, err)
+				assert.Assert(t, res != util.Response{})
+			} else {
+				assert.Assert(t, res == util.Response{})
 			}
-
-			msg := new(dns.Msg)
-			msg.SetQuestion(testCase2.Name, testCase2.Type)
-
-			res, err := resolver.LookUp(msg)
-
-			assert.NilError(t, err)
-			assert.Assert(t, res != util.Response{})
-		}
+		})
 	}
-}
-
-func TestInvalidQuic(t *testing.T) {
-	t.Parallel()
-
-	opts := util.Options{
-		QUIC:    true,
-		Logger:  util.InitLogger(0),
-		Request: util.Request{Server: "example.com", Port: 853, Type: dns.TypeA, Name: "git.froth.zone", Timeout: 10 * time.Millisecond},
-	}
-	resolver, err := query.LoadResolver(opts)
-	assert.NilError(t, err)
-
-	msg := new(dns.Msg)
-	msg.SetQuestion(opts.Request.Name, opts.Request.Type)
-	res, err := resolver.LookUp(msg)
-	assert.ErrorContains(t, err, "timeout")
-	assert.Equal(t, res, util.Response{})
 }

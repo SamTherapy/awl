@@ -45,7 +45,7 @@ func ParseMiscArgs(args []string, opts *util.Options) error {
 				opts.Logger.Info("DNSCrypt implicitly set")
 			case strings.HasPrefix(arg, "tcp://"):
 				opts.TCP = true
-				opts.Request.Server = strings.TrimPrefix(arg, "udp://")
+				opts.Request.Server = strings.TrimPrefix(arg, "tcp://")
 				opts.Logger.Info("TCP implicitly set")
 			case strings.HasPrefix(arg, "udp://"):
 				opts.Request.Server = strings.TrimPrefix(arg, "udp://")

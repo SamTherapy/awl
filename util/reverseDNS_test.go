@@ -10,25 +10,43 @@ import (
 	"gotest.tools/v3/assert"
 )
 
-var (
-	PTR   = dns.StringToType["PTR"]
-	NAPTR = dns.StringToType["NAPTR"]
-)
-
-func TestIPv4(t *testing.T) {
+func TestPTR(t *testing.T) {
 	t.Parallel()
 
-	act, err := util.ReverseDNS("8.8.4.4", PTR)
-	assert.NilError(t, err)
-	assert.Equal(t, act, "4.4.8.8.in-addr.arpa.", "IPv4 reverse")
-}
+	tests := []struct {
+		name     string
+		in       string
+		expected string
+	}{
+		{
+			"IPv4",
+			"8.8.4.4", "4.4.8.8.in-addr.arpa.",
+		},
+		{
+			"IPv6",
+			"2606:4700:4700::1111", "1.1.1.1.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.7.4.0.0.7.4.6.0.6.2.ip6.arpa.",
+		},
+		{
+			"Inavlid value",
+			"AAAAA", "",
+		},
+	}
 
-func TestIPv6(t *testing.T) {
-	t.Parallel()
+	for _, test := range tests {
+		test := test
 
-	act, err := util.ReverseDNS("2606:4700:4700::1111", PTR)
-	assert.NilError(t, err)
-	assert.Equal(t, act, "1.1.1.1.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.7.4.0.0.7.4.6.0.6.2.ip6.arpa.", "IPv6 reverse")
+		t.Run(test.name, func(t *testing.T) {
+			t.Parallel()
+
+			act, err := util.ReverseDNS(test.in, dns.StringToType["PTR"])
+			if err == nil {
+				assert.NilError(t, err)
+			} else {
+				assert.ErrorContains(t, err, "unrecognized address")
+			}
+			assert.Equal(t, act, test.expected)
+		})
+	}
 }
 
 func TestNAPTR(t *testing.T) {
@@ -48,23 +66,14 @@ func TestNAPTR(t *testing.T) {
 		test := test
 		t.Run(test.in, func(t *testing.T) {
 			t.Parallel()
-			act, err := util.ReverseDNS(test.in, NAPTR)
+			act, err := util.ReverseDNS(test.in, dns.StringToType["NAPTR"])
 			assert.NilError(t, err)
 			assert.Equal(t, test.want, act)
 		})
 	}
 }
 
-func TestInvalid(t *testing.T) {
-	t.Parallel()
-
-	_, err := util.ReverseDNS("AAAAA", 1)
-	assert.ErrorContains(t, err, "invalid value AAAAA given")
-}
-
-func TestInvalid2(t *testing.T) {
-	t.Parallel()
-
-	_, err := util.ReverseDNS("1.0", PTR)
-	assert.ErrorContains(t, err, "PTR reverse")
+func TestInvalidAll(t *testing.T) {
+	_, err := util.ReverseDNS("q", 15236)
+	assert.ErrorContains(t, err, "invalid value")
 }

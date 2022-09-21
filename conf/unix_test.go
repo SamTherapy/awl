@@ -13,8 +13,10 @@ import (
 	"gotest.tools/v3/assert"
 )
 
-func TestNonWinConfig(t *testing.T) {
-	if runtime.GOOS == "windows" || runtime.GOOS == "plan9" {
+func TestUnixConfig(t *testing.T) {
+	t.Parallel()
+
+	if runtime.GOOS == "windows" || runtime.GOOS == "plan9" || runtime.GOOS == "js" || runtime.GOOS == "zos" {
 		t.Skip("Not running Unix-like, skipping")
 	}
 

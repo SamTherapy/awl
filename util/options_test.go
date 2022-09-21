@@ -17,21 +17,20 @@ func TestSubnet(t *testing.T) {
 		"::0/0",
 		"0",
 		"127.0.0.1/32",
+		"Invalid",
 	}
 
 	for _, test := range subnet {
 		test := test
+
 		t.Run(test, func(t *testing.T) {
 			t.Parallel()
 			err := util.ParseSubnet(test, new(util.Options))
-			assert.NilError(t, err)
+			if err != nil {
+				assert.ErrorContains(t, err, "invalid CIDR address")
+			} else {
+				assert.NilError(t, err)
+			}
 		})
 	}
-}
-
-func TestInvalidSub(t *testing.T) {
-	t.Parallel()
-
-	err := util.ParseSubnet("1", new(util.Options))
-	assert.ErrorContains(t, err, "invalid CIDR address")
 }

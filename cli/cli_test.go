@@ -11,51 +11,64 @@ import (
 )
 
 func TestEmpty(t *testing.T) {
+	t.Parallel()
+
 	args := []string{"awl", "-4"}
 
 	opts, err := cli.ParseCLI(args, "TEST")
-
 	assert.NilError(t, err)
-	assert.Equal(t, opts.Request.Port, 53)
 	assert.Assert(t, opts.IPv4)
+	assert.Equal(t, opts.Request.Port, 53)
 }
 
 func TestTLSPort(t *testing.T) {
+	t.Parallel()
+
 	args := []string{"awl", "-T"}
 
 	opts, err := cli.ParseCLI(args, "TEST")
-
 	assert.NilError(t, err)
 	assert.Equal(t, opts.Request.Port, 853)
 }
 
-func TestSubnet(t *testing.T) {
-	args := []string{"awl", "--subnet", "127.0.0.1/32"}
+func TestValidSubnet(t *testing.T) {
+	t.Parallel()
 
-	opts, err := cli.ParseCLI(args, "TEST")
+	tests := []struct {
+		args []string
+		want uint16
+	}{
+		{[]string{"awl", "--subnet", "127.0.0.1/32"}, uint16(1)},
+		{[]string{"awl", "--subnet", "0"}, uint16(1)},
+		{[]string{"awl", "--subnet", "::/0"}, uint16(2)},
+	}
 
-	assert.NilError(t, err)
-	assert.Equal(t, opts.EDNS.Subnet.Family, uint16(1))
+	for _, test := range tests {
+		test := test
 
-	args = []string{"awl", "--subnet", "0"}
+		t.Run(test.args[2], func(t *testing.T) {
+			t.Parallel()
 
-	opts, err = cli.ParseCLI(args, "TEST")
-	assert.NilError(t, err)
-	assert.Equal(t, opts.EDNS.Subnet.Family, uint16(1))
+			opts, err := cli.ParseCLI(test.args, "TEST")
 
-	args = []string{"awl", "--subnet", "::/0"}
+			assert.NilError(t, err)
+			assert.Equal(t, opts.EDNS.Subnet.Family, test.want)
+		})
+	}
+}
 
-	opts, err = cli.ParseCLI(args, "TEST")
-	assert.NilError(t, err)
-	assert.Equal(t, opts.EDNS.Subnet.Family, uint16(2))
+func TestInvalidSubnet(t *testing.T) {
+	t.Parallel()
 
-	args = []string{"awl", "--subnet", "/"}
+	args := []string{"awl", "--subnet", "/"}
 
-	opts, err = cli.ParseCLI(args, "TEST")
+	_, err := cli.ParseCLI(args, "TEST")
 	assert.ErrorContains(t, err, "EDNS subnet")
 }
 
 func TestMBZ(t *testing.T) {
+	t.Parallel()
+
 	args := []string{"awl", "--zflag", "G"}
 
 	_, err := cli.ParseCLI(args, "TEST")
@@ -64,6 +77,8 @@ func TestMBZ(t *testing.T) {
 }
 
 func TestInvalidFlag(t *testing.T) {
+	t.Parallel()
+
 	args := []string{"awl", "--treebug"}
 
 	_, err := cli.ParseCLI(args, "TEST")
@@ -72,6 +87,8 @@ func TestInvalidFlag(t *testing.T) {
 }
 
 func TestInvalidDig(t *testing.T) {
+	t.Parallel()
+
 	args := []string{"awl", "+a"}
 
 	_, err := cli.ParseCLI(args, "TEST")
@@ -80,6 +97,8 @@ func TestInvalidDig(t *testing.T) {
 }
 
 func TestVersion(t *testing.T) {
+	t.Parallel()
+
 	args := []string{"awl", "--version"}
 
 	_, err := cli.ParseCLI(args, "test")
@@ -88,6 +107,8 @@ func TestVersion(t *testing.T) {
 }
 
 func TestTimeout(t *testing.T) {
+	t.Parallel()
+
 	args := [][]string{
 		{"awl", "+timeout=0"},
 		{"awl", "--timeout", "0"},
@@ -95,14 +116,20 @@ func TestTimeout(t *testing.T) {
 	for _, test := range args {
 		test := test
 
-		opt, err := cli.ParseCLI(test, "TEST")
+		t.Run(test[1], func(t *testing.T) {
+			t.Parallel()
 
-		assert.NilError(t, err)
-		assert.Equal(t, opt.Request.Timeout, time.Second/2)
+			opt, err := cli.ParseCLI(test, "TEST")
+
+			assert.NilError(t, err)
+			assert.Equal(t, opt.Request.Timeout, time.Second/2)
+		})
 	}
 }
 
 func TestRetries(t *testing.T) {
+	t.Parallel()
+
 	args := [][]string{
 		{"awl", "+retry=-2"},
 		{"awl", "+tries=-2"},
@@ -111,10 +138,14 @@ func TestRetries(t *testing.T) {
 	for _, test := range args {
 		test := test
 
-		opt, err := cli.ParseCLI(test, "TEST")
+		t.Run(test[1], func(t *testing.T) {
+			t.Parallel()
 
-		assert.NilError(t, err)
-		assert.Equal(t, opt.Request.Retries, 0)
+			opt, err := cli.ParseCLI(test, "TEST")
+
+			assert.NilError(t, err)
+			assert.Equal(t, opt.Request.Retries, 0)
+		})
 	}
 }
 
