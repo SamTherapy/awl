@@ -63,14 +63,14 @@ test-ci:
 
 ## fuzz: runs fuzz tests
 fuzz: $(TEST_SOURCES)
-	$(TEST) -fuzz=FuzzFlags -fuzztime 10000x ./cli
-	$(TEST) -fuzz=FuzzDig -fuzztime 10000x ./cli
-	$(TEST) -fuzz=FuzzParseArgs -fuzztime 10000x ./cli
+	$(TEST) -fuzz=FuzzFlags -fuzztime 10000x ./cmd
+	$(TEST) -fuzz=FuzzDig -fuzztime 10000x ./cmd
+	$(TEST) -fuzz=FuzzParseArgs -fuzztime 10000x ./cmd
 
 fuzz-ci: $(TEST_SOURCES)
-	$(TEST) -fuzz=FuzzFlags -fuzztime 1000x ./cli
-	$(TEST) -fuzz=FuzzDig -fuzztime 1000x ./cli
-	$(TEST) -fuzz=FuzzParseArgs -fuzztime 1000x ./cli
+	$(TEST) -fuzz=FuzzFlags -fuzztime 1000x ./cmd
+	$(TEST) -fuzz=FuzzDig -fuzztime 1000x ./cmd
+	$(TEST) -fuzz=FuzzParseArgs -fuzztime 1000x ./cmd
 
 .PHONY: full_test
 full_test: test fuzz

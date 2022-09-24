@@ -9,9 +9,9 @@ import (
 	"os"
 	"strings"
 
-	"git.froth.zone/sam/awl/cli"
-	"git.froth.zone/sam/awl/query"
-	"git.froth.zone/sam/awl/util"
+	cli "git.froth.zone/sam/awl/cmd"
+	"git.froth.zone/sam/awl/pkg/query"
+	"git.froth.zone/sam/awl/pkg/util"
 )
 
 var version = "DEV"
