@@ -1,6 +1,3 @@
 [submodule "doc/wiki"]
 	path = doc/wiki
 	url = ../awl.wiki
-[submodule "pkg/awl-dns-git"]
-	path = pkg/awl-dns-git
-	url = https://aur.archlinux.org/awl-dns-git.git
