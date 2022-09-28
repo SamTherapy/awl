@@ -32,11 +32,11 @@ Grab a prebuilt binary from the
 
 Dependencies:
 
-- Go >= 1.18
+- [Go](https://go.dev/) >= 1.18
 - GNU/BSD make or Plan 9 mk (if using the makefile/mkfile)
-- scdoc (optional, for man page)
+- [scdoc](https://git.sr.ht/~sircmpwn/scdoc) (optional, for man page)
 
-Using `go install` (recommended):
+Using `go install`:
 
 ```sh
 go install git.froth.zone/sam/awl@latest
