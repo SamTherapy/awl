@@ -187,16 +187,26 @@ func TestRealPrint(t *testing.T) {
 
 		t.Run("", func(t *testing.T) {
 			t.Parallel()
-			resp, err := query.CreateQuery(test)
+
+			var (
+				res util.Response
+				err error
+			)
+			for i := 0; i <= test.Request.Retries; i++ {
+				res, err = query.CreateQuery(test)
+				if err == nil {
+					break
+				}
+			}
 			assert.NilError(t, err)
 
 			if test.JSON || test.XML || test.YAML {
 				str := ""
-				str, err = query.PrintSpecial(resp, test)
+				str, err = query.PrintSpecial(res, test)
 				assert.NilError(t, err)
 				assert.Assert(t, str != "")
 			}
-			str, err := query.ToString(resp, test)
+			str, err := query.ToString(res, test)
 			assert.NilError(t, err)
 			assert.Assert(t, str != "")
 		})

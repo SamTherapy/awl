@@ -3,12 +3,14 @@
 package resolvers_test
 
 import (
+	"errors"
 	"os"
 	"testing"
 	"time"
 
 	"git.froth.zone/sam/awl/pkg/query"
 	"git.froth.zone/sam/awl/pkg/util"
+	"github.com/ameshkov/dnscrypt/v2"
 	"github.com/miekg/dns"
 	"gotest.tools/v3/assert"
 )
@@ -116,7 +118,17 @@ func TestResolve(t *testing.T) {
 		t.Run(test.name, func(t *testing.T) {
 			t.Parallel()
 
-			res, err := query.CreateQuery(test.opts)
+			var (
+				res util.Response
+				err error
+			)
+			for i := 0; i <= test.opts.Request.Retries; i++ {
+				res, err = query.CreateQuery(test.opts)
+				if err == nil || errors.Is(err, dnscrypt.ErrInvalidDNSStamp) {
+					break
+				}
+			}
+
 			if err == nil {
 				assert.NilError(t, err)
 				assert.Assert(t, res != util.Response{})

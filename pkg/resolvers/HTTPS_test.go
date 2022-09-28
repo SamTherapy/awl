@@ -6,6 +6,7 @@ import (
 	"errors"
 	"testing"
 
+	"git.froth.zone/sam/awl/pkg/query"
 	"git.froth.zone/sam/awl/pkg/resolvers"
 	"git.froth.zone/sam/awl/pkg/util"
 	"github.com/miekg/dns"
@@ -76,13 +77,16 @@ func TestHTTPS(t *testing.T) {
 		t.Run(test.name, func(t *testing.T) {
 			t.Parallel()
 
-			resolver, err := resolvers.LoadResolver(test.opts)
-			assert.NilError(t, err)
-
-			msg := new(dns.Msg)
-			msg.SetQuestion(test.opts.Request.Name, test.opts.Request.Type)
-			// msg = msg.SetQuestion(testCase.Name, testCase.Type)
-			res, err := resolver.LookUp(msg)
+			var (
+				res util.Response
+				err error
+			)
+			for i := 0; i <= test.opts.Request.Retries; i++ {
+				res, err = query.CreateQuery(test.opts)
+				if err == nil || errors.Is(err, &resolvers.ErrHTTPStatus{}) {
+					break
+				}
+			}
 
 			if err == nil {
 				assert.NilError(t, err)

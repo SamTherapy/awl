@@ -6,7 +6,7 @@ import (
 	"testing"
 	"time"
 
-	"git.froth.zone/sam/awl/pkg/resolvers"
+	"git.froth.zone/sam/awl/pkg/query"
 	"git.froth.zone/sam/awl/pkg/util"
 	"github.com/miekg/dns"
 	"gotest.tools/v3/assert"
@@ -74,6 +74,7 @@ func TestQuic(t *testing.T) {
 					Type:    dns.TypeA,
 					Name:    "git.froth.zone",
 					Timeout: 10 * time.Millisecond,
+					Retries: 0,
 				},
 			},
 		},
@@ -85,13 +86,16 @@ func TestQuic(t *testing.T) {
 		t.Run(test.name, func(t *testing.T) {
 			t.Parallel()
 
-			resolver, err := resolvers.LoadResolver(test.opts)
-			assert.NilError(t, err)
-
-			msg := new(dns.Msg)
-			msg.SetQuestion(test.opts.Request.Name, test.opts.Request.Type)
-
-			res, err := resolver.LookUp(msg)
+			var (
+				res util.Response
+				err error
+			)
+			for i := 0; i <= test.opts.Request.Retries; i++ {
+				res, err = query.CreateQuery(test.opts)
+				if err == nil {
+					break
+				}
+			}
 
 			if err == nil {
 				assert.NilError(t, err)
