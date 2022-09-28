@@ -126,7 +126,18 @@ func TestCreateQ(t *testing.T) {
 
 		t.Run(test.name, func(t *testing.T) {
 			t.Parallel()
-			res, err := query.CreateQuery(test.opts)
+
+			var (
+				res util.Response
+				err error
+			)
+			for i := 0; i <= test.opts.Request.Retries; i++ {
+				res, err = query.CreateQuery(test.opts)
+				if err == nil {
+					break
+				}
+			}
+
 			assert.NilError(t, err)
 			assert.Assert(t, res != util.Response{})
 
