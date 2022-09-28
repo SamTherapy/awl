@@ -1,3 +1,4 @@
+#!/usr/bin/env bash
 # bash completion for awl                                  -*- shell-script -*-
 # SPDX-License-Identifier: BSD-3-Clause
 
