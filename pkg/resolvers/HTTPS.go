@@ -4,6 +4,7 @@ package resolvers
 
 import (
 	"bytes"
+	"crypto/tls"
 	"fmt"
 	"io"
 	"net/http"
@@ -15,7 +16,8 @@ import (
 
 // HTTPSResolver is for DNS-over-HTTPS queries.
 type HTTPSResolver struct {
-	opts util.Options
+	client http.Client
+	opts   util.Options
 }
 
 var _ Resolver = (*HTTPSResolver)(nil)
@@ -24,8 +26,19 @@ var _ Resolver = (*HTTPSResolver)(nil)
 func (resolver *HTTPSResolver) LookUp(msg *dns.Msg) (util.Response, error) {
 	var resp util.Response
 
-	httpR := &http.Client{
+	resolver.client = http.Client{
 		Timeout: resolver.opts.Request.Timeout,
+		Transport: &http.Transport{
+			MaxConnsPerHost:     1,
+			MaxIdleConns:        1,
+			MaxIdleConnsPerHost: 1,
+			Proxy:               http.ProxyFromEnvironment,
+			TLSClientConfig: &tls.Config{
+				//nolint:gosec // This is intentional if the user requests it
+				InsecureSkipVerify: resolver.opts.TLSNoVerify,
+				ServerName:         resolver.opts.TLSHost,
+			},
+		},
 	}
 
 	buf, err := msg.Pack()
@@ -44,7 +57,7 @@ func (resolver *HTTPSResolver) LookUp(msg *dns.Msg) (util.Response, error) {
 	req.Header.Set("Accept", "application/dns-message")
 
 	now := time.Now()
-	res, err := httpR.Do(req)
+	res, err := resolver.client.Do(req)
 	resp.RTT = time.Since(now)
 
 	if err != nil {
