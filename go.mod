@@ -4,7 +4,7 @@ go 1.18
 
 require (
 	github.com/ameshkov/dnscrypt/v2 v2.2.5
-	github.com/dchest/uniuri v0.0.0-20200228104902-7aecb25e1fe5
+	github.com/dchest/uniuri v0.0.0-20220929095258-3027df40b6ce
 	github.com/lucas-clemente/quic-go v0.29.1
 	github.com/miekg/dns v1.1.50
 	github.com/stefansundin/go-zflag v1.1.1
