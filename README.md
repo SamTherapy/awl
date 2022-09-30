@@ -45,7 +45,6 @@ go install git.froth.zone/sam/awl@latest
 Using the makefile:
 
 ```sh
-make
 make && sudo make install
 ```
 
