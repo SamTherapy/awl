@@ -9,7 +9,7 @@ require (
 	github.com/miekg/dns v1.1.50
 	github.com/stefansundin/go-zflag v1.1.1
 	golang.org/x/net v0.0.0-20221004154528-8021a29435af
-	golang.org/x/sys v0.0.0-20220928140112-f11e5e49a4ec
+	golang.org/x/sys v0.0.0-20221006211917-84dc82d7e875
 	gopkg.in/yaml.v3 v3.0.1
 	gotest.tools/v3 v3.3.0
 )
