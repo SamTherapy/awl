@@ -21,7 +21,7 @@ import (
 // ToString turns the response into something that looks a lot like dig
 //
 // Much of this is taken from https://github.com/miekg/dns/blob/master/msg.go#L900
-func ToString(res util.Response, opts util.Options) (string, error) {
+func ToString(res util.Response, opts *util.Options) (string, error) {
 	if res.DNS == nil {
 		return "<nil> MsgHdr", errNoMessage
 	}
@@ -146,7 +146,7 @@ func ToString(res util.Response, opts util.Options) (string, error) {
 	return s, nil
 }
 
-func serverExtra(opts util.Options) string {
+func serverExtra(opts *util.Options) string {
 	// Add extra information to server string
 	var extra string
 
@@ -167,7 +167,7 @@ func serverExtra(opts util.Options) string {
 }
 
 // stringParse edits the raw responses to user requests.
-func stringParse(str string, isAns bool, opts util.Options) (string, error) {
+func stringParse(str string, isAns bool, opts *util.Options) (string, error) {
 	split := strings.Split(str, "\t")
 
 	// Make edits if so requested
@@ -220,7 +220,7 @@ func stringParse(str string, isAns bool, opts util.Options) (string, error) {
 
 // PrintSpecial is for printing as JSON, XML or YAML.
 // As of now JSON and XML use the stdlib version.
-func PrintSpecial(res util.Response, opts util.Options) (string, error) {
+func PrintSpecial(res util.Response, opts *util.Options) (string, error) {
 	formatted, err := MakePrintable(res, opts)
 	if err != nil {
 		return "", err
@@ -252,7 +252,7 @@ func PrintSpecial(res util.Response, opts util.Options) (string, error) {
 
 // MakePrintable takes a DNS message and makes it nicer to be printed as JSON,YAML,
 // and XML. Little is changed beyond naming.
-func MakePrintable(res util.Response, opts util.Options) (*Message, error) {
+func MakePrintable(res util.Response, opts *util.Options) (*Message, error) {
 	var (
 		err error
 		msg = res.DNS

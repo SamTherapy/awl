@@ -14,7 +14,7 @@ import (
 func TestRealPrint(t *testing.T) {
 	t.Parallel()
 
-	opts := []util.Options{
+	opts := []*util.Options{
 		{
 			Logger: util.InitLogger(0),
 
@@ -216,14 +216,14 @@ func TestRealPrint(t *testing.T) {
 func TestBadFormat(t *testing.T) {
 	t.Parallel()
 
-	_, err := query.PrintSpecial(util.Response{DNS: new(dns.Msg)}, util.Options{})
+	_, err := query.PrintSpecial(util.Response{DNS: new(dns.Msg)}, new(util.Options))
 	assert.ErrorContains(t, err, "never happen")
 }
 
 func TestEmpty(t *testing.T) {
 	t.Parallel()
 
-	str, err := query.ToString(util.Response{}, util.Options{})
+	str, err := query.ToString(util.Response{}, new(util.Options))
 
 	assert.Error(t, err, "no message")
 	assert.Assert(t, str == "<nil> MsgHdr")

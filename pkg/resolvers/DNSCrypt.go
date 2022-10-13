@@ -13,7 +13,7 @@ import (
 
 // DNSCryptResolver is for making DNSCrypt queries.
 type DNSCryptResolver struct {
-	opts util.Options
+	opts *util.Options
 }
 
 var _ Resolver = (*DNSCryptResolver)(nil)

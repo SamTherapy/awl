@@ -14,13 +14,14 @@ import (
 func TestCreateQ(t *testing.T) {
 	t.Parallel()
 
+	//nolint:govet // I could not be assed to refactor this, and it is only for tests
 	tests := []struct {
 		name string
-		opts util.Options
+		opts *util.Options
 	}{
 		{
 			"1",
-			util.Options{
+			&util.Options{
 				Logger: util.InitLogger(0),
 				HeaderFlags: util.HeaderFlags{
 					Z: true,
@@ -59,7 +60,7 @@ func TestCreateQ(t *testing.T) {
 		},
 		{
 			"2",
-			util.Options{
+			&util.Options{
 				Logger: util.InitLogger(0),
 				HeaderFlags: util.HeaderFlags{
 					Z: true,
@@ -88,7 +89,7 @@ func TestCreateQ(t *testing.T) {
 		},
 		{
 			"3",
-			util.Options{
+			&util.Options{
 				Logger: util.InitLogger(0),
 				JSON:   true,
 				QUIC:   true,

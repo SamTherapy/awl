@@ -16,13 +16,14 @@ import (
 func TestDNSCrypt(t *testing.T) {
 	t.Parallel()
 
+	//nolint:govet // I could not be assed to refactor this, and it is only for tests
 	tests := []struct {
 		name string
-		opts util.Options
+		opts *util.Options
 	}{
 		{
 			"Valid",
-			util.Options{
+			&util.Options{
 				Logger:   util.InitLogger(0),
 				DNSCrypt: true,
 				Request: util.Request{
@@ -35,7 +36,7 @@ func TestDNSCrypt(t *testing.T) {
 		},
 		{
 			"Valid (TCP)",
-			util.Options{
+			&util.Options{
 				Logger:   util.InitLogger(0),
 				DNSCrypt: true,
 				TCP:      true,
@@ -50,7 +51,7 @@ func TestDNSCrypt(t *testing.T) {
 		},
 		{
 			"Invalid",
-			util.Options{
+			&util.Options{
 				Logger:   util.InitLogger(0),
 				DNSCrypt: true,
 				TCP:      true,

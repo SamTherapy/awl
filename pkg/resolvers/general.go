@@ -13,7 +13,7 @@ import (
 
 // StandardResolver is for UDP/TCP resolvers.
 type StandardResolver struct {
-	opts util.Options
+	opts *util.Options
 }
 
 var _ Resolver = (*StandardResolver)(nil)

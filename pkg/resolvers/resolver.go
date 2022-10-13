@@ -22,7 +22,7 @@ type Resolver interface {
 }
 
 // LoadResolver loads the respective resolver for performing a DNS query.
-func LoadResolver(opts util.Options) (Resolver, error) {
+func LoadResolver(opts *util.Options) (Resolver, error) {
 	switch {
 	case opts.HTTPS:
 		opts.Logger.Info("loading DNS-over-HTTPS resolver")

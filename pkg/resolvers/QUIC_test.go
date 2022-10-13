@@ -15,13 +15,14 @@ import (
 func TestQuic(t *testing.T) {
 	t.Parallel()
 
+	//nolint:govet // I could not be assed to refactor this, and it is only for tests
 	tests := []struct {
 		name string
-		opts util.Options
+		opts *util.Options
 	}{
 		{
 			"Valid",
-			util.Options{
+			&util.Options{
 				QUIC:   true,
 				Logger: util.InitLogger(0),
 				Request: util.Request{
@@ -35,7 +36,7 @@ func TestQuic(t *testing.T) {
 		},
 		{
 			"Bad domain",
-			util.Options{
+			&util.Options{
 				QUIC:   true,
 				Logger: util.InitLogger(0),
 				Request: util.Request{
@@ -50,7 +51,7 @@ func TestQuic(t *testing.T) {
 		},
 		{
 			"Not canonical",
-			util.Options{
+			&util.Options{
 				QUIC:   true,
 				Logger: util.InitLogger(0),
 				Request: util.Request{
@@ -65,7 +66,7 @@ func TestQuic(t *testing.T) {
 		},
 		{
 			"Invalid query domain",
-			util.Options{
+			&util.Options{
 				QUIC:   true,
 				Logger: util.InitLogger(0),
 				Request: util.Request{

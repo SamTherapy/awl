@@ -17,7 +17,7 @@ import (
 
 // ParseCLI parses arguments given from the CLI and passes them into an `Options`
 // struct.
-func ParseCLI(args []string, version string) (util.Options, error) {
+func ParseCLI(args []string, version string) (*util.Options, error) {
 	flagSet := flag.NewFlagSet(args[0], flag.ContinueOnError)
 
 	flagSet.Usage = func() {
@@ -105,13 +105,13 @@ func ParseCLI(args []string, version string) (util.Options, error) {
 
 	// Parse the flags
 	if err := flagSet.Parse(args[1:]); err != nil {
-		return util.Options{Logger: util.InitLogger(*verbosity)}, fmt.Errorf("flag: %w", err)
+		return &util.Options{Logger: util.InitLogger(*verbosity)}, fmt.Errorf("flag: %w", err)
 	}
 
 	// TODO: DRY, dumb dumb.
 	mbz, err := strconv.ParseInt(*mbzflag, 0, 16)
 	if err != nil {
-		return util.Options{Logger: util.InitLogger(*verbosity)}, fmt.Errorf("EDNS MBZ: %w", err)
+		return &util.Options{Logger: util.InitLogger(*verbosity)}, fmt.Errorf("EDNS MBZ: %w", err)
 	}
 
 	opts := util.Options{
@@ -179,7 +179,7 @@ func ParseCLI(args []string, version string) (util.Options, error) {
 	// TODO: DRY
 	if *subnet != "" {
 		if err = util.ParseSubnet(*subnet, &opts); err != nil {
-			return opts, fmt.Errorf("%w", err)
+			return &opts, fmt.Errorf("%w", err)
 		}
 	}
 
@@ -189,14 +189,14 @@ func ParseCLI(args []string, version string) (util.Options, error) {
 	if *versionFlag {
 		fmt.Printf("awl version %s, built with %s\n", version, runtime.Version())
 
-		return opts, ErrNotError
+		return &opts, ErrNotError
 	}
 
 	// Parse all the arguments that don't start with - or --
 	// This includes the dig-style (+) options
 	err = ParseMiscArgs(flagSet.Args(), &opts)
 	if err != nil {
-		return opts, err
+		return &opts, err
 	}
 
 	opts.Logger.Info("Dig/Drill flags parsed")
@@ -224,7 +224,7 @@ func ParseCLI(args []string, version string) (util.Options, error) {
 	opts.Logger.Info("Options fully populated")
 	opts.Logger.Debug(fmt.Sprintf("%+v", opts))
 
-	return opts, nil
+	return &opts, nil
 }
 
 // ErrNotError is for returning not error.

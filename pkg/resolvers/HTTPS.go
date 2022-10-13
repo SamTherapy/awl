@@ -16,8 +16,8 @@ import (
 
 // HTTPSResolver is for DNS-over-HTTPS queries.
 type HTTPSResolver struct {
+	opts   *util.Options
 	client http.Client
-	opts   util.Options
 }
 
 var _ Resolver = (*HTTPSResolver)(nil)

@@ -15,7 +15,7 @@ import (
 
 // QUICResolver is for DNS-over-QUIC queries.
 type QUICResolver struct {
-	opts util.Options
+	opts *util.Options
 }
 
 var _ Resolver = (*QUICResolver)(nil)

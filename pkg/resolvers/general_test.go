@@ -18,13 +18,14 @@ import (
 func TestResolve(t *testing.T) {
 	t.Parallel()
 
+	//nolint:govet // I could not be assed to refactor this, and it is only for tests
 	tests := []struct {
 		name string
-		opts util.Options
+		opts *util.Options
 	}{
 		{
 			"UDP",
-			util.Options{
+			&util.Options{
 				Logger: util.InitLogger(0),
 				Request: util.Request{
 					Server:  "8.8.4.4",
@@ -37,7 +38,7 @@ func TestResolve(t *testing.T) {
 		},
 		{
 			"UDP (Bad Cookie)",
-			util.Options{
+			&util.Options{
 				Logger:    util.InitLogger(0),
 				BadCookie: false,
 				Request: util.Request{
@@ -55,7 +56,7 @@ func TestResolve(t *testing.T) {
 		},
 		{
 			"UDP (Truncated)",
-			util.Options{
+			&util.Options{
 				Logger: util.InitLogger(0),
 				IPv4:   true,
 				Request: util.Request{
@@ -69,7 +70,7 @@ func TestResolve(t *testing.T) {
 		},
 		{
 			"TCP",
-			util.Options{
+			&util.Options{
 				Logger: util.InitLogger(0),
 				TCP:    true,
 
@@ -84,7 +85,7 @@ func TestResolve(t *testing.T) {
 		},
 		{
 			"TLS",
-			util.Options{
+			&util.Options{
 				Logger: util.InitLogger(0),
 				TLS:    true,
 				Request: util.Request{
@@ -98,7 +99,7 @@ func TestResolve(t *testing.T) {
 		},
 		{
 			"Timeout",
-			util.Options{
+			&util.Options{
 				Logger: util.InitLogger(0),
 				Request: util.Request{
 					Server:  "8.8.4.1",

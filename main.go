@@ -28,7 +28,7 @@ func main() {
 	}
 }
 
-func run(args []string) (opts util.Options, code int, err error) {
+func run(args []string) (opts *util.Options, code int, err error) {
 	opts, err = cli.ParseCLI(args, version)
 	if err != nil {
 		return opts, 1, fmt.Errorf("parse: %w", err)

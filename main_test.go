@@ -10,8 +10,7 @@ import (
 )
 
 func TestRun(t *testing.T) {
-	t.Parallel()
-
+	//	t.Parallel()
 	args := [][]string{
 		{"awl", "+yaml", "@1.1.1.1"},
 		{"awl", "+short", "@1.1.1.1"},
@@ -21,7 +20,6 @@ func TestRun(t *testing.T) {
 		test := test
 
 		t.Run("", func(t *testing.T) {
-			t.Parallel()
 			_, code, err := run(test)
 			assert.NilError(t, err)
 			assert.Equal(t, code, 0)
@@ -30,8 +28,7 @@ func TestRun(t *testing.T) {
 }
 
 func TestHelp(t *testing.T) {
-	t.Parallel()
-
+	// t.Parallel()
 	args := []string{"awl", "-h"}
 
 	_, code, err := run(args)

@@ -14,7 +14,7 @@ import (
 
 // CreateQuery creates a DNS query from the options given.
 // It sets query flags and EDNS flags from the respective options.
-func CreateQuery(opts util.Options) (util.Response, error) {
+func CreateQuery(opts *util.Options) (util.Response, error) {
 	req := new(dns.Msg)
 	req.SetQuestion(opts.Request.Name, opts.Request.Type)
 	req.Question[0].Qclass = opts.Request.Class

@@ -16,13 +16,14 @@ import (
 func TestHTTPS(t *testing.T) {
 	t.Parallel()
 
+	//nolint:govet // I could not be assed to refactor this, and it is only for tests
 	tests := []struct {
 		name string
-		opts util.Options
+		opts *util.Options
 	}{
 		{
 			"Good",
-			util.Options{
+			&util.Options{
 				HTTPS:  true,
 				Logger: util.InitLogger(0),
 				Request: util.Request{
@@ -35,7 +36,7 @@ func TestHTTPS(t *testing.T) {
 		},
 		{
 			"404",
-			util.Options{
+			&util.Options{
 				HTTPS:  true,
 				Logger: util.InitLogger(0),
 				Request: util.Request{
@@ -47,7 +48,7 @@ func TestHTTPS(t *testing.T) {
 		},
 		{
 			"Bad request domain",
-			util.Options{
+			&util.Options{
 				HTTPS:  true,
 				Logger: util.InitLogger(0),
 				Request: util.Request{
@@ -59,7 +60,7 @@ func TestHTTPS(t *testing.T) {
 		},
 		{
 			"Bad server domain",
-			util.Options{
+			&util.Options{
 				HTTPS:  true,
 				Logger: util.InitLogger(0),
 				Request: util.Request{
