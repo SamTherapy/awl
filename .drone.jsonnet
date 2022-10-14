@@ -136,7 +136,6 @@ local release() = {
       name: 'trigger',
       image: 'plugins/downstream',
       settings: {
-        server: 'ci.git.froth.zone',
         token: {
           DRONE_TOKEN: {
             from_secret: 'DRONE_TOKEN',
