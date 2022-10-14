@@ -27,6 +27,13 @@ Grab a prebuilt binary from the
 ### Package Managers
 
 - AUR: [awl-dns-git](https://aur.archlinux.org/packages/awl-dns-git)
+- Debian/Ubuntu (WIP):
+
+  ```sh
+  echo "deb [trusted=yes] http://packages.freecumextremist.finance/awl/apt awl main" | sudo tee /etc/apt/sources.list.d/awl.list
+  sudo apt update
+  sudo apt install awl
+  ```
 
 ### From source
 
