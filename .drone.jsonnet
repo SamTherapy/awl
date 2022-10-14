@@ -10,13 +10,16 @@ local testing(version, arch) = {
   steps: [
     {
       name: 'lint',
-      image: 'rancher/drone-golangci-lint:latest',
+      image: 'golangci/golangci-lint',
+      commands: [
+        'golangci-lint run ./...',
+      ],
     },
     {
       name: 'cache',
       image: 'golang:' + version,
       commands: [
-        'go mod tidy'
+        'go mod tidy',
       ],
       depends_on: [
         'lint',
@@ -81,6 +84,9 @@ local release() = {
   kind: 'pipeline',
   type: 'docker',
   name: 'release',
+  clone: {
+    disable: true,
+  },
   trigger: {
     event: [
       'tag',
@@ -88,11 +94,11 @@ local release() = {
   },
   steps: [
     {
-      name: 'fetch',
-      image: 'alpine/git',
-      commands: [
-        'git fetch --tags',
-      ],
+      name: 'clone',
+      image: 'woodpeckerci/plugin-git',
+      settings: {
+        tags: true,
+      },
     },
     {
       name: 'test',
@@ -116,6 +122,7 @@ local release() = {
         },
       },
       commands: [
+        'apk add --no-cache scdoc',
         'goreleaser release',
       ],
       volumes: [
@@ -125,8 +132,27 @@ local release() = {
         },
       ],
     },
+    {
+      name: 'trigger',
+      image: 'plugins/downstream',
+      settings: {
+        server: 'ci.git.froth.zone',
+        token: {
+          DRONE_TOKEN: {
+            from_secret: 'DRONE_TOKEN',
+          },
+        },
+        fork: true,
+        repositories: [
+          'packages/awl',
+        ],
+        parameters: [
+          'TAG=${DRONE_TAG}',
+        ],
+      },
+    },
   ],
-    volumes: [
+  volumes: [
     {
       name: 'cache',
       temp: {},

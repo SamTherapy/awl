@@ -1,4 +1,3 @@
-#!/usr/bin/env fish
 # SPDX-License-Identifier: BSD-3-Clause
 function __fish_complete_awl
     set -l token (commandline -ct)

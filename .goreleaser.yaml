@@ -2,47 +2,32 @@
 # Make sure to check the documentation at https://goreleaser.com
 before:
   hooks:
+    - make clean
     # You may remove this if you don't use go modules.
     - go mod tidy
     # you may remove this if you don't need go generate
     # - go generate ./...
+    - doc/makeman.sh
 builds:
   - env:
       - CGO_ENABLED=0
-    goos:
-      - linux
-      - windows
-      - darwin
-      - freebsd
-    goarch:
-      - amd64
-      - arm
-      - arm64
-    ignore:
-      # Windows on ARM, maybe someday
-      - goos: windows
-        goarch: arm64
-      - goos: windows
-        goarch: arm
-
-      - goos: darwin
-        goarch: arm
-      - goos: freebsd
-        goarch: arm
+    targets:
+      - go_first_class
+      - plan9_amd64
+      - freebsd_amd64
 
 universal_binaries:
   - replace: true
 
 archives:
-  -
-    files:
+  - files:
       - LICENCE
       - completions/**
+      - doc/awl.1.gz
     replacements:
       darwin: macOS
       linux: Linux
       windows: Windows
-      amd64: x86_64
     format_overrides:
       - goos: windows
         format: zip
@@ -57,16 +42,16 @@ changelog:
   sort: asc
 
   groups:
-    - title: 'Dependency Updates'
+    - title: "Dependency Updates"
       regexp: "^.*fix\\(deps\\)*:+.*$"
       order: 2
-    - title: 'Features'
+    - title: "Features"
       regexp: "^.*feat[(\\w)]*:+.*$"
       order: 0
-    - title: 'Bug fixes'
+    - title: "Bug fixes"
       regexp: "^.*fix[(\\w)]*:+.*$"
       order: 1
-    - title: 'Other'
+    - title: "Other"
       order: 999
 
   filters:
@@ -76,6 +61,43 @@ changelog:
       - "^docs?:"
       - "typo"
       - "^ci:"
+
+nfpms:
+  - id: packages
+    maintainer: Sam <sam@samtherapy.net>
+    homepage: https://dns.froth.zone/awl
+    description: |-
+      Command-line DNS query tool.
+      Awl supports DNS-over-[UDP,TCP,HTTPS,QUIC] and DNSCrypt.
+    license: BSD 3 Clause
+    bindir: /usr/bin
+    section: utils
+    formats:
+      - deb
+      # - rpm
+      # - apk
+    contents:
+      - src: completions/bash.bash
+        dst: /usr/share/bash-completion/completions/awl
+      - src: completions/zsh.zsh
+        dst: /usr/share/zsh/vendor-completions/_awl
+        packager: deb
+      - src: completions/zsh.zsh
+        dst: /usr/share/zsh/site-functions/_awl
+        packager: apk
+      - src: completions/zsh.zsh
+        dst: /usr/share/zsh/site-functions/_awl
+        packager: rpm
+      - src: completions/fish.fish
+        dst: /usr/share/fish/vendor_completions.d/awl.fish
+      - src: doc/awl.1.gz
+        dst: /usr/share/man/man1/awl.1.gz
+      - src: LICENCE
+        dst: /usr/share/doc/awl/copyright
+    deb:
+      lintian_overrides:
+        - statically-linked-binary
+        - changelog-file-missing-in-native-package
 
 gitea_urls:
   api: https://git.froth.zone/api/v1/

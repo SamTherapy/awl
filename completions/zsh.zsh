@@ -96,7 +96,7 @@ _arguments -s -C $args \
   '*--tls-host+[set TLS lookup hostname]:host:_hosts' \
   '*-'{s,-short}'+[print terse output]' \
   '*-'{j,-json}'+[present the results as JSON]' \
-  '*-'{x,-xml}'+[present the results as XML]' \
+  '*-'{X,-xml}'+[present the results as XML]' \
   '*-'{y,-yaml}'+[present the results as YAML]' \
   '*: :->args' && ret=0
 

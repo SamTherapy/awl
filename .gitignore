@@ -24,5 +24,6 @@ coverage/*
 
 awl
 doc/awl.1
+doc/awl.1.gz
 
 .dccache
