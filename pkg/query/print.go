@@ -147,23 +147,18 @@ func ToString(res util.Response, opts *util.Options) (string, error) {
 }
 
 func serverExtra(opts *util.Options) string {
-	// Add extra information to server string
-	var extra string
-
 	switch {
 	case opts.TCP:
-		extra = ":" + strconv.Itoa(opts.Request.Port) + " (TCP)"
+		return " (TCP)"
 	case opts.TLS:
-		extra = ":" + strconv.Itoa(opts.Request.Port) + " (TLS)"
+		return " (TLS)"
 	case opts.HTTPS, opts.DNSCrypt:
-		extra = ""
+		return ""
 	case opts.QUIC:
-		extra = ":" + strconv.Itoa(opts.Request.Port) + " (QUIC)"
+		return " (QUIC)"
 	default:
-		extra = ":" + strconv.Itoa(opts.Request.Port) + " (UDP)"
+		return " (UDP)"
 	}
-
-	return extra
 }
 
 // stringParse edits the raw responses to user requests.
@@ -419,7 +414,7 @@ func MakePrintable(res util.Response, opts *util.Options) (*Message, error) {
 		ret.Statistics = Statistics{
 			RTT:     res.RTT.String(),
 			Server:  opts.Request.Server + serverExtra(opts),
-			When:    time.Now().Format(time.RFC1123Z),
+			When:    time.Now().Format(time.RFC3339),
 			MsgSize: res.DNS.Len(),
 		}
 	} else {
