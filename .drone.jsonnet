@@ -141,7 +141,6 @@ local release() = {
             from_secret: 'DRONE_TOKEN',
           },
         },
-        fork: true,
         repositories: [
           'packages/awl',
         ],

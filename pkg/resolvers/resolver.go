@@ -36,7 +36,10 @@ func LoadResolver(opts *util.Options) (Resolver, error) {
 		}, nil
 	case opts.QUIC:
 		opts.Logger.Info("loading DNS-over-QUIC resolver")
-		opts.Request.Server = net.JoinHostPort(opts.Request.Server, strconv.Itoa(opts.Request.Port))
+
+		if !strings.HasSuffix(opts.Request.Server, ":"+strconv.Itoa(opts.Request.Port)) {
+			opts.Request.Server = net.JoinHostPort(opts.Request.Server, strconv.Itoa(opts.Request.Port))
+		}
 
 		return &QUICResolver{
 			opts: opts,
@@ -53,7 +56,10 @@ func LoadResolver(opts *util.Options) (Resolver, error) {
 		}, nil
 	default:
 		opts.Logger.Info("loading standard/DNS-over-TLS resolver")
-		opts.Request.Server = net.JoinHostPort(opts.Request.Server, strconv.Itoa(opts.Request.Port))
+
+		if !strings.HasSuffix(opts.Request.Server, ":"+strconv.Itoa(opts.Request.Port)) {
+			opts.Request.Server = net.JoinHostPort(opts.Request.Server, strconv.Itoa(opts.Request.Port))
+		}
 
 		return &StandardResolver{
 			opts: opts,
