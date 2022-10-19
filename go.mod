@@ -8,7 +8,7 @@ require (
 	github.com/lucas-clemente/quic-go v0.29.2
 	github.com/miekg/dns v1.1.50
 	github.com/stefansundin/go-zflag v1.1.1
-	golang.org/x/net v0.0.0-20221017152216-f25eb7ecb193
+	golang.org/x/net v0.0.0-20221019024206-cb67ada4b0ad
 	golang.org/x/sys v0.1.0
 	gopkg.in/yaml.v3 v3.0.1
 	gotest.tools/v3 v3.4.0
