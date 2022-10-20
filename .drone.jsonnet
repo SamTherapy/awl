@@ -137,9 +137,7 @@ local release() = {
       image: 'plugins/downstream',
       settings: {
         token: {
-          DRONE_TOKEN: {
-            from_secret: 'DRONE_TOKEN',
-          },
+          from_secret: 'DRONE_TOKEN',
         },
         repositories: [
           'packages/awl',
