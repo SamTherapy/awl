@@ -30,7 +30,10 @@ Grab a prebuilt binary from the
 - Debian/Ubuntu (WIP):
 
   ```sh
-  echo "deb [trusted=yes] https://packages.freecumextremist.finance/awl/apt awl main" | sudo tee /etc/apt/sources.list.d/awl.list
+  # Add PGP key
+  curl -sL https://packages.freecumextremist.finance/key.asc | sudo tee /usr/share/keyrings/awl.asc >/dev/null
+  # Add repo
+  echo "deb [signed-by=/usr/share/keyrings/awl.asc] https://packages.freecumextremist.finance/awl/apt awl main" | sudo tee /etc/apt/sources.list.d/awl.list
   sudo apt update
   sudo apt install awl
   ```
