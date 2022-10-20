@@ -54,7 +54,7 @@ func ParseDig(arg string, opts *util.Options) error {
 		opts.Display.ShowClass = isNo
 
 	// EDNS queries
-	case "dnssec":
+	case "do", "dnssec":
 		opts.EDNS.DNSSEC = isNo
 	case "expire":
 		opts.EDNS.Expire = isNo
@@ -79,8 +79,6 @@ func ParseDig(arg string, opts *util.Options) error {
 		opts.TLS = isNo
 	case "dnscrypt":
 		opts.DNSCrypt = isNo
-	case "https":
-		opts.HTTPS = isNo
 	case "quic":
 		opts.QUIC = isNo
 	// End DNS-over-X
@@ -204,6 +202,18 @@ func parseDigEq(startNo bool, arg string, opts *util.Options) error {
 			opts.EDNS.Version = uint8(ver)
 		} else {
 			opts.EDNS.Version = 0
+		}
+
+	case "https", "https-get", "https-post":
+		opts.HTTPS = startNo
+		if isSplit && val != "" {
+			opts.HTTPSOptions.Endpoint = val
+		} else {
+			opts.HTTPSOptions.Endpoint = "/dns-query"
+		}
+
+		if strings.HasSuffix(arg, "get") {
+			opts.HTTPSOptions.Get = true
 		}
 
 	case "subnet":

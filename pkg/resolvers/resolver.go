@@ -31,6 +31,8 @@ func LoadResolver(opts *util.Options) (Resolver, error) {
 			opts.Request.Server = "https://" + opts.Request.Server
 		}
 
+		opts.Request.Server += opts.HTTPSOptions.Endpoint
+
 		return &HTTPSResolver{
 			opts: opts,
 		}, nil

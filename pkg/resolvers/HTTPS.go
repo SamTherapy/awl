@@ -48,7 +48,14 @@ func (resolver *HTTPSResolver) LookUp(msg *dns.Msg) (util.Response, error) {
 
 	resolver.opts.Logger.Debug("https: sending HTTPS request")
 
-	req, err := http.NewRequest("POST", resolver.opts.Request.Server, bytes.NewBuffer(buf))
+	var method string
+	if resolver.opts.HTTPSOptions.Get {
+		method = "GET"
+	} else {
+		method = "POST"
+	}
+
+	req, err := http.NewRequest(method, resolver.opts.Request.Server, bytes.NewBuffer(buf))
 	if err != nil {
 		return util.Response{}, fmt.Errorf("doh: request creation: %w", err)
 	}

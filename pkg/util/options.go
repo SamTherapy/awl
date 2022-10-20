@@ -18,8 +18,12 @@ type Options struct {
 	TLSHost string `json:"tlsHost" example:""`
 	// EDNS Options
 	EDNS
+
+	// HTTPS options :)
+	HTTPSOptions
+
 	// DNS request :)
-	Request Request
+	Request
 
 	// Verbosity levels, see [logawl.AllLevels]
 	Verbosity int `json:"-" example:"0"`
@@ -63,6 +67,16 @@ type Options struct {
 	IPv4 bool `json:"forceIPv4" example:"false"`
 	// Force IPv6 only
 	IPv6 bool `json:"forceIPv6" example:"false"`
+}
+
+// HTTPSOptions are options exclusively for DNS-over-HTTPS queries.
+type HTTPSOptions struct {
+	// URL endpoint
+	Endpoint string `json:"endpoint" example:"/dns-query"`
+
+	// True, make GET request.
+	// False, make POST request.
+	Get bool `json:"get" example:"false"`
 }
 
 // HeaderFlags are the flags that are in DNS headers.

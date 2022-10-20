@@ -25,13 +25,14 @@ some more recent RFCs and output options.
 When no arguments are given, *awl* will perform an _NS_ query on the root ('_._').
 
 When a nameserver is not given, *awl* will query a random system nameserver.
-If one cannot be found, *awl* will query localhost.
+If one cannot be found, *awl* will query the localhost.
 
 # OPTIONS
 
 Anything in [brackets] is optional.
+Many options are inherited from *dig*(1).
 
-*-D*, *--dnssec*, *+dnssec*
+*-D*, *--dnssec*, *+dnssec*, *+do*
 	Enable DNSSEC. This needs to be manually enabled.
 
 *-v*[=_int_]
@@ -83,13 +84,13 @@ Anything in [brackets] is optional.
 *--no-bad-cookie*, *+[no]badcookie*
 	\[Do not\] ignore BADCOOKIE responses
 
-*--tcp*, *+tcp*, *+vc*
+*--tcp*, *+[no]tcp*, *+[no]vc*
 	Use TCP for the query (see RFC 7766).
 
-*--dnscrypt*, *+dnscrypt*
+*--dnscrypt*, *+[no]dnscrypt*
 	Use DNSCrypt.
 
-*-T*, *--tls*, *+tls*
+*-T*, *--tls*, *+[no]tls*
 	Use DNS-over-TLS, implies *--tcp* (see RFC 7858)
 
 *--tls-host* _string_
@@ -99,10 +100,10 @@ Anything in [brackets] is optional.
 *--tls-no-verify*
 	Ignore TLS validation when performing a DNS query.
 
-*-H*. *--https*, *+https*
+*-H*. *--https*, *+[no]https*
 	Use DNS-over-HTTPS (see RFC 8484).
 
-*-Q*. *--quic*, *+quic*
+*-Q*. *--quic*, *+[no]quic*
 	Use DNS-over-QUIC (see RFC 9250).
 
 *-x*, *--reverse*
@@ -204,16 +205,16 @@ All of these options except disabling EDNS imply *+edns*.
 
 ## Output Formats
 
-*-j*, *--json*, *+json*
+*-j*, *--json*, *+[no]json*
 	Print the query results as JSON.
 
-*-X*, *--xml*, *+xml*
+*-X*, *--xml*, *+[no]xml*
 	Print the query results as XML.
 
-*-y*, *--yaml*, *+yaml*
+*-y*, *--yaml*, *+[no]yaml*
 	Print the query results as YAML.
 
-*-s*, *--short*, *+short*
+*-s*, *--short*, *+[no]short*
 	Print just the address of the answer.
 
 # EXIT STATUS
@@ -253,8 +254,6 @@ RFC 1034,1035 (UDP), 7766 (TCP), 7858 (TLS), 8484 (HTTPS), 9230 (QUIC)
 Probably more, _https://www.statdns.com/rfc_
 
 # BUGS
-
-OPT records are only printed when using a standard output, not JSON/XML/YAML.
 
 Full parity with *dig*(1) is not complete.
 
