@@ -71,6 +71,12 @@ brews:
     license: BSD-3-Clause
     custom_block: |
       head "https://git.froth.zone/sam/awl.git"
+    install: |-
+      bin.install "awl"
+      bash_completion.install "completions/bash.bash" => "awl"
+      zsh_completion.install "completions/zsh.zsh" => "_awl"
+      fish_completion.install "completions/fish.fish" => "awl.fish"
+      man1.install "doc/awl.1.gz"
 
 scoop:
   bucket:
