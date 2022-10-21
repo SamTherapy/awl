@@ -27,7 +27,7 @@ Grab a prebuilt binary from the
 ### Package Managers
 
 - AUR: [awl-dns-git](https://aur.archlinux.org/packages/awl-dns-git)
-- Debian/Ubuntu (WIP):
+- Debian/Ubuntu:
 
   ```sh
   # Add PGP key
@@ -36,6 +36,19 @@ Grab a prebuilt binary from the
   echo "deb [signed-by=/usr/share/keyrings/awl.asc] https://packages.freecumextremist.finance/awl/apt awl main" | sudo tee /etc/apt/sources.list.d/awl.list
   sudo apt update
   sudo apt install awl
+  ```
+
+- Homebrew:
+
+  ```sh
+  brew install SamTherapy/tap/awl
+  ```
+
+- Scoop:
+
+  ```pwsh
+  scoop bucket add froth https://git.froth.zone/sam/scoop.git
+  scoop install awl
   ```
 
 ### From source

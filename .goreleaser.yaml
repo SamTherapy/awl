@@ -56,7 +56,6 @@ changelog:
 
   filters:
     exclude:
-      - "SKIP CI"
       - "^test:"
       - "^docs?:"
       - "typo"
