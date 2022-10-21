@@ -68,8 +68,8 @@ brews:
     homepage: https://dns.froth.zone/awl
     description: A DNS query tool
     license: BSD-3-Clause
-    custom_block: |
-      head "https://git.froth.zone/sam/awl.git"
+    # custom_block: |
+    #   head "https://git.froth.zone/sam/awl.git"
     install: |-
       bin.install "awl"
       bash_completion.install "completions/bash.bash" => "awl"
