@@ -123,5 +123,5 @@ nfpms:
         - changelog-file-missing-in-native-package
 
 gitea_urls:
-  api: https://git.froth.zone/api/v1/
+  api: https://git.froth.zone/api/v1
   download: https://git.froth.zone
