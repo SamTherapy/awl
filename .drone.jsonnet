@@ -3,7 +3,7 @@
 local testing(version, arch) = {
   kind: 'pipeline',
   type: 'docker',
-  name: version + '-' + arch,
+  name: '%s-%s' % [version, arch],
   platform: {
     arch: arch,
   },
@@ -17,7 +17,7 @@ local testing(version, arch) = {
     },
     {
       name: 'cache',
-      image: 'golang:' + version,
+      image: 'golang:%s' % [version],
       commands: [
         'go mod tidy',
       ],
@@ -33,7 +33,7 @@ local testing(version, arch) = {
     },
     {
       name: 'test',
-      image: 'golang:' + version,
+      image: 'golang:%s' % [version],
       commands: [
         'make test-ci',
       ],
@@ -49,7 +49,7 @@ local testing(version, arch) = {
     },
     {
       name: 'fuzz',
-      image: 'golang:' + version,
+      image: 'golang:%s' % [version],
       commands: [
         'make fuzz-ci',
       ],
