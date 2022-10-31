@@ -30,7 +30,7 @@ func FuzzDig(f *testing.F) {
 		"expire", "noexpire",
 		"ednsflags", "ednsflags=\"", "ednsflags=1", "noednsflags",
 		"subnet=0.0.0.0/0", "subnet=::0/0", "subnet=b", "subnet=0", "subnet",
-		"cookie", "nocookeie",
+		"cookie", "nocookie",
 		"keepopen", "keepalive", "nokeepopen", "nokeepalive",
 		"nsid", "nonsid",
 		"padding", "nopadding",
