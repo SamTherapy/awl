@@ -149,6 +149,28 @@ func TestRetries(t *testing.T) {
 	}
 }
 
+func TestSetHTTPS(t *testing.T) {
+	t.Parallel()
+
+	args := [][]string{
+		{"awl", "-H", "@dns.froth.zone/dns-query"},
+		{"awl", "+https", "@dns.froth.zone"},
+	}
+	for _, test := range args {
+		test := test
+
+		t.Run(test[1], func(t *testing.T) {
+			t.Parallel()
+
+			opt, err := cli.ParseCLI(test, "TEST")
+
+			assert.NilError(t, err)
+			assert.Equal(t, opt.Request.Server, "dns.froth.zone")
+			assert.Equal(t, opt.HTTPSOptions.Endpoint, "/dns-query")
+		})
+	}
+}
+
 func FuzzFlags(f *testing.F) {
 	testcases := []string{"git.froth.zone", "", "!12345", "google.com.edu.org.fr"}
 

@@ -26,10 +26,10 @@ func ParseCLI(args []string, version string) (*util.Options, error) {
 	Usage: awl name [@server] [record]
 	 <name> domain, IP address, phone number
 	 <record> defaults to A
-	  
+
 	 Arguments may be in any order, including flags.
 	 Dig-like +[no]commands are also supported, see dig(1) or dig -h
-		  
+
 	Options:`)
 		flagSet.PrintDefaults()
 	}
@@ -173,6 +173,10 @@ func ParseCLI(args []string, version string) (*util.Options, error) {
 			Nsid:       *nsid,
 			ZFlag:      uint16(mbz & 0x7FFF),
 			Padding:    *padding,
+		},
+		HTTPSOptions: util.HTTPSOptions{
+			Endpoint: "/dns-query",
+			Get:      false,
 		},
 	}
 

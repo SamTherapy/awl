@@ -50,7 +50,18 @@ func ParseMiscArgs(args []string, opts *util.Options) error {
 			case strings.HasPrefix(arg, "udp://"):
 				opts.Request.Server = strings.TrimPrefix(arg, "udp://")
 			default:
-				opts.Request.Server = arg
+				// Allow HTTPS queries to have a fallback default
+				if opts.HTTPS {
+					server, endpoint, isSplit := strings.Cut(arg, "/")
+					if isSplit {
+						opts.HTTPSOptions.Endpoint = "/" + endpoint
+						opts.Request.Server = server
+					} else {
+						opts.Request.Server = server
+					}
+				} else {
+					opts.Request.Server = arg
+				}
 			}
 
 		// Dig-style +queries
@@ -114,7 +125,7 @@ func ParseMiscArgs(args []string, opts *util.Options) error {
 		case opts.TLS:
 			opts.Request.Server = "dns.google"
 		case opts.HTTPS:
-			opts.Request.Server = "https://dns.cloudflare.com/dns-query"
+			opts.Request.Server = "https://dns.cloudflare.com"
 		case opts.QUIC:
 			opts.Request.Server = "dns.adguard.com"
 		default:
