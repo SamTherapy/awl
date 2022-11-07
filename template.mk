@@ -10,7 +10,7 @@ CGO_ENABLED ?= 0
 GO ?= go
 TEST ?= $(GO) test -race -cover
 COVER ?= $(GO) tool cover
-GOFLAGS ?= -ldflags="-s -w -X=main.version=$(HASH)" -trimpath
+GOFLAGS ?= -buildmode=pie -trimpath -ldflags="-s -w -X=main.version=$(HASH) -linkmode=external"
 DESTDIR :=
 
 PREFIX ?= /usr/local
