@@ -134,7 +134,7 @@ local release() = {
     },
     {
       name: 'trigger',
-      image: 'grafana/downstream',
+      image: 'grafana/drone-downstream',
       settings: {
         token: {
           from_secret: 'DRONE_TOKEN',
