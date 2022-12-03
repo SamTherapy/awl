@@ -47,7 +47,7 @@ func ParseCLI(args []string, version string) (*util.Options, error) {
 		ipv6    = flagSet.Bool("6", false, "force IPv6", flag.OptShorthand('6'))
 		reverse = flagSet.Bool("reverse", false, "do a reverse lookup", flag.OptShorthand('x'))
 
-		timeout = flagSet.Float32("timeout", 1, "Timeout, in `seconds`")
+		timeout = flagSet.Float32("timeout", 5, "Timeout, in `seconds`")
 		retry   = flagSet.Int("retries", 2, "number of `times` to retry")
 
 		edns         = flagSet.Bool("no-edns", false, "disable EDNS entirely")
@@ -151,16 +151,18 @@ func ParseCLI(args []string, version string) (*util.Options, error) {
 			Port:    *port,
 		},
 		Display: util.Display{
-			Comments:   !*noC,
-			Question:   !*noQ,
-			Opt:        !*noOpt,
-			Answer:     !*noAns,
-			Authority:  !*noAuth,
-			Additional: !*noAdd,
-			Statistics: !*noStats,
-			HumanTTL:   false,
-			ShowQuery:  false,
-			TTL:        true,
+			Comments:       !*noC,
+			Question:       !*noQ,
+			Opt:            !*noOpt,
+			Answer:         !*noAns,
+			Authority:      !*noAuth,
+			Additional:     !*noAdd,
+			Statistics:     !*noStats,
+			TTL:            true,
+			ShowClass:      true,
+			ShowQuery:      false,
+			HumanTTL:       false,
+			UcodeTranslate: true,
 		},
 		EDNS: util.EDNS{
 			EnableEDNS: !*edns,
