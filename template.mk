@@ -1,7 +1,7 @@
 # SPDX-License-Identifier: BSD-3-Clause
 # Template for the BSD/GNU makefiles
 
-HASH ?= `git describe --always --dirty --broken | sed 's/^v//;s/\([^-]*-g\)/r\1/;s/-/./g' || echo "UNKNOWN"`
+HASH ?= `git describe --tags --always --dirty --broken | sed 's/^v//;s/\([^-]*-g\)/r\1/;s/-/./g' || echo "UNKNOWN"`
 
 SOURCES ?= $(shell find . -name "*.go" -type f ! -name '*_test*')
 TEST_SOURCES ?= $(shell find . -name "*_test.go" -type f)
