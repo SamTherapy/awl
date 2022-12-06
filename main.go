@@ -18,7 +18,7 @@ var version = "DEV"
 func main() {
 	if opts, code, err := run(os.Args); err != nil {
 		// TODO: Make not ew
-		if errors.Is(err, cli.ErrNotError) || strings.Contains(err.Error(), "help requested") {
+		if errors.Is(err, util.ErrNotError) || strings.Contains(err.Error(), "help requested") {
 			os.Exit(0)
 		} else {
 			opts.Logger.Error(err)

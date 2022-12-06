@@ -7,7 +7,6 @@ import (
 	"testing"
 
 	"git.froth.zone/sam/awl/pkg/query"
-	"git.froth.zone/sam/awl/pkg/resolvers"
 	"git.froth.zone/sam/awl/pkg/util"
 	"github.com/miekg/dns"
 	"gotest.tools/v3/assert"
@@ -84,7 +83,7 @@ func TestHTTPS(t *testing.T) {
 			)
 			for i := 0; i <= test.opts.Request.Retries; i++ {
 				res, err = query.CreateQuery(test.opts)
-				if err == nil || errors.Is(err, &resolvers.ErrHTTPStatus{}) {
+				if err == nil || errors.Is(err, &util.ErrHTTPStatus{}) {
 					break
 				}
 			}
@@ -93,7 +92,7 @@ func TestHTTPS(t *testing.T) {
 				assert.NilError(t, err)
 				assert.Assert(t, res != util.Response{})
 			} else {
-				if errors.Is(err, &resolvers.ErrHTTPStatus{}) {
+				if errors.Is(err, &util.ErrHTTPStatus{}) {
 					assert.ErrorContains(t, err, "404")
 				}
 				assert.Equal(t, res, util.Response{})

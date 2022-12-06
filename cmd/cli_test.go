@@ -7,6 +7,7 @@ import (
 	"time"
 
 	cli "git.froth.zone/sam/awl/cmd"
+	"git.froth.zone/sam/awl/pkg/util"
 	"gotest.tools/v3/assert"
 )
 
@@ -103,7 +104,7 @@ func TestVersion(t *testing.T) {
 
 	_, err := cli.ParseCLI(args, "test")
 
-	assert.ErrorType(t, err, cli.ErrNotError)
+	assert.ErrorType(t, err, util.ErrNotError)
 }
 
 func TestTimeout(t *testing.T) {

@@ -195,7 +195,7 @@ func ParseCLI(args []string, version string) (*util.Options, error) {
 	if *versionFlag {
 		fmt.Printf("awl version %s, built with %s\n", version, runtime.Version())
 
-		return &opts, ErrNotError
+		return &opts, util.ErrNotError
 	}
 
 	// Parse all the arguments that don't start with - or --
@@ -232,9 +232,6 @@ func ParseCLI(args []string, version string) (*util.Options, error) {
 
 	return &opts, nil
 }
-
-// ErrNotError is for returning not error.
-var ErrNotError = errors.New("not an error")
 
 var errNoArg = errors.New("no argument given")
 
