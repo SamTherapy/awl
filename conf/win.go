@@ -21,7 +21,7 @@ https://gist.github.com/moloch--/9fb1c8497b09b45c840fe93dd23b1e98
 //
 // Here be dragons.
 func GetDNSConfig() (*dns.ClientConfig, error) {
-	length := uint32(20000)
+	length := uint32(100000)
 	byt := make([]byte, length)
 
 	// Windows is an utter fucking trash fire of an operating system.
