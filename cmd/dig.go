@@ -25,6 +25,18 @@ func ParseDig(arg string, opts *util.Options) error {
 	opts.Logger.Info("Setting", arg)
 
 	switch arg {
+	case "trace", "notrace":
+		opts.Trace = isNo
+		if isNo {
+			opts.DNSSEC = true
+			opts.Display.Comments = false
+			opts.Display.Question = false
+			opts.Display.Opt = false
+			opts.Display.Answer = true
+			opts.Display.Authority = true
+			opts.Display.Additional = false
+			opts.Display.Statistics = false
+		}
 	// Set DNS query flags
 	case "aa", "aaflag", "aaonly":
 		opts.AA = isNo

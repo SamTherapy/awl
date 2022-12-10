@@ -67,6 +67,9 @@ type Options struct {
 	IPv4 bool `json:"forceIPv4" example:"false"`
 	// Force IPv6 only
 	IPv6 bool `json:"forceIPv6" example:"false"`
+
+	// Trace from the root
+	Trace bool `json:"trace" example:"false"`
 }
 
 // HTTPSOptions are options exclusively for DNS-over-HTTPS queries.

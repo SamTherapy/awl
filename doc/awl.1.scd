@@ -114,6 +114,11 @@ Many options are inherited from *dig*(1).
 	Set the timeout period. Floating point numbers are accepted.
 	0.5 seconds is the minimum.
 
+*--trace*, *+trace*
+	Trace the path of the query from the root, acting like its own resolver.
+	This option enables DNSSEC.
+	When *@server* is specified, this will only affect the initial query.
+
 *--retries* _int_, *+tries*=_int_, *+retry*=_int_
 	Set the number of retries.
 	Retry is one more than tries, dig style.

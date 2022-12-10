@@ -27,6 +27,17 @@ func TestRun(t *testing.T) {
 	}
 }
 
+func TestTrace(t *testing.T) {
+	domains := []string{"git.froth.zone", "google.com", "amazon.com", "freecumextremist.com", "dns.froth.zone", "sleepy.cafe", "pkg.go.dev"}
+
+	for i := range domains {
+		args := []string{"awl", "+trace", domains[i], "@1.1.1.1"}
+		_, code, err := run(args)
+		assert.NilError(t, err)
+		assert.Equal(t, code, 0)
+	}
+}
+
 func TestHelp(t *testing.T) {
 	// t.Parallel()
 	args := []string{"awl", "-h"}

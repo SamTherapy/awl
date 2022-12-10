@@ -28,7 +28,7 @@ local -a alts args
   '*+'{no,}'keepopen[keep TCP socket open between queries]'
   '*+'{no,}'recurse[set the RD (recursion desired) bit in the query]'
   # '*+'{no,}'nssearch[search all authoritative nameservers]'
-  # '*+'{no,}'trace[trace delegation down from root]'
+  '*+'{no,}'trace[trace delegation down from root]'
   # '*+'{no,}'cmd[print initial comment in output]'
   '*+'{no,}'short[print terse output]'
   '*+'{no,}'identify[print IP and port of responder]'
@@ -98,6 +98,7 @@ _arguments -s -C $args \
   '*-'{j,-json}'+[present the results as JSON]' \
   '*-'{X,-xml}'+[present the results as XML]' \
   '*-'{y,-yaml}'+[present the results as YAML]' \
+  '*--trace+[trace from the root]' \
   '*: :->args' && ret=0
 
 if [[ -n $state ]]; then

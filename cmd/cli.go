@@ -18,6 +18,63 @@ import (
 // ParseCLI parses arguments given from the CLI and passes them into an `Options`
 // struct.
 func ParseCLI(args []string, version string) (*util.Options, error) {
+	// Parse the standard flags
+	opts, misc, err := parseFlags(args, version)
+	if err != nil {
+		return opts, err
+	}
+
+	// Parse all the arguments that don't start with - or --
+	// This includes the dig-style (+) options
+	err = ParseMiscArgs(misc, opts)
+	if err != nil {
+		return opts, err
+	}
+
+	opts.Logger.Info("Dig/Drill flags parsed")
+	opts.Logger.Debug(fmt.Sprintf("%+v", opts))
+
+	// Special options and exceptions time
+
+	if opts.Request.Port == 0 {
+		if opts.TLS || opts.QUIC {
+			opts.Request.Port = 853
+		} else {
+			opts.Request.Port = 53
+		}
+	}
+
+	opts.Logger.Info("Port set to", opts.Request.Port)
+
+	// Set timeout to 0.5 seconds if set below 0.5
+	if opts.Request.Timeout < (time.Second / 2) {
+		opts.Request.Timeout = (time.Second / 2)
+	}
+
+	if opts.Request.Retries < 0 {
+		opts.Request.Retries = 0
+	}
+
+	if opts.Trace {
+		if opts.TLS || opts.HTTPS || opts.QUIC {
+			opts.Logger.Warn("Every query after the root query will only use UDP/TCP")
+		}
+
+		if opts.Reverse {
+			opts.Logger.Error("Reverse queries are not currently supported")
+		}
+
+		opts.RD = true
+	}
+
+	opts.Logger.Info("Options fully populated")
+	opts.Logger.Debug(fmt.Sprintf("%+v", opts))
+
+	return opts, nil
+}
+
+// Everything that has to do with CLI flags goes here (the posix style, eg. -a and --bbbb).
+func parseFlags(args []string, version string) (*util.Options, []string, error) {
 	flagSet := flag.NewFlagSet(args[0], flag.ContinueOnError)
 
 	flagSet.Usage = func() {
@@ -46,6 +103,7 @@ func ParseCLI(args []string, version string) (*util.Options, error) {
 		ipv4    = flagSet.Bool("4", false, "force IPv4", flag.OptShorthand('4'))
 		ipv6    = flagSet.Bool("6", false, "force IPv6", flag.OptShorthand('6'))
 		reverse = flagSet.Bool("reverse", false, "do a reverse lookup", flag.OptShorthand('x'))
+		trace   = flagSet.Bool("trace", false, "trace from the root")
 
 		timeout = flagSet.Float32("timeout", 5, "Timeout, in `seconds`")
 		retry   = flagSet.Int("retries", 2, "number of `times` to retry")
@@ -101,23 +159,24 @@ func ParseCLI(args []string, version string) (*util.Options, error) {
 	)
 
 	// Don't sort the flags when -h is given
-	flagSet.SortFlags = false
+	flagSet.SortFlags = true
 
 	// Parse the flags
 	if err := flagSet.Parse(args[1:]); err != nil {
-		return &util.Options{Logger: util.InitLogger(*verbosity)}, fmt.Errorf("flag: %w", err)
+		return &util.Options{Logger: util.InitLogger(*verbosity)}, nil, fmt.Errorf("flag: %w", err)
 	}
 
 	// TODO: DRY, dumb dumb.
 	mbz, err := strconv.ParseInt(*mbzflag, 0, 16)
 	if err != nil {
-		return &util.Options{Logger: util.InitLogger(*verbosity)}, fmt.Errorf("EDNS MBZ: %w", err)
+		return &util.Options{Logger: util.InitLogger(*verbosity)}, nil, fmt.Errorf("EDNS MBZ: %w", err)
 	}
 
 	opts := util.Options{
 		Logger:      util.InitLogger(*verbosity),
 		IPv4:        *ipv4,
 		IPv6:        *ipv6,
+		Trace:       *trace,
 		Short:       *short,
 		TCP:         *tcp,
 		DNSCrypt:    *dnscrypt,
@@ -185,7 +244,7 @@ func ParseCLI(args []string, version string) (*util.Options, error) {
 	// TODO: DRY
 	if *subnet != "" {
 		if err = util.ParseSubnet(*subnet, &opts); err != nil {
-			return &opts, fmt.Errorf("%w", err)
+			return &opts, nil, fmt.Errorf("%w", err)
 		}
 	}
 
@@ -195,42 +254,10 @@ func ParseCLI(args []string, version string) (*util.Options, error) {
 	if *versionFlag {
 		fmt.Printf("awl version %s, built with %s\n", version, runtime.Version())
 
-		return &opts, util.ErrNotError
+		return &opts, nil, util.ErrNotError
 	}
 
-	// Parse all the arguments that don't start with - or --
-	// This includes the dig-style (+) options
-	err = ParseMiscArgs(flagSet.Args(), &opts)
-	if err != nil {
-		return &opts, err
-	}
-
-	opts.Logger.Info("Dig/Drill flags parsed")
-	opts.Logger.Debug(fmt.Sprintf("%+v", opts))
-
-	if opts.Request.Port == 0 {
-		if opts.TLS || opts.QUIC {
-			opts.Request.Port = 853
-		} else {
-			opts.Request.Port = 53
-		}
-	}
-
-	opts.Logger.Info("Port set to", opts.Request.Port)
-
-	// Set timeout to 0.5 seconds if set below 0.5
-	if opts.Request.Timeout < (time.Second / 2) {
-		opts.Request.Timeout = (time.Second / 2)
-	}
-
-	if opts.Request.Retries < 0 {
-		opts.Request.Retries = 0
-	}
-
-	opts.Logger.Info("Options fully populated")
-	opts.Logger.Debug(fmt.Sprintf("%+v", opts))
-
-	return &opts, nil
+	return &opts, flagSet.Args(), nil
 }
 
 var errNoArg = errors.New("no argument given")

@@ -60,6 +60,7 @@ func FuzzDig(f *testing.F) {
 		"all", "noall",
 		"idnout", "noidnout",
 		"class", "noclass",
+		"trace", "notrace",
 		"invalid",
 	}
 
