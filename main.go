@@ -47,16 +47,18 @@ func run(args []string) (opts *util.Options, code int, err error) {
 	)
 
 	for ok := true; ok; ok = keepTracing {
-		if keepTracing {
-			opts.Request.Name = tempDomain
-			opts.Request.Type = tempQueryType
-		} else {
-			tempDomain = opts.Request.Name
-			tempQueryType = opts.Request.Type
+		if opts.Trace {
+			if keepTracing {
+				opts.Request.Name = tempDomain
+				opts.Request.Type = tempQueryType
+			} else {
+				tempDomain = opts.Request.Name
+				tempQueryType = opts.Request.Type
 
-			// Override the query because it needs to be done
-			opts.Request.Name = "."
-			opts.Request.Type = dns.TypeNS
+				// Override the query because it needs to be done
+				opts.Request.Name = "."
+				opts.Request.Type = dns.TypeNS
+			}
 		}
 		// Retry queries if a query fails
 		for i := 0; i <= opts.Request.Retries; i++ {
