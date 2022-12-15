@@ -302,7 +302,7 @@ func MakePrintable(res util.Response, opts *util.Options) (*Message, error) {
 			temp := strings.Split(answer.String(), "\t")
 
 			var (
-				ttl  string
+				ttl  any
 				name string
 			)
 
@@ -310,7 +310,7 @@ func MakePrintable(res util.Response, opts *util.Options) (*Message, error) {
 				if opts.Display.HumanTTL {
 					ttl = (time.Duration(answer.Header().Ttl) * time.Second).String()
 				} else {
-					ttl = strconv.Itoa(int(answer.Header().Ttl))
+					ttl = answer.Header().Ttl
 				}
 			}
 

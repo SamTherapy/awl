@@ -51,7 +51,7 @@ type Question struct {
 // RRHeader is for DNS Resource Headers.
 type RRHeader struct {
 	Name     string `json:"name,omitempty" xml:"name,omitempty" yaml:"name,omitempty" example:"127.0.0.1"`
-	TTL      string `json:"ttl,omitempty" xml:"ttl,omitempty" yaml:"ttl,omitempty" example:"0ms"`
+	TTL      any    `json:"ttl,omitempty" xml:"ttl,omitempty" yaml:"ttl,omitempty" example:"0ms"`
 	Class    string `json:"class,omitempty" xml:"class,omitempty" yaml:"class,omitempty" example:"A"`
 	Type     string `json:"type,omitempty" xml:"type,omitempty" yaml:"type,omitempty" example:"IN"`
 	Rdlength uint16 `json:"-" xml:"-" yaml:"-"`
