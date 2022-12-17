@@ -19,7 +19,7 @@ type DNSCryptResolver struct {
 var _ Resolver = (*DNSCryptResolver)(nil)
 
 // LookUp performs a DNS query.
-func (resolver *DNSCryptResolver) LookUp(msg *dns.Msg) (util.Response, error) {
+func (resolver *DNSCryptResolver) LookUp(msg *dns.Msg) (resp util.Response, err error) {
 	client := dnscrypt.Client{
 		Timeout: resolver.opts.Request.Timeout,
 		UDPSize: 1232,
@@ -42,7 +42,7 @@ func (resolver *DNSCryptResolver) LookUp(msg *dns.Msg) (util.Response, error) {
 
 	resolverInf, err := client.Dial(resolver.opts.Request.Server)
 	if err != nil {
-		return util.Response{}, fmt.Errorf("dnscrypt: dial: %w", err)
+		return resp, fmt.Errorf("dnscrypt: dial: %w", err)
 	}
 
 	now := time.Now()
@@ -50,13 +50,15 @@ func (resolver *DNSCryptResolver) LookUp(msg *dns.Msg) (util.Response, error) {
 	rtt := time.Since(now)
 
 	if err != nil {
-		return util.Response{}, fmt.Errorf("dnscrypt: exchange: %w", err)
+		return resp, fmt.Errorf("dnscrypt: exchange: %w", err)
+	}
+
+	resp = util.Response{
+		DNS: res,
+		RTT: rtt,
 	}
 
 	resolver.opts.Logger.Info("Request successful")
 
-	return util.Response{
-		DNS: res,
-		RTT: rtt,
-	}, nil
+	return
 }

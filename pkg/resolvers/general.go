@@ -19,12 +19,7 @@ type StandardResolver struct {
 var _ Resolver = (*StandardResolver)(nil)
 
 // LookUp performs a DNS query.
-func (resolver *StandardResolver) LookUp(msg *dns.Msg) (util.Response, error) {
-	var (
-		resp util.Response
-		err  error
-	)
-
+func (resolver *StandardResolver) LookUp(msg *dns.Msg) (resp util.Response, err error) {
 	dnsClient := new(dns.Client)
 	dnsClient.Dialer = &net.Dialer{
 		Timeout: resolver.opts.Request.Timeout,
@@ -56,7 +51,7 @@ func (resolver *StandardResolver) LookUp(msg *dns.Msg) (util.Response, error) {
 
 	resp.DNS, resp.RTT, err = dnsClient.Exchange(msg, resolver.opts.Request.Server)
 	if err != nil {
-		return util.Response{}, fmt.Errorf("standard: DNS exchange: %w", err)
+		return resp, fmt.Errorf("standard: DNS exchange: %w", err)
 	}
 
 	switch dns.RcodeToString[resp.DNS.MsgHdr.Rcode] {
@@ -69,7 +64,7 @@ func (resolver *StandardResolver) LookUp(msg *dns.Msg) (util.Response, error) {
 			resp.DNS, resp.RTT, err = dnsClient.Exchange(msg, resolver.opts.Request.Server)
 
 			if err != nil {
-				return util.Response{}, fmt.Errorf("badcookie: DNS exchange: %w", err)
+				return resp, fmt.Errorf("badcookie: DNS exchange: %w", err)
 			}
 		}
 
@@ -95,8 +90,8 @@ func (resolver *StandardResolver) LookUp(msg *dns.Msg) (util.Response, error) {
 	}
 
 	if err != nil {
-		return util.Response{}, fmt.Errorf("standard: DNS exchange: %w", err)
+		return resp, fmt.Errorf("standard: DNS exchange: %w", err)
 	}
 
-	return resp, nil
+	return
 }

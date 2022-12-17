@@ -23,9 +23,7 @@ type HTTPSResolver struct {
 var _ Resolver = (*HTTPSResolver)(nil)
 
 // LookUp performs a DNS query.
-func (resolver *HTTPSResolver) LookUp(msg *dns.Msg) (util.Response, error) {
-	var resp util.Response
-
+func (resolver *HTTPSResolver) LookUp(msg *dns.Msg) (resp util.Response, err error) {
 	resolver.client = http.Client{
 		Timeout: resolver.opts.Request.Timeout,
 		Transport: &http.Transport{
@@ -43,7 +41,7 @@ func (resolver *HTTPSResolver) LookUp(msg *dns.Msg) (util.Response, error) {
 
 	buf, err := msg.Pack()
 	if err != nil {
-		return util.Response{}, fmt.Errorf("doh: packing: %w", err)
+		return resp, fmt.Errorf("doh: packing: %w", err)
 	}
 
 	resolver.opts.Logger.Debug("https: sending HTTPS request")
@@ -57,7 +55,7 @@ func (resolver *HTTPSResolver) LookUp(msg *dns.Msg) (util.Response, error) {
 
 	req, err := http.NewRequest(method, resolver.opts.Request.Server, bytes.NewBuffer(buf))
 	if err != nil {
-		return util.Response{}, fmt.Errorf("doh: request creation: %w", err)
+		return resp, fmt.Errorf("doh: request creation: %w", err)
 	}
 
 	req.Header.Set("Content-Type", "application/dns-message")
@@ -68,23 +66,29 @@ func (resolver *HTTPSResolver) LookUp(msg *dns.Msg) (util.Response, error) {
 	resp.RTT = time.Since(now)
 
 	if err != nil {
-		return util.Response{}, fmt.Errorf("doh: HTTP request: %w", err)
+		// overwrite RTT or else tests will fail
+		resp.RTT = 0
+
+		return resp, fmt.Errorf("doh: HTTP request: %w", err)
 	}
 
 	if res.StatusCode != http.StatusOK {
-		return util.Response{}, &util.ErrHTTPStatus{Code: res.StatusCode}
+		// overwrite RTT or else tests will fail
+		resp.RTT = 0
+
+		return resp, &util.ErrHTTPStatus{Code: res.StatusCode}
 	}
 
 	resolver.opts.Logger.Debug("https: reading response")
 
 	fullRes, err := io.ReadAll(res.Body)
 	if err != nil {
-		return util.Response{}, fmt.Errorf("doh: body read: %w", err)
+		return resp, fmt.Errorf("doh: body read: %w", err)
 	}
 
 	err = res.Body.Close()
 	if err != nil {
-		return util.Response{}, fmt.Errorf("doh: body close: %w", err)
+		return resp, fmt.Errorf("doh: body close: %w", err)
 	}
 
 	resolver.opts.Logger.Debug("https: unpacking response")
@@ -93,7 +97,7 @@ func (resolver *HTTPSResolver) LookUp(msg *dns.Msg) (util.Response, error) {
 
 	err = resp.DNS.Unpack(fullRes)
 	if err != nil {
-		return util.Response{}, fmt.Errorf("doh: dns message unpack: %w", err)
+		return resp, fmt.Errorf("doh: dns message unpack: %w", err)
 	}
 
 	return resp, nil

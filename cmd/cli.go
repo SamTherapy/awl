@@ -17,7 +17,7 @@ import (
 
 // ParseCLI parses arguments given from the CLI and passes them into an `Options`
 // struct.
-func ParseCLI(args []string, version string) (*util.Options, error) {
+func ParseCLI(args []string, version string) (opts *util.Options, err error) {
 	// Parse the standard flags
 	opts, misc, err := parseFlags(args, version)
 	if err != nil {
@@ -70,11 +70,11 @@ func ParseCLI(args []string, version string) (*util.Options, error) {
 	opts.Logger.Info("Options fully populated")
 	opts.Logger.Debug(fmt.Sprintf("%+v", opts))
 
-	return opts, nil
+	return
 }
 
 // Everything that has to do with CLI flags goes here (the posix style, eg. -a and --bbbb).
-func parseFlags(args []string, version string) (*util.Options, []string, error) {
+func parseFlags(args []string, version string) (opts *util.Options, flags []string, err error) {
 	flagSet := flag.NewFlagSet(args[0], flag.ContinueOnError)
 
 	flagSet.Usage = func() {
@@ -162,7 +162,7 @@ func parseFlags(args []string, version string) (*util.Options, []string, error) 
 	flagSet.SortFlags = true
 
 	// Parse the flags
-	if err := flagSet.Parse(args[1:]); err != nil {
+	if err = flagSet.Parse(args[1:]); err != nil {
 		return &util.Options{Logger: util.InitLogger(*verbosity)}, nil, fmt.Errorf("flag: %w", err)
 	}
 
@@ -172,7 +172,7 @@ func parseFlags(args []string, version string) (*util.Options, []string, error) 
 		return &util.Options{Logger: util.InitLogger(*verbosity)}, nil, fmt.Errorf("EDNS MBZ: %w", err)
 	}
 
-	opts := util.Options{
+	opts = &util.Options{
 		Logger:      util.InitLogger(*verbosity),
 		IPv4:        *ipv4,
 		IPv6:        *ipv6,
@@ -243,8 +243,8 @@ func parseFlags(args []string, version string) (*util.Options, []string, error) 
 
 	// TODO: DRY
 	if *subnet != "" {
-		if err = util.ParseSubnet(*subnet, &opts); err != nil {
-			return &opts, nil, fmt.Errorf("%w", err)
+		if err = util.ParseSubnet(*subnet, opts); err != nil {
+			return opts, nil, fmt.Errorf("%w", err)
 		}
 	}
 
@@ -254,10 +254,12 @@ func parseFlags(args []string, version string) (*util.Options, []string, error) 
 	if *versionFlag {
 		fmt.Printf("awl version %s, built with %s\n", version, runtime.Version())
 
-		return &opts, nil, util.ErrNotError
+		return opts, nil, util.ErrNotError
 	}
 
-	return &opts, flagSet.Args(), nil
+	flags = flagSet.Args()
+
+	return
 }
 
 var errNoArg = errors.New("no argument given")

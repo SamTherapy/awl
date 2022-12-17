@@ -21,15 +21,12 @@ import (
 // ToString turns the response into something that looks a lot like dig
 //
 // Much of this is taken from https://github.com/miekg/dns/blob/master/msg.go#L900
-func ToString(res util.Response, opts *util.Options) (string, error) {
+func ToString(res util.Response, opts *util.Options) (s string, err error) {
 	if res.DNS == nil {
 		return "<nil> MsgHdr", errNoMessage
 	}
 
-	var (
-		s   string
-		opt *dns.OPT
-	)
+	var opt *dns.OPT
 
 	if !opts.Short {
 		if opts.Display.Comments {
@@ -143,7 +140,7 @@ func ToString(res util.Response, opts *util.Options) (string, error) {
 		}
 	}
 
-	return s, nil
+	return
 }
 
 func serverExtra(opts *util.Options) string {

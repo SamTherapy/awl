@@ -22,7 +22,7 @@ type Resolver interface {
 }
 
 // LoadResolver loads the respective resolver for performing a DNS query.
-func LoadResolver(opts *util.Options) (Resolver, error) {
+func LoadResolver(opts *util.Options) (resolver Resolver, err error) {
 	switch {
 	case opts.HTTPS:
 		opts.Logger.Info("loading DNS-over-HTTPS resolver")
@@ -32,10 +32,11 @@ func LoadResolver(opts *util.Options) (Resolver, error) {
 		}
 
 		opts.Request.Server += opts.HTTPSOptions.Endpoint
-
-		return &HTTPSResolver{
+		resolver = &HTTPSResolver{
 			opts: opts,
-		}, nil
+		}
+
+		return
 	case opts.QUIC:
 		opts.Logger.Info("loading DNS-over-QUIC resolver")
 
@@ -43,9 +44,11 @@ func LoadResolver(opts *util.Options) (Resolver, error) {
 			opts.Request.Server = net.JoinHostPort(opts.Request.Server, strconv.Itoa(opts.Request.Port))
 		}
 
-		return &QUICResolver{
+		resolver = &QUICResolver{
 			opts: opts,
-		}, nil
+		}
+
+		return
 	case opts.DNSCrypt:
 		opts.Logger.Info("loading DNSCrypt resolver")
 
@@ -53,9 +56,11 @@ func LoadResolver(opts *util.Options) (Resolver, error) {
 			opts.Request.Server = "sdns://" + opts.Request.Server
 		}
 
-		return &DNSCryptResolver{
+		resolver = &DNSCryptResolver{
 			opts: opts,
-		}, nil
+		}
+
+		return
 	default:
 		opts.Logger.Info("loading standard/DNS-over-TLS resolver")
 
@@ -63,8 +68,10 @@ func LoadResolver(opts *util.Options) (Resolver, error) {
 			opts.Request.Server = net.JoinHostPort(opts.Request.Server, strconv.Itoa(opts.Request.Port))
 		}
 
-		return &StandardResolver{
+		resolver = &StandardResolver{
 			opts: opts,
-		}, nil
+		}
+
+		return
 	}
 }

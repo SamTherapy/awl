@@ -22,9 +22,7 @@ type QUICResolver struct {
 var _ Resolver = (*QUICResolver)(nil)
 
 // LookUp performs a DNS query.
-func (resolver *QUICResolver) LookUp(msg *dns.Msg) (util.Response, error) {
-	var resp util.Response
-
+func (resolver *QUICResolver) LookUp(msg *dns.Msg) (resp util.Response, err error) {
 	tls := &tls.Config{
 		//nolint:gosec // This is intentional if the user requests it
 		InsecureSkipVerify: resolver.opts.TLSNoVerify,
@@ -40,7 +38,7 @@ func (resolver *QUICResolver) LookUp(msg *dns.Msg) (util.Response, error) {
 
 	connection, err := quic.DialAddr(resolver.opts.Request.Server, tls, conf)
 	if err != nil {
-		return util.Response{}, fmt.Errorf("doq: dial: %w", err)
+		return resp, fmt.Errorf("doq: dial: %w", err)
 	}
 
 	resolver.opts.Logger.Debug("quic: packing query")
@@ -48,7 +46,7 @@ func (resolver *QUICResolver) LookUp(msg *dns.Msg) (util.Response, error) {
 	// Compress request to over-the-wire
 	buf, err := msg.Pack()
 	if err != nil {
-		return util.Response{}, fmt.Errorf("doq: pack: %w", err)
+		return resp, fmt.Errorf("doq: pack: %w", err)
 	}
 
 	t := time.Now()
@@ -57,21 +55,21 @@ func (resolver *QUICResolver) LookUp(msg *dns.Msg) (util.Response, error) {
 
 	stream, err := connection.OpenStream()
 	if err != nil {
-		return util.Response{}, fmt.Errorf("doq: quic stream creation: %w", err)
+		return resp, fmt.Errorf("doq: quic stream creation: %w", err)
 	}
 
 	resolver.opts.Logger.Debug("quic: writing to stream")
 
 	_, err = stream.Write(buf)
 	if err != nil {
-		return util.Response{}, fmt.Errorf("doq: quic stream write: %w", err)
+		return resp, fmt.Errorf("doq: quic stream write: %w", err)
 	}
 
 	resolver.opts.Logger.Debug("quic: reading stream")
 
 	fullRes, err := io.ReadAll(stream)
 	if err != nil {
-		return util.Response{}, fmt.Errorf("doq: quic stream read: %w", err)
+		return resp, fmt.Errorf("doq: quic stream read: %w", err)
 	}
 
 	resp.RTT = time.Since(t)
@@ -80,14 +78,14 @@ func (resolver *QUICResolver) LookUp(msg *dns.Msg) (util.Response, error) {
 	// Close with error: no error
 	err = connection.CloseWithError(0, "")
 	if err != nil {
-		return util.Response{}, fmt.Errorf("doq: quic connection close: %w", err)
+		return resp, fmt.Errorf("doq: quic connection close: %w", err)
 	}
 
 	resolver.opts.Logger.Debug("quic: closing stream")
 
 	err = stream.Close()
 	if err != nil {
-		return util.Response{}, fmt.Errorf("doq: quic stream close: %w", err)
+		return resp, fmt.Errorf("doq: quic stream close: %w", err)
 	}
 
 	resp.DNS = &dns.Msg{}
@@ -96,8 +94,8 @@ func (resolver *QUICResolver) LookUp(msg *dns.Msg) (util.Response, error) {
 
 	err = resp.DNS.Unpack(fullRes)
 	if err != nil {
-		return util.Response{}, fmt.Errorf("doq: unpack: %w", err)
+		return resp, fmt.Errorf("doq: unpack: %w", err)
 	}
 
-	return resp, nil
+	return
 }
