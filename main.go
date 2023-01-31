@@ -64,7 +64,7 @@ func run(args []string) (opts *util.Options, code int, err error) {
 		for i := 0; i <= opts.Request.Retries; i++ {
 			resp, err = query.CreateQuery(opts)
 			if err == nil {
-				keepTracing = opts.Trace && (!resp.DNS.Authoritative || (opts.Request.Name == "." && tempDomain != "."))
+				keepTracing = opts.Trace && (!resp.DNS.Authoritative || (opts.Request.Name == "." && tempDomain != ".")) && resp.DNS.MsgHdr.Rcode == 0
 
 				break
 			} else if i != opts.Request.Retries {
