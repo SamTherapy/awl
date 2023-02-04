@@ -10,7 +10,7 @@ import (
 	"time"
 
 	"git.froth.zone/sam/awl/pkg/util"
-	"github.com/lucas-clemente/quic-go"
+	"github.com/quic-go/quic-go"
 	"github.com/miekg/dns"
 )
 
