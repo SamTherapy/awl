@@ -10,8 +10,8 @@ import (
 	"time"
 
 	"git.froth.zone/sam/awl/pkg/util"
-	"github.com/quic-go/quic-go"
 	"github.com/miekg/dns"
+	"github.com/quic-go/quic-go"
 )
 
 // QUICResolver is for DNS-over-QUIC queries.
