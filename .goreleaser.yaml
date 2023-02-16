@@ -3,11 +3,11 @@
 before:
   hooks:
     - make clean
-    # You may remove this if you don't use go modules.
     - go mod tidy
-    # you may remove this if you don't need go generate
-    # - go generate ./...
+    # Make manpages
     - doc/makeman.sh
+    # Vendor dependencies
+    - go mod vendor
 builds:
   - env:
       - CGO_ENABLED=0
@@ -24,13 +24,22 @@ archives:
       - LICENCE
       - completions/**
       - doc/awl.1.gz
-    replacements:
-      darwin: macOS
-      linux: Linux
-      windows: Windows
+    name_template: >-
+      {{ .ProjectName }}_
+      {{- title .Os }}_
+      {{- .Arch }}
     format_overrides:
       - goos: windows
         format: zip
+    rlcp: true
+  - files:
+      - vendor/**
+    id: vendor
+    format: tar.xz
+    name_template: "{{ .ProjectName }}-{{ .Version }}-deps"
+    meta: true
+    wrap_in_directory: "{{ .ProjectName }}"
+    rlcp: true
 
 checksum:
   name_template: "checksums.txt"
