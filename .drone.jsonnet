@@ -159,8 +159,8 @@ local release() = {
 [
   testing('1.19', 'amd64'),
   testing('1.19', 'arm64'),
-  testing('1.18', 'amd64'),
-  testing('1.18', 'arm64'),
+  testing('1.20', 'amd64'),
+  testing('1.20', 'arm64'),
 
   release(),
 ]
