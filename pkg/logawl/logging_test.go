@@ -7,7 +7,7 @@ import (
 	"testing"
 	"time"
 
-	"git.froth.zone/sam/awl/pkg/logawl"
+	"dns.froth.zone/awl/pkg/logawl"
 	"gotest.tools/v3/assert"
 )
 

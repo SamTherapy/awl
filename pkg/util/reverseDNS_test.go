@@ -5,7 +5,7 @@ package util_test
 import (
 	"testing"
 
-	"git.froth.zone/sam/awl/pkg/util"
+	"dns.froth.zone/awl/pkg/util"
 	"github.com/miekg/dns"
 	"gotest.tools/v3/assert"
 )

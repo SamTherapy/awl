@@ -8,7 +8,7 @@ import (
 	"strings"
 	"time"
 
-	"git.froth.zone/sam/awl/pkg/util"
+	"dns.froth.zone/awl/pkg/util"
 )
 
 // ParseDig parses commands from the popular DNS tool dig.

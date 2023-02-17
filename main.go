@@ -10,9 +10,9 @@ import (
 	"strings"
 	"time"
 
-	cli "git.froth.zone/sam/awl/cmd"
-	"git.froth.zone/sam/awl/pkg/query"
-	"git.froth.zone/sam/awl/pkg/util"
+	cli "dns.froth.zone/awl/cmd"
+	"dns.froth.zone/awl/pkg/query"
+	"dns.froth.zone/awl/pkg/util"
 	"github.com/miekg/dns"
 )
 

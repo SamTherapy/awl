@@ -7,7 +7,7 @@ package resolvers
 import (
 	"errors"
 
-	"git.froth.zone/sam/awl/pkg/util"
+	"dns.froth.zone/awl/pkg/util"
 	"github.com/miekg/dns"
 )
 

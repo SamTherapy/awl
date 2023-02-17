@@ -7,8 +7,8 @@ import (
 	"math/rand"
 	"strings"
 
-	"git.froth.zone/sam/awl/conf"
-	"git.froth.zone/sam/awl/pkg/util"
+	"dns.froth.zone/awl/conf"
+	"dns.froth.zone/awl/pkg/util"
 	"github.com/miekg/dns"
 	"golang.org/x/net/idna"
 )

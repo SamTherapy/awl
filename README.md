@@ -62,7 +62,7 @@ Dependencies:
 Using `go install`:
 
 ```sh
-go install git.froth.zone/sam/awl@latest
+go install dns.froth.zone/awl@latest
 ```
 
 Using the makefile:

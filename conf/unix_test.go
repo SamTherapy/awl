@@ -9,7 +9,7 @@ import (
 	"runtime"
 	"testing"
 
-	"git.froth.zone/sam/awl/conf"
+	"dns.froth.zone/awl/conf"
 	"gotest.tools/v3/assert"
 )
 

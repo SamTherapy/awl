@@ -6,7 +6,7 @@ import (
 	"fmt"
 	"net"
 
-	"git.froth.zone/sam/awl/pkg/logawl"
+	"dns.froth.zone/awl/pkg/logawl"
 	"github.com/miekg/dns"
 )
 

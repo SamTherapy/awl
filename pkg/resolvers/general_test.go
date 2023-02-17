@@ -8,8 +8,8 @@ import (
 	"testing"
 	"time"
 
-	"git.froth.zone/sam/awl/pkg/query"
-	"git.froth.zone/sam/awl/pkg/util"
+	"dns.froth.zone/awl/pkg/query"
+	"dns.froth.zone/awl/pkg/util"
 	"github.com/ameshkov/dnscrypt/v2"
 	"github.com/miekg/dns"
 	"gotest.tools/v3/assert"

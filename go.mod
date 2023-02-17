@@ -1,4 +1,4 @@
-module git.froth.zone/sam/awl
+module dns.froth.zone/awl
 
 go 1.18
 

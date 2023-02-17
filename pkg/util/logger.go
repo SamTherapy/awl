@@ -2,7 +2,7 @@
 
 package util
 
-import "git.froth.zone/sam/awl/pkg/logawl"
+import "dns.froth.zone/awl/pkg/logawl"
 
 // InitLogger initializes the logawl instance.
 func InitLogger(verbosity int) (log *logawl.Logger) {
