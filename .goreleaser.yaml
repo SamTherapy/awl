@@ -24,6 +24,7 @@ archives:
     name_template: >-
       {{ .ProjectName }}_
       {{- if eq .Os "darwin" }}MacOS_
+      {{- else if eq .Os "freebsd" }}FreeBSD_
       {{- else }}{{- title .Os }}_{{ end }}
       {{- .Arch }}
     format_overrides:
