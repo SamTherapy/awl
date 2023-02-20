@@ -16,9 +16,6 @@ builds:
       - plan9_amd64
       - freebsd_amd64
 
-universal_binaries:
-  - replace: true
-
 archives:
   - files:
       - LICENCE
@@ -26,7 +23,8 @@ archives:
       - doc/awl.1.gz
     name_template: >-
       {{ .ProjectName }}_
-      {{- title .Os }}_
+      {{- if eq .Os "darwin" }}MacOS_
+      {{- else }}{{- title .Os }}_{{ end }}
       {{- .Arch }}
     format_overrides:
       - goos: windows
