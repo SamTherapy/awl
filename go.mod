@@ -6,7 +6,7 @@ require (
 	github.com/ameshkov/dnscrypt/v2 v2.2.5
 	github.com/dchest/uniuri v1.2.0
 	github.com/miekg/dns v1.1.50
-	github.com/quic-go/quic-go v0.32.0
+	github.com/quic-go/quic-go v0.33.0
 	github.com/stefansundin/go-zflag v1.1.1
 	golang.org/x/net v0.7.0
 	golang.org/x/sys v0.5.0
@@ -25,7 +25,6 @@ require (
 	github.com/google/pprof v0.0.0-20230207041349-798e818bf904 // indirect
 	github.com/kr/pretty v0.3.1 // indirect
 	github.com/onsi/ginkgo/v2 v2.8.3 // indirect
-	github.com/quic-go/qtls-go1-18 v0.2.0 // indirect
 	github.com/quic-go/qtls-go1-19 v0.2.1 // indirect
 	github.com/quic-go/qtls-go1-20 v0.1.1 // indirect
 	golang.org/x/crypto v0.6.0 // indirect
