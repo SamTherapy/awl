@@ -42,7 +42,7 @@ If one cannot be found, *awl* will query the localhost.
 *-h*
 	Show a "short" help message.
 
-*-p*, *--port* *port*
+*-p*, *--port* _port_
 	Sets the port to query. Default ports listed below.
 	- _53_ for *UDP* and *TCP*
 	- _853_ for *TLS* and *QUIC*
