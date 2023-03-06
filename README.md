@@ -59,6 +59,12 @@ Dependencies:
 - GNU/BSD make or Plan 9 mk (if using the makefile/mkfile)
 - [scdoc](https://git.sr.ht/~sircmpwn/scdoc) (optional, for man page)
 
+Using `go install`:
+
+```sh
+go install dns.froth.zone/awl@latest
+```
+
 Using the makefile:
 
 ```sh
