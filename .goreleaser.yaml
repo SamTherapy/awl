@@ -89,6 +89,7 @@ scoop:
   bucket:
     owner: sam
     name: scoop
+  folder: bucket
   homepage: https://dns.froth.zone/awl
   description: A DNS query client
   license: BSD-3-Clause
