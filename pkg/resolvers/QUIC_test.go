@@ -22,13 +22,28 @@ func TestQuic(t *testing.T) {
 		opts *util.Options
 	}{
 		{
-			"Valid",
+			"Valid, AdGuard",
 			&util.Options{
 				QUIC:   true,
 				Logger: util.InitLogger(0),
 				Request: util.Request{
 					Server:  "dns.adguard.com",
 					Type:    dns.TypeNS,
+					Port:    853,
+					Timeout: 750 * time.Millisecond,
+					Retries: 3,
+				},
+			},
+		},
+		{
+			"Valid, Froth",
+			&util.Options{
+				QUIC:   true,
+				Logger: util.InitLogger(0),
+				Request: util.Request{
+					Server:  "dns.froth.zone",
+					Type:    dns.TypeA,
+					Name:    "git.freecumextremist.com",
 					Port:    853,
 					Timeout: 750 * time.Millisecond,
 					Retries: 3,

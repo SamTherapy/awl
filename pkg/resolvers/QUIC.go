@@ -65,6 +65,11 @@ func (resolver *QUICResolver) LookUp(msg *dns.Msg) (resp util.Response, err erro
 		return resp, fmt.Errorf("doq: quic stream write: %w", err)
 	}
 
+	err = stream.Close()
+	if err != nil {
+		return resp, fmt.Errorf("doq: quic stream close: %w", err)
+	}
+
 	resolver.opts.Logger.Debug("quic: reading stream")
 
 	fullRes, err := io.ReadAll(stream)
@@ -82,11 +87,6 @@ func (resolver *QUICResolver) LookUp(msg *dns.Msg) (resp util.Response, err erro
 	}
 
 	resolver.opts.Logger.Debug("quic: closing stream")
-
-	err = stream.Close()
-	if err != nil {
-		return resp, fmt.Errorf("doq: quic stream close: %w", err)
-	}
 
 	resp.DNS = &dns.Msg{}
 
