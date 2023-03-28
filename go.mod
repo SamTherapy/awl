@@ -5,7 +5,7 @@ go 1.18
 require (
 	dns.froth.zone/dnscrypt v0.0.0-20230306222640-3459b621a676
 	github.com/dchest/uniuri v1.2.0
-	github.com/miekg/dns v1.1.51
+	github.com/miekg/dns v1.1.53
 	github.com/quic-go/quic-go v0.33.0
 	github.com/stefansundin/go-zflag v1.1.1
 	golang.org/x/net v0.8.0
