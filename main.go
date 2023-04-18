@@ -10,7 +10,7 @@ import (
 	"strings"
 	"time"
 
-	cli "dns.froth.zone/awl/cmd"
+	cli "dns.froth.zone/awl/internal/cmd"
 	"dns.froth.zone/awl/pkg/query"
 	"dns.froth.zone/awl/pkg/util"
 	"github.com/miekg/dns"

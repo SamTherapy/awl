@@ -5,7 +5,7 @@ package cli_test
 import (
 	"testing"
 
-	cli "dns.froth.zone/awl/cmd"
+	cli "dns.froth.zone/awl/internal/cmd"
 	"dns.froth.zone/awl/pkg/util"
 	"gotest.tools/v3/assert"
 )

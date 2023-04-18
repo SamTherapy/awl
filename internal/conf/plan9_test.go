@@ -1,5 +1,5 @@
 // SPDX-License-Identifier: BSD-3-Clause
-//go:build windows
+//go:build plan9
 
 package conf_test
 
@@ -7,15 +7,15 @@ import (
 	"runtime"
 	"testing"
 
-	"dns.froth.zone/awl/conf"
+	"dns.froth.zone/awl/internal/conf"
 	"gotest.tools/v3/assert"
 )
 
-func TestWinConfig(t *testing.T) {
+func TestPlan9Config(t *testing.T) {
 	t.Parallel()
 
-	if runtime.GOOS != "windows" {
-		t.Skip("Not running Windows, skipping")
+	if runtime.GOOS != "plan9" {
+		t.Skip("Not running Plan 9, skipping")
 	}
 
 	conf, err := conf.GetDNSConfig()
