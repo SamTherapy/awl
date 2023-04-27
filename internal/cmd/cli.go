@@ -60,10 +60,6 @@ func ParseCLI(args []string, version string) (opts *util.Options, err error) {
 			opts.Logger.Warn("Every query after the root query will only use UDP/TCP")
 		}
 
-		if opts.Reverse {
-			opts.Logger.Error("Reverse queries are not currently supported")
-		}
-
 		opts.RD = true
 	}
 
