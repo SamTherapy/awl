@@ -8,6 +8,7 @@ before:
     - doc/makeman.sh
     # Vendor dependencies
     - go mod vendor
+
 builds:
   - env:
       - CGO_ENABLED=0
@@ -39,6 +40,9 @@ archives:
     meta: true
     wrap_in_directory: "{{ .ProjectName }}"
     rlcp: true
+
+universal_binaries:
+- replace: true
 
 checksum:
   name_template: "checksums.txt"
@@ -85,19 +89,20 @@ brews:
       fish_completion.install "completions/fish.fish" => "awl.fish"
       man1.install "doc/awl.1.gz"
 
-scoop:
-  bucket:
-    owner: sam
-    name: scoop
-  folder: bucket
-  homepage: https://dns.froth.zone/awl
-  description: A DNS query client
-  license: BSD-3-Clause
+scoops:
+  - bucket:
+      owner: sam
+      name: scoop
+    folder: bucket
+    homepage: https://dns.froth.zone/awl
+    description: A DNS query client
+    license: BSD-3-Clause
 
 nfpms:
   - id: packages
     maintainer: Sam <sam@samtherapy.net>
     homepage: https://dns.froth.zone/awl
+    package_name: awl-dns
     description: |-
       Command-line DNS query tool.
       Awl supports DNS-over-[UDP,TCP,HTTPS,QUIC] and DNSCrypt.
@@ -106,8 +111,8 @@ nfpms:
     section: utils
     formats:
       - deb
-      # - rpm
-      # - apk
+      - rpm
+      - apk
     contents:
       - src: completions/bash.bash
         dst: /usr/share/bash-completion/completions/awl
