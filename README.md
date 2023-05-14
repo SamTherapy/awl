@@ -27,15 +27,28 @@ Grab a prebuilt binary from the
 ### Package Managers
 
 - AUR: [awl-dns-git](https://aur.archlinux.org/packages/awl-dns-git)
-- Debian/Ubuntu:
+- Debian/Ubuntu (any .deb consuming distro should work):
 
   ```sh
   # Add PGP key
-  curl -sL https://packages.freecumextremist.finance/key.asc | sudo tee /usr/share/keyrings/awl.asc >/dev/null
+  sudo curl https://git.froth.zone/api/packages/sam/debian/repository.key -o /usr/share/keyrings/git-froth-zone.asc
   # Add repo
-  echo "deb [signed-by=/usr/share/keyrings/awl.asc] https://packages.freecumextremist.finance/awl/apt awl main" | sudo tee /etc/apt/sources.list.d/awl.list >/dev/null
+  echo "deb [signed-by=/usr/share/keyrings/git-froth-zone.asc]  https://git.froth.zone/api/packages/sam/debian sid main" | sudo tee /etc/apt/sources.list.d/git-froth-zone.list
   sudo apt update
-  sudo apt install awl
+  sudo apt install awl-dns
+  ```
+
+- Fedora (any .rpm consuming distro should work):
+  ```sh
+  dnf config-manager --add-repo https://git.froth.zone/api/packages/sam/rpm/sam.repo
+  dnf install awl-dns
+  ```
+
+- Alpine (any .apk consuming distro should work):
+  ```sh
+  echo "https://git.froth.zone/api/packages/sam/alpine/edge/main" | sudo tee -a /etc/apk/repositories
+  sudo curl -JO https://git.froth.zone/api/packages/sam/alpine/key --output-dir /etc/apk/keys
+  sudo apk add awl-dns
   ```
 
 - Homebrew:
