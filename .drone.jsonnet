@@ -133,18 +133,28 @@ local release() = {
       ],
     },
     {
-      name: 'trigger',
-      image: 'grafana/drone-downstream',
+      name: 'package',
+      image: 'git.freecumextremist.com/notsam/drone-gitea-push-packages',
       settings: {
-        token: {
-          from_secret: 'DRONE_TOKEN',
+        base_url: 'https://git.froth.zone',
+        owner: 'sam',
+        project_name: 'awl',
+        package_name: 'awl-dns',
+        username: 'sam',
+        password: {
+          from_secret: 'GITEA_TOKEN',
         },
-        repositories: [
-          'packages/awl',
+        architectures: [
+          'amd64',
+          'arm64',
+          '386',
+          'armv6'
         ],
-        parameters: [
-          'TAG=${DRONE_TAG}',
-        ],
+        package_types: [
+          'deb',
+          'apk',
+          'rpm'
+        ]
       },
     },
   ],
