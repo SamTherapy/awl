@@ -113,6 +113,7 @@ nfpms:
       - deb
       - rpm
       - apk
+      - termux.deb
     contents:
       - src: completions/bash.bash
         dst: /usr/share/bash-completion/completions/awl
