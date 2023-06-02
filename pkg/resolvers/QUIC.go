@@ -4,9 +4,11 @@
 package resolvers
 
 import (
+	"context"
 	"crypto/tls"
 	"fmt"
 	"io"
+	"strings"
 	"time"
 
 	"dns.froth.zone/awl/pkg/util"
@@ -31,12 +33,20 @@ func (resolver *QUICResolver) LookUp(msg *dns.Msg) (resp util.Response, err erro
 		NextProtos:         []string{"doq"},
 	}
 
+	// Make sure that TLSHost is ALWAYS set
+	if resolver.opts.TLSHost == "" {
+		tls.ServerName = strings.Split(resolver.opts.Request.Server, ":")[0]
+	}
+
 	conf := new(quic.Config)
 	conf.HandshakeIdleTimeout = resolver.opts.Request.Timeout
 
 	resolver.opts.Logger.Debug("quic: making query")
 
-	connection, err := quic.DialAddr(resolver.opts.Request.Server, tls, conf)
+	ctx, cancel := context.WithTimeout(context.Background(), resolver.opts.Request.Timeout)
+	defer cancel()
+
+	connection, err := quic.DialAddr(ctx, resolver.opts.Request.Server, tls, conf)
 	if err != nil {
 		return resp, fmt.Errorf("doq: dial: %w", err)
 	}
