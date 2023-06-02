@@ -4,6 +4,7 @@ package query_test
 
 import (
 	"testing"
+	"time"
 
 	"dns.froth.zone/awl/pkg/query"
 	"dns.froth.zone/awl/pkg/util"
@@ -100,6 +101,7 @@ func TestCreateQ(t *testing.T) {
 					Type:    dns.TypeA,
 					Name:    "example.com.",
 					Retries: 3,
+					Timeout: time.Second,
 				},
 				Display: util.Display{
 					Comments:   true,
