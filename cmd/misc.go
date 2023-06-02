@@ -35,6 +35,7 @@ func ParseMiscArgs(args []string, opts *util.Options) error {
 				opts.HTTPS = true
 				opts.Request.Server = arg
 				opts.Logger.Info("DNS-over-HTTPS implicitly set")
+
 				_, endpoint, isSplit := strings.Cut(arg, "/")
 				if isSplit {
 					opts.HTTPSOptions.Endpoint = "/" + endpoint
