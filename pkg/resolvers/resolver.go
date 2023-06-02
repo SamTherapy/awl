@@ -31,7 +31,11 @@ func LoadResolver(opts *util.Options) (resolver Resolver, err error) {
 			opts.Request.Server = "https://" + opts.Request.Server
 		}
 
-		opts.Request.Server += opts.HTTPSOptions.Endpoint
+		// Make sure that the endpoint is defaulted to /dns-query
+		if !strings.HasSuffix(opts.Request.Server, opts.HTTPSOptions.Endpoint) {
+			opts.Request.Server += opts.HTTPSOptions.Endpoint
+		}
+
 		resolver = &HTTPSResolver{
 			opts: opts,
 		}

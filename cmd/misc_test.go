@@ -3,6 +3,7 @@
 package cli_test
 
 import (
+	"strings"
 	"testing"
 
 	cli "dns.froth.zone/awl/cmd"
@@ -128,6 +129,7 @@ func TestFlagSetting(t *testing.T) {
 		{"@sdns://AQMAAAAAAAAAETk0LjE0MC4xNC4xNDo1NDQzINErR_JS3PLCu_iZEIbq95zkSV2LFsigxDIuUso_OQhzIjIuZG5zY3J5cHQuZGVmYXVsdC5uczEuYWRndWFyZC5jb20", "sdns://AQMAAAAAAAAAETk0LjE0MC4xNC4xNDo1NDQzINErR_JS3PLCu_iZEIbq95zkSV2LFsigxDIuUso_OQhzIjIuZG5zY3J5cHQuZGVmYXVsdC5uczEuYWRndWFyZC5jb20", "DNSCrypt"},
 		{"@tls://dns.google", "dns.google", "TLS"},
 		{"@https://dns.cloudflare.com/dns-query", "https://dns.cloudflare.com/dns-query", "HTTPS"},
+		{"@https://dns.example.net/a", "https://dns.example.net/a", "HTTPS with a set path"},
 		{"@quic://dns.adguard.com", "dns.adguard.com", "QUIC"},
 		{"@tcp://dns.froth.zone", "dns.froth.zone", "TCP"},
 		{"@udp://dns.example.com", "dns.example.com", "UDP"},
@@ -144,23 +146,23 @@ func TestFlagSetting(t *testing.T) {
 
 			err := cli.ParseMiscArgs([]string{test.in}, opts)
 			assert.NilError(t, err)
-			switch test.over {
-			case "DNSCrypt":
+			switch {
+			case strings.HasPrefix(test.over, "DNSCrypt"):
 				assert.Assert(t, opts.DNSCrypt)
 				assert.Equal(t, opts.Request.Server, test.expected)
-			case "TLS":
+			case strings.HasPrefix(test.over, "TLS"):
 				assert.Assert(t, opts.TLS)
 				assert.Equal(t, opts.Request.Server, test.expected)
-			case "HTTPS":
+			case strings.HasPrefix(test.over, "HTTPS"):
 				assert.Assert(t, opts.HTTPS)
 				assert.Equal(t, opts.Request.Server, test.expected)
-			case "QUIC":
+			case strings.HasPrefix(test.over, "QUIC"):
 				assert.Assert(t, opts.QUIC)
 				assert.Equal(t, opts.Request.Server, test.expected)
-			case "TCP":
+			case strings.HasPrefix(test.over, "TCP"):
 				assert.Assert(t, opts.TCP)
 				assert.Equal(t, opts.Request.Server, test.expected)
-			case "UDP":
+			case strings.HasPrefix(test.over, "UDP"):
 				assert.Assert(t, true)
 				assert.Equal(t, opts.Request.Server, test.expected)
 			}
