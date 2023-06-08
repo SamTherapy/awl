@@ -38,7 +38,7 @@ Grab a prebuilt binary from the
   sudo apt install awl-dns
   ```
 
-- Fedora (any .rpm consuming distro should work):
+- Fedora (any .rpm consuming distro should work [but will run into problems updating, not recommended](https://git.froth.zone/sam/awl/issues/197)):
     ```sh
     echo '[git-froth-zone-sam]
     name=sam - Froth Git
