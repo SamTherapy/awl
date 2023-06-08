@@ -39,10 +39,15 @@ Grab a prebuilt binary from the
   ```
 
 - Fedora (any .rpm consuming distro should work):
-  ```sh
-  dnf config-manager --add-repo https://git.froth.zone/api/packages/sam/rpm/sam.repo
-  dnf install awl-dns
-  ```
+    ```sh
+    echo '[git-froth-zone-sam]
+    name=sam - Froth Git
+    baseurl=https://git.froth.zone/api/packages/sam/rpm
+    enabled=1
+    gpgcheck=0
+    gpgkey=https://git.froth.zone/api/packages/sam/rpm/repository.key' | sudo tee /etc/yum.repos.d/git-froth-zone-sam.repo
+    sudo yum install awl-dns
+    ```
 
 - Alpine (any .apk consuming distro should work):
   ```sh
