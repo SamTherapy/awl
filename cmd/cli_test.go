@@ -104,7 +104,7 @@ func TestVersion(t *testing.T) {
 
 	_, err := cli.ParseCLI(args, "test")
 
-	assert.ErrorType(t, err, util.ErrNotError)
+	assert.ErrorIs(t, err, util.ErrNotError)
 }
 
 func TestTimeout(t *testing.T) {
