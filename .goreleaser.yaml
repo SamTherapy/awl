@@ -31,7 +31,6 @@ archives:
     format_overrides:
       - goos: windows
         format: zip
-    rlcp: true
   - files:
       - vendor/**
     id: vendor
@@ -39,7 +38,6 @@ archives:
     name_template: "{{ .ProjectName }}-{{ .Version }}-deps"
     meta: true
     wrap_in_directory: "{{ .ProjectName }}"
-    rlcp: true
 
 universal_binaries:
 - replace: true
@@ -74,7 +72,7 @@ changelog:
       - "^ci:"
 
 brews:
-  - tap:
+  - repository:
       owner: sam
       name: homebrew
     homepage: https://dns.froth.zone/awl
@@ -90,7 +88,7 @@ brews:
       man1.install "doc/awl.1.gz"
 
 scoops:
-  - bucket:
+  - repository:
       owner: sam
       name: scoop
     folder: bucket
