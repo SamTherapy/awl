@@ -148,13 +148,13 @@ local release() = {
           'amd64',
           'arm64',
           '386',
-          'armv6'
+          'armv6',
         ],
         package_types: [
           'deb',
           'apk',
-          'rpm'
-        ]
+          'rpm',
+        ],
       },
     },
   ],
@@ -167,10 +167,10 @@ local release() = {
 };
 
 [
-  testing('1.19', 'amd64'),
-  testing('1.19', 'arm64'),
   testing('1.20', 'amd64'),
   testing('1.20', 'arm64'),
+  testing('1.21', 'amd64'),
+  testing('1.21', 'arm64'),
 
   release(),
 ]
