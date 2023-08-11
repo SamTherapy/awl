@@ -105,7 +105,6 @@ nfpms:
       Command-line DNS query tool.
       Awl supports DNS-over-[UDP,TCP,HTTPS,QUIC] and DNSCrypt.
     license: BSD-3-Clause
-    bindir: /usr/bin
     section: utils
     formats:
       - deb
