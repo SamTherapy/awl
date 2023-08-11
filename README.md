@@ -73,7 +73,7 @@ Grab a prebuilt binary from the
 
 Dependencies:
 
-- [Go](https://go.dev/) >= 1.18
+- [Go](https://go.dev/) >= 1.20
 - GNU/BSD make or Plan 9 mk (if using the makefile/mkfile)
 - [scdoc](https://git.sr.ht/~sircmpwn/scdoc) (optional, for man page)
 
