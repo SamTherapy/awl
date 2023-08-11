@@ -1,10 +1,12 @@
 # SPDX-License-Identifier: BSD-3-Clause
 # Plan 9 mkfile
 
+</$objtype/mkfile
+
 GO = go
 PROG = awl
-
-GOFLAGS = -ldflags=-s -ldflags=-w -ldflags=-X=main.version=PLAN9 -trimpath
+VERSION = `{awk '{print substr($0,0,8)}' .git/refs/heads/master}
+GOFLAGS = -ldflags=-s -ldflags=-w -ldflags=-X=main.version=$VERSION -trimpath
 
 CGO_ENABLED = 0
 
