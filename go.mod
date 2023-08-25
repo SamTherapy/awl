@@ -6,7 +6,7 @@ require (
 	dns.froth.zone/dnscrypt v0.0.1
 	github.com/dchest/uniuri v1.2.0
 	github.com/miekg/dns v1.1.55
-	github.com/quic-go/quic-go v0.38.0
+	github.com/quic-go/quic-go v0.38.1
 	github.com/stefansundin/go-zflag v1.1.1
 	golang.org/x/net v0.14.0
 	golang.org/x/sys v0.11.0
@@ -23,7 +23,7 @@ require (
 	github.com/google/pprof v0.0.0-20230808223545-4887780b67fb // indirect
 	github.com/kr/pretty v0.3.1 // indirect
 	github.com/onsi/ginkgo/v2 v2.11.0 // indirect
-	github.com/quic-go/qtls-go1-20 v0.3.2 // indirect
+	github.com/quic-go/qtls-go1-20 v0.3.3 // indirect
 	golang.org/x/crypto v0.12.0 // indirect
 	golang.org/x/exp v0.0.0-20230810033253-352e893a4cad // indirect
 	golang.org/x/mod v0.12.0 // indirect
