@@ -5,7 +5,7 @@ go 1.20
 require (
 	dns.froth.zone/dnscrypt v0.0.1
 	github.com/dchest/uniuri v1.2.0
-	github.com/miekg/dns v1.1.55
+	github.com/miekg/dns v1.1.56
 	github.com/quic-go/quic-go v0.38.1
 	github.com/stefansundin/go-zflag v1.1.1
 	golang.org/x/net v0.15.0
@@ -28,5 +28,5 @@ require (
 	golang.org/x/exp v0.0.0-20230810033253-352e893a4cad // indirect
 	golang.org/x/mod v0.12.0 // indirect
 	golang.org/x/text v0.13.0 // indirect
-	golang.org/x/tools v0.12.0 // indirect
+	golang.org/x/tools v0.13.0 // indirect
 )
