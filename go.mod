@@ -8,7 +8,7 @@ require (
 	github.com/miekg/dns v1.1.56
 	github.com/quic-go/quic-go v0.39.0
 	github.com/stefansundin/go-zflag v1.1.1
-	golang.org/x/net v0.15.0
+	golang.org/x/net v0.16.0
 	golang.org/x/sys v0.13.0
 	gopkg.in/yaml.v3 v3.0.1
 	gotest.tools/v3 v3.5.1
@@ -24,7 +24,7 @@ require (
 	github.com/onsi/ginkgo/v2 v2.11.0 // indirect
 	github.com/quic-go/qtls-go1-20 v0.3.4 // indirect
 	go.uber.org/mock v0.3.0 // indirect
-	golang.org/x/crypto v0.13.0 // indirect
+	golang.org/x/crypto v0.14.0 // indirect
 	golang.org/x/exp v0.0.0-20230810033253-352e893a4cad // indirect
 	golang.org/x/mod v0.12.0 // indirect
 	golang.org/x/text v0.13.0 // indirect
