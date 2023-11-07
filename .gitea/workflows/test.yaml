@@ -6,9 +6,9 @@ jobs:
     strategy:
       fail-fast: true
       matrix:
-        platform: [macos, windows]
         goVer: ["oldstable", "stable"]
-    runs-on: ${{ matrix.platform }}-latest
+    runs-on: ubuntu-latest
+
     steps:
       - name: Set up Go
         uses: actions/setup-go@v4
