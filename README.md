@@ -93,7 +93,7 @@ make && sudo make install
 
 Send a [pull request](https://git.froth.zone/sam/awl/pulls) our way. Prefer
 emails? Send a patch to the
-[mailing list](https://lists.sr.ht/~sammefishe/awl-dev).
+[mailing list](https://lists.sr.ht/~sammefishe/awl-devel).
 
 Found a bug or want a new feature? Create an issue
 [here](https://git.froth.zone/sam/awl/issues).
