@@ -259,4 +259,4 @@ This man page is probably not complete.
 
 Likely numerous more, report them either to the tracker
 _https://git.froth.zone/sam/awl/issues_ or via email
-_~sammefishe/awl-dev@lists.sr.ht_
+_~sammefishe/awl-develop@lists.sr.ht_

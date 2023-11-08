@@ -30,6 +30,6 @@ jobs:
         with:
           distribution: goreleaser
           version: latest
-          args: release --rm-dist --skip=homebrew,nix,scoop,upload
+          args: release --clean --skip=homebrew,nix,scoop
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

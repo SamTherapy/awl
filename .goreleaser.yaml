@@ -106,10 +106,9 @@ nix:
       name: nur
     homepage: https://dns.froth.zone/awl
     description: A DNS query client
-    license: BSD-3-Clause
-    extra_install:
+    license: bsd3
+    extra_install: |-
       installManPage ./doc/awl.1.gz
-    post_install: |
       installShellCompletion ./completions/*
 
 nfpms:

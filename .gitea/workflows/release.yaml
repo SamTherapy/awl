@@ -20,7 +20,7 @@ jobs:
       - name: Set up Go
         uses: actions/setup-go@v4
         with:
-          go-version: '>=1.21'
+          go-version: stable
 
       - name: Install scdoc
         run: sudo apt-get install -y scdoc
@@ -30,8 +30,7 @@ jobs:
         with:
           distribution: goreleaser
           version: latest
-          args: release --rm-dist
+          args: release --clean
         env:
           GITEA_TOKEN: ${{ secrets.PUBLISH_TOKEN }}
-          UPLOAD_PACKAGES_USERNAME: sam
           UPLOAD_PACKAGES_SECRET: ${{ secrets.PUBLISH_TOKEN }}
