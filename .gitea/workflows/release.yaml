@@ -23,7 +23,7 @@ jobs:
           go-version: stable
 
       - name: Install scdoc
-        run: sudo apt-get install -y scdoc
+        run: apt-get install -y scdoc
 
       - name: Release with GoReleaser
         uses: goreleaser/goreleaser-action@v5
