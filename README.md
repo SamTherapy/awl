@@ -65,7 +65,7 @@ Grab a prebuilt binary from the
 - Scoop:
 
   ```pwsh
-  scoop bucket add froth https://git.froth.zone/sam/scoop.git
+  scoop bucket add froth https://git.froth.zone/packages/scoop.git
   scoop install awl
   ```
 

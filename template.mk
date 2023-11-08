@@ -89,6 +89,7 @@ clean:
 # Ignore errors if you remove something that doesn't exist
 	rm -f doc/$(PROG).1
 	rm -f coverage/cover*
+	rm -rf vendor
 
 ## help: Prints this help message
 .PHONY: help

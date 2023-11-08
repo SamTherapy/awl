@@ -33,3 +33,5 @@ jobs:
           args: release --rm-dist
         env:
           GITEA_TOKEN: ${{ secrets.PUBLISH_TOKEN }}
+          UPLOAD_PACKAGES_USERNAME: sam
+          UPLOAD_PACKAGES_SECRET: ${{ secrets.PUBLISH_TOKEN }}

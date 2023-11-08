@@ -27,7 +27,10 @@ archives:
       {{- if eq .Os "darwin" }}MacOS_
       {{- else if eq .Os "freebsd" }}FreeBSD_
       {{- else }}{{- title .Os }}_{{ end }}
-      {{- .Arch }}
+      {{- if eq .Arch "386" }}i386
+      {{- else if eq .Arch "mips64" }}mips64_hardfloat
+      {{- else if eq .Arch "mips64le" }}mips64le_hardfloat
+      {{- else }}{{ .Arch }}{{ end -}}
     format_overrides:
       - goos: windows
         format: zip
@@ -73,7 +76,7 @@ changelog:
 
 brews:
   - repository:
-      owner: sam
+      owner: packaging
       name: homebrew
     homepage: https://dns.froth.zone/awl
     description: A DNS query tool
@@ -89,50 +92,125 @@ brews:
 
 scoops:
   - repository:
-      owner: sam
+      owner: packaging
       name: scoop
     folder: bucket
     homepage: https://dns.froth.zone/awl
     description: A DNS query client
     license: BSD-3-Clause
 
+nix:
+  -
+    repository:
+      owner: packaging
+      name: nur
+    homepage: https://dns.froth.zone/awl
+    description: A DNS query client
+    license: BSD-3-Clause
+    extra_install:
+      installManPage ./doc/awl.1.gz
+    post_install: |
+      installShellCompletion ./completions/*
+
 nfpms:
   - id: packages
-    maintainer: Sam <sam@samtherapy.net>
-    homepage: https://dns.froth.zone/awl
     package_name: awl-dns
+    vendor: Sam Therapy <sam@samtherapy.net>
+    maintainer: Sam Therapy <sam@samtherapy.net>
+    homepage: https://dns.froth.zone/awl
+    description: |-
+      Command-line DNS query tool.
+      Awl supports DNS-over-[UDP,TCP,HTTPS,QUIC] and DNSCrypt.
+    license: BSD-3-Clause
+    section: utils
+    bindir: /usr/bin
+    formats:
+      - apk
+      - archlinux
+      - deb
+      - rpm
+    contents:
+      - src: completions/bash.bash
+        dst: /usr/share/bash-completion/completions/awl
+      - src: doc/awl.1.gz
+        dst: /usr/share/man/man1/awl.1.gz
+      - src: LICENCE
+        dst: /usr/share/doc/awl/copyright
+      - src: completions/fish.fish
+        dst: /usr/share/fish/vendor_completions.d/awl.fish
+      # DEB only
+      - src: completions/zsh.zsh
+        dst: /usr/share/zsh/vendor-completions/_awl
+        packager: deb
+      # Alpine .apk only
+      - src: completions/zsh.zsh
+        dst: /usr/share/zsh/site-functions/_awl
+        packager: apk
+      # RPM only
+      - src: completions/zsh.zsh
+        dst: /usr/share/zsh/site-functions/_awl
+        packager: rpm
+    deb:
+      lintian_overrides:
+        - statically-linked-binary
+        - changelog-file-missing-in-native-package
+    overrides:
+      deb:
+        file_name_template: >-
+          {{- .PackageName }}_
+          {{- .Version }}_
+          {{- if eq .Arch "386" }}i386
+          {{- else if eq .Arch "arm" }}armel
+          {{- else }}{{ .Arch }}{{ end -}}
+      rpm:
+        file_name_template: >-
+          {{- .PackageName }}-
+          {{- .Version }}-
+          {{- if eq .Arch "amd64" }}x86_64
+          {{- else if eq .Arch "386" }}i686
+          {{- else if eq .Arch "arm" }}armhfp
+          {{- else if eq .Arch "arm64" }}aarch64
+          {{- else }}{{ .Arch }}{{ end -}}
+
+  - id: termux
+    package_name: awl-dns
+    vendor: Sam Therapy <sam@samtherapy.net>
+    maintainer: Sam Therapy <sam@samtherapy.net>
+    homepage: https://dns.froth.zone/awl
     description: |-
       Command-line DNS query tool.
       Awl supports DNS-over-[UDP,TCP,HTTPS,QUIC] and DNSCrypt.
     license: BSD-3-Clause
     section: utils
     formats:
+      - termux.deb
+    file_name_template:  >-
+          {{- .PackageName }}_
+          {{- .Version }}_
+          {{- if eq .Arch "amd64" }}x86_64
+          {{- else if eq .Arch "386" }}i686
+          {{- else if eq .Arch "arm" }}arm
+          {{- else if eq .Arch "arm64" }}aarch64
+          {{- else }}{{ .Arch }}{{ end -}}
+
+uploads:
+  -
+    name: packages
+    method: PUT
+    mode: archive
+    exts:
       - deb
       - rpm
       - apk
       - termux.deb
-    contents:
-      - src: completions/bash.bash
-        dst: /usr/share/bash-completion/completions/awl
-      - src: completions/zsh.zsh
-        dst: /usr/share/zsh/vendor-completions/_awl
-        packager: deb
-      - src: completions/zsh.zsh
-        dst: /usr/share/zsh/site-functions/_awl
-        packager: apk
-      - src: completions/zsh.zsh
-        dst: /usr/share/zsh/site-functions/_awl
-        packager: rpm
-      - src: completions/fish.fish
-        dst: /usr/share/fish/vendor_completions.d/awl.fish
-      - src: doc/awl.1.gz
-        dst: /usr/share/man/man1/awl.1.gz
-      - src: LICENCE
-        dst: /usr/share/doc/awl/copyright
-    deb:
-      lintian_overrides:
-        - statically-linked-binary
-        - changelog-file-missing-in-native-package
+    username: sam
+    target: >-
+      https://git.froth.zone/api/packages/sam/
+      {{- if eq .ArtifactExt "deb" }}debian/pool/sid/main/upload
+      {{- else if eq .ArtifactExt "termux.deb" }}debian/pool/termux/main/upload
+      {{- else if eq .ArtifactExt "rpm" }}rpm/upload
+      {{- else if eq .ArtifactExt "apk" }}alpine/edge/main{{ end -}}
+    custom_artifact_name: true # Truncate the artifact name from the upload URL
 
 gitea_urls:
   api: https://git.froth.zone/api/v1
