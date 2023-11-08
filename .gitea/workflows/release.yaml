@@ -32,5 +32,6 @@ jobs:
           version: latest
           args: release --clean
         env:
+          GORELEASER_FORCE_TOKEN: gitea
           GITEA_TOKEN: ${{ secrets.PUBLISH_TOKEN }}
           UPLOAD_PACKAGES_SECRET: ${{ secrets.PUBLISH_TOKEN }}
