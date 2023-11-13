@@ -31,14 +31,15 @@ Grab a prebuilt binary from the
 
   ```sh
   # Add PGP key
-  sudo curl https://git.froth.zone/api/packages/sam/debian/repository.key -o /usr/share/keyrings/git-froth-zone.asc
+  sudo curl https://git.froth.zone/api/packages/sam/debian/repository.key -o /usr/share/keyrings/git-froth-zone-sam.asc
   # Add repo
-  echo "deb [signed-by=/usr/share/keyrings/git-froth-zone.asc]  https://git.froth.zone/api/packages/sam/debian sid main" | sudo tee /etc/apt/sources.list.d/git-froth-zone.list
+  echo "deb [signed-by=/usr/share/keyrings/git-froth-zone-sam.asc]  https://git.froth.zone/api/packages/sam/debian sid main" | sudo tee /etc/apt/sources.list.d/git-froth-zone-sam.list
   sudo apt update
   sudo apt install awl-dns
   ```
 
 - Fedora (any .rpm consuming distro should work [but will run into problems updating, not recommended](https://git.froth.zone/sam/awl/issues/197)):
+
     ```sh
     echo '[git-froth-zone-sam]
     name=sam - Froth Git
@@ -50,6 +51,7 @@ Grab a prebuilt binary from the
     ```
 
 - Alpine (any .apk consuming distro should work):
+
   ```sh
   echo "https://git.froth.zone/api/packages/sam/alpine/edge/main" | sudo tee -a /etc/apk/repositories
   sudo curl -JO https://git.froth.zone/api/packages/sam/alpine/key --output-dir /etc/apk/keys
