@@ -5,7 +5,7 @@ go 1.20
 require (
 	dns.froth.zone/dnscrypt v0.0.1
 	github.com/dchest/uniuri v1.2.0
-	github.com/miekg/dns v1.1.56
+	github.com/miekg/dns v1.1.57
 	github.com/quic-go/quic-go v0.40.0
 	github.com/stefansundin/go-zflag v1.1.1
 	golang.org/x/net v0.18.0
