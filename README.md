@@ -27,7 +27,7 @@ awl example.com
 awl example.com +tls +json
 ```
 
-For more and the usage, see the [manpage](/wiki/awl.1).
+For more and the usage, see the [manpage](https://git.froth.zone/sam/awl/wiki/awl.1).
 
 ## Installing
 
