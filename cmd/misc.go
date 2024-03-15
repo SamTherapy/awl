@@ -132,7 +132,7 @@ func ParseMiscArgs(args []string, opts *util.Options) error {
 		case opts.HTTPS:
 			opts.Request.Server = "https://dns.cloudflare.com"
 		case opts.QUIC:
-			opts.Request.Server = "dns.adguard.com"
+			opts.Request.Server = "dns.froth.zone"
 		default:
 			var err error
 			resolv, err := conf.GetDNSConfig()
