@@ -19,7 +19,7 @@ builds:
 
 archives:
   - files:
-      - LICENCE
+      - LICENSE
       - completions/**
       - doc/awl.1.gz
     name_template: >-
@@ -133,7 +133,7 @@ nfpms:
         dst: /usr/share/bash-completion/completions/awl
       - src: doc/awl.1.gz
         dst: /usr/share/man/man1/awl.1.gz
-      - src: LICENCE
+      - src: license
         dst: /usr/share/doc/awl/copyright
       - src: completions/fish.fish
         dst: /usr/share/fish/vendor_completions.d/awl.fish
