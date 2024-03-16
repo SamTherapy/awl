@@ -17,9 +17,8 @@ jobs:
 
       - name: Checkout repository
         uses: actions/checkout@v4
-
-      - name: Checkout submodules
-        run: git submodule update --init --recursive
+        with:
+          submodules: recursive
 
       - name: Test
         run: make test-ci
