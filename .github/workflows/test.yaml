@@ -10,15 +10,15 @@ jobs:
         goVer: ["oldstable", "stable"]
     runs-on: ${{ matrix.platform }}-latest
     steps:
-      - name: Set up Go
-        uses: actions/setup-go@v5
-        with:
-          go-version: ${{ matrix.goVer }}
-
       - name: Checkout repository
         uses: actions/checkout@v4
         with:
           submodules: recursive
+
+      - name: Set up Go
+        uses: actions/setup-go@v5
+        with:
+          go-version: ${{ matrix.goVer }}
 
       - name: Test
         run: make test-ci
