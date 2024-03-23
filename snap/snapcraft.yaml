@@ -2,12 +2,16 @@
 # why not?
 
 name: awl
-base: core20
+base: bare
 adopt-info: awl
 license: BSD-3-Clause
 summary: A command-line DNS query tool.
 description: |
   awl is a command line DNS tool, much like dig and drill.
+icon: doc/img/awl.svg
+issues:
+  - https://git.froth.zone/sam/awl/issues
+  - ~sammefishe/awl-devel@lists.sr.ht
 
 grade: devel
 confinement: strict

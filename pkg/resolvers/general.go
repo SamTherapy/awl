@@ -62,7 +62,6 @@ func (resolver *StandardResolver) LookUp(msg *dns.Msg) (resp util.Response, err 
 			msg.Extra = resp.DNS.Extra
 
 			resp.DNS, resp.RTT, err = dnsClient.Exchange(msg, resolver.opts.Request.Server)
-
 			if err != nil {
 				return resp, fmt.Errorf("badcookie: DNS exchange: %w", err)
 			}

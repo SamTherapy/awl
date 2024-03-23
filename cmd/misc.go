@@ -83,7 +83,6 @@ func ParseMiscArgs(args []string, opts *util.Options) error {
 
 			opts.Logger.Info(arg, "detected as a domain name")
 			opts.Request.Name, err = idna.ToASCII(arg)
-
 			if err != nil {
 				return fmt.Errorf("unicode to punycode: %w", err)
 			}
@@ -99,7 +98,6 @@ func ParseMiscArgs(args []string, opts *util.Options) error {
 
 			opts.Logger.Info(arg, "is unknown. Assuming domain")
 			opts.Request.Name, err = idna.ToASCII(arg)
-
 			if err != nil {
 				return fmt.Errorf("unicode to punycode: %w", err)
 			}

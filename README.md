@@ -1,16 +1,14 @@
-# <img src="./doc/awl-text.png" width="50%" title="awl logo" alt="awl">
+<!-- markdownlint-disable MD033 -->
+# <img src="./doc/img/awl-text.png" width="50%" title="awl logo" alt="awl">
 
 > awl *(noun)*: A pointed tool for making small holes in wood or leather
 
-
 A command-line DNS lookup tool that supports DNS queries over UDP, TCP, TLS, HTTPS, DNSCrypt, and QUIC.
-
 
 [![Gitea Release](https://img.shields.io/gitea/v/release/sam/awl?gitea_url=https%3A%2F%2Fgit.froth.zone&display_name=release&style=for-the-badge)](https://git.froth.zone/sam/awl)
 [![Last Commit](https://img.shields.io/gitea/last-commit/sam/awl?gitea_url=https%3A%2F%2Fgit.froth.zone&style=for-the-badge)](https://git.froth.zone/sam/awl/commits/branch/master)
 [![Go Report](https://goreportcard.com/badge/dns.froth.zone/awl?style=for-the-badge)](https://goreportcard.com/report/dns.froth.zone/awl)
 [![License](https://img.shields.io/github/license/samtherapy/awl?style=for-the-badge)](https://spdx.org/licenses/BSD-3-Clause.html)
-
 
 Awl is designed to be a drop-in replacement for [dig](https://bind9.readthedocs.io/en/v9_18_3/manpages.html#dig-dns-lookup-utility).
 
@@ -20,8 +18,8 @@ Awl is designed to be a drop-in replacement for [dig](https://bind9.readthedocs.
 # Query a domain over UDP
 awl example.com
 
-# Query a domain over TCP
-awl example.com
+# Query a domain over HTTPS, print only the results
+awl example.com +https --short
 
 # Query a domain over TLS, print as JSON
 awl example.com +tls +json
@@ -63,6 +61,7 @@ apk add awl-dns
 <summary>Arch</summary>
 
 AUR package available as [awl-dns-git](https://aur.archlinux.org/packages/awl-dns-git/)
+
 ```shell
 yay -S awl-dns-git ||
 paru -S awl-dns-git
@@ -138,6 +137,7 @@ brew install SamTherapy/tap/awl
 ```shell
 brew install SamTherapy/tap/awl
 ```
+
 </details>
 </details>
 <br />
@@ -152,11 +152,27 @@ brew install SamTherapy/tap/awl
 scoop bucket add froth https://git.froth.zone/packages/scoop.git
 scoop install awl
 ```
+
 </details>
 </details>
 
+## Contributing
+
+Please see the [CONTRIBUTING.md](./CONTRIBUTING.md) file for more information.
+
+TL;DR: If you like the project, spread the word! If you want to contribute, [use the issue tracker](https://git.froth.zone/sam/awl/issues) or [open a pull request](https://git.froth.zone/sam/awl/pulls).
+Want to use email instead? Use our [mailing list](https://lists.sr.ht/~sammefishe/awl-devel)!
+
+### Mirrors
+
+The canonical repository is located on [my personal Forgejo instance](https://git.froth.zone/sam/awl). \
+Official mirrors are located on [GitHub](https://github.com/SamTherapy/awl) and [SourceHut](https://sr.ht/~sammefishe/awl/).
+Contributions are accepted on all mirrors, but the Forgejo instance is preferred.
+
 ## License
+
 [BSD-3-Clause](https://spdx.org/licenses/BSD-3-Clause.html)
 
 ### Credits
+
 - Awl image taken from [Wikimedia Commons](https://commons.wikimedia.org/wiki/File:Awl.tif), imaged is licensed CC0.
