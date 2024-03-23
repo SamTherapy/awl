@@ -5,7 +5,7 @@ before:
     - make clean
     - go mod tidy
     # Make manpages
-    - doc/makeman.sh
+    - docs/makeman.sh
     # Vendor dependencies
     - go mod vendor
 
@@ -21,7 +21,7 @@ archives:
   - files:
       - LICENSE
       - completions/**
-      - doc/awl.1.gz
+      - docs/awl.1.gz
     name_template: >-
       {{ .ProjectName }}_
       {{- if eq .Os "darwin" }}MacOS_
@@ -88,7 +88,7 @@ brews:
       bash_completion.install "completions/bash.bash" => "awl"
       zsh_completion.install "completions/zsh.zsh" => "_awl"
       fish_completion.install "completions/fish.fish" => "awl.fish"
-      man1.install "doc/awl.1.gz"
+      man1.install "docs/awl.1.gz"
 
 scoops:
   - repository:
@@ -108,7 +108,7 @@ nix:
     description: A DNS query client
     license: bsd3
     extra_install: |-
-      installManPage ./doc/awl.1.gz
+      installManPage ./docs/awl.1.gz
       installShellCompletion ./completions/*
 
 nfpms:
@@ -131,10 +131,10 @@ nfpms:
     contents:
       - src: completions/bash.bash
         dst: /usr/share/bash-completion/completions/awl
-      - src: doc/awl.1.gz
+      - src: docs/awl.1.gz
         dst: /usr/share/man/man1/awl.1.gz
       - src: LICENSE
-        dst: /usr/share/doc/awl/copyright
+        dst: /usr/share/docs/awl/copyright
       - src: completions/fish.fish
         dst: /usr/share/fish/vendor_completions.d/awl.fish
       # DEB only

@@ -9,7 +9,7 @@ EXE := $(PROG)
 .PHONY: install
 install: all
 	install -Dm755 $(PROG) $(DESTDIR)$(PREFIX)/$(BIN)/$(PROG)
-	install -Dm644 doc/$(PROG).1 $(DESTDIR)$(MAN)/man1/$(PROG).1
+	install -Dm644 docs/$(PROG).1 $(DESTDIR)$(MAN)/man1/$(PROG).1
 # completions need to go in one specific place :)
 	install -Dm644 completions/bash.bash $(DESTDIR)$(PREFIX)$(SHARE)/bash-completion/completions/$(PROG)
 	install -Dm644 completions/fish.fish $(DESTDIR)$(PREFIX)$(SHARE)/fish/vendor_completions.d/$(PROG).fish

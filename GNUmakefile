@@ -22,7 +22,7 @@ install:
 else
 install: all
 	install -$(INSTALLFLAGS)m755 $(PROG) $(DESTDIR)$(PREFIX)/$(BIN)/$(PROG)
-	install -$(INSTALLFLAGS)m644 doc/$(PROG).1 $(DESTDIR)$(MAN)/man1/$(PROG).1
+	install -$(INSTALLFLAGS)m644 docs/$(PROG).1 $(DESTDIR)$(MAN)/man1/$(PROG).1
 # completions need to go in one specific place :)
 	install -$(INSTALLFLAGS)m644 completions/bash.bash $(DESTDIR)$(PREFIX)/$(SHARE)/bash-completion/completions/$(PROG)
 	install -$(INSTALLFLAGS)m644 completions/fish.fish $(DESTDIR)$(PREFIX)/$(SHARE)/fish/vendor_completions.d/$(PROG).fish

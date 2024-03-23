@@ -1,5 +1,5 @@
 <!-- markdownlint-disable MD033 -->
-# <img src="./doc/img/awl-text.png" width="50%" title="awl logo" alt="awl">
+# <img src="./docs/img/awl-text.png" width="50%" title="awl logo" alt="awl">
 
 > awl *(noun)*: A pointed tool for making small holes in wood or leather
 
@@ -158,7 +158,7 @@ scoop install awl
 
 ## Contributing
 
-Please see the [CONTRIBUTING.md](./CONTRIBUTING.md) file for more information.
+Please see the [CONTRIBUTING.md](./docs/CONTRIBUTING.md) file for more information.
 
 TL;DR: If you like the project, spread the word! If you want to contribute, [use the issue tracker](https://git.froth.zone/sam/awl/issues) or [open a pull request](https://git.froth.zone/sam/awl/pulls).
 Want to use email instead? Use our [mailing list](https://lists.sr.ht/~sammefishe/awl-devel)!

@@ -23,19 +23,19 @@ MAN ?= $(PREFIX)/$(SHARE)/man
 PROG ?= awl
 
 # hehe
-all: $(PROG) doc/$(PROG).1
+all: $(PROG) docs/$(PROG).1
 
 $(PROG): $(SOURCES)
 	$(GO) build -o $(EXE) $(GOFLAGS) .
 
-doc/$(PROG).1: doc/$(PROG).1.scd
+docs/$(PROG).1: docs/$(PROG).1.scd
 	$(SCDOC) <$? >$@
 
-doc/wiki/$(PROG).1.md: doc/$(PROG).1
+docs/wiki/$(PROG).1.md: docs/$(PROG).1
 	pandoc --from man --to gfm -o $@ $?
 
 ## update_doc: update documentation (requires pandoc)
-update_doc: doc/wiki/$(PROG).1.md
+update_doc: docs/wiki/$(PROG).1.md
 
 .PHONY: fmt
 fmt:
@@ -87,7 +87,7 @@ cover: coverage/cover.html
 clean:
 	$(GO) clean
 # Ignore errors if you remove something that doesn't exist
-	rm -f doc/$(PROG).1
+	rm -f docs/$(PROG).1
 	rm -f coverage/cover*
 	rm -rf vendor
 

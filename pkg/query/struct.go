@@ -61,7 +61,7 @@ type Answer struct {
 
 // EDNS0 is for all EDNS options.
 //
-// RFC: https://datatracker.ietf.org/doc/draft-peltan-edns-presentation-format/
+// RFC: https://datatracker.ietf.org/docs/draft-peltan-edns-presentation-format/
 //
 //nolint:govet,tagliatelle
 type EDNS0 struct {

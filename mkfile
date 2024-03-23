@@ -17,7 +17,7 @@ $PROG:
 
 install:V:
   $GO install $GOFLAGS  .
-  # cp doc/$PROG.1 /sys/man/1/$PROG
+  # cp docs/$PROG.1 /sys/man/1/$PROG
 
 test:V:
   $GO test -v -cover ./...
