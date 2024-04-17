@@ -4,30 +4,53 @@ on:
   push:
     tags:
       - "*"
+env:
+  REGISTRY: ghcr.io
+  IMAGE_NAME: ${{ github.repository }}
 
 jobs:
   release:
     runs-on: ubuntu-latest
+    env:
+      SNAPCRAFT_STORE_CREDENTIALS : ${{ secrets.SNAPCRAFT_TOKEN }}
     steps:
+      # Workaround a dumb docker problem where everything has to be lowercase
+      - id: lowercase
+        run: |
+          echo IMAGE_NAME=$(echo $IMAGE_NAME | tr '[:upper:]' '[:lower:]') >> "${GITHUB_ENV}"
+
+      - name: Login to Container Registry
+        uses: docker/login-action@v3
+        with:
+          registry: ${{ env.REGISTRY }}
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
       - name: Checkout repository
         uses: actions/checkout@v4
         with:
           fetch-depth: 0
           submodules: recursive
 
+      - name: Install Snapcraft
+        uses: samuelmeuli/action-snapcraft@v2
+
       - name: Set up Go
         uses: actions/setup-go@v5
         with:
-          go-version: '>=1.20.1'
+          go-version: stable
 
       - name: Install scdoc
         run: sudo apt-get install -y scdoc
+
+      - name: Workaround a dumb Snap bug
+        run: mkdir -p $HOME/.cache/snapcraft/download && mkdir -p $HOME/.cache/snapcraft/stage-packages
 
       - name: Release with GoReleaser
         uses: goreleaser/goreleaser-action@v5
         with:
           distribution: goreleaser
           version: latest
-          args: release --clean --skip=homebrew,nix,scoop
+          args: release --clean --skip=aur,homebrew,nix,scoop
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

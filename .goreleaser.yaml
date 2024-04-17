@@ -17,6 +17,9 @@ builds:
       - plan9_amd64
       - freebsd_amd64
 
+universal_binaries:
+  - replace: true
+
 archives:
   - files:
       - LICENSE
@@ -41,75 +44,6 @@ archives:
     name_template: "{{ .ProjectName }}-{{ .Version }}-deps"
     meta: true
     wrap_in_directory: "{{ .ProjectName }}"
-
-universal_binaries:
-- replace: true
-
-checksum:
-  name_template: "checksums.txt"
-
-snapshot:
-  name_template: "{{ incpatch .Version }}-next"
-
-changelog:
-  sort: asc
-
-  groups:
-    - title: "Dependency Updates"
-      regexp: "^.*fix\\(deps\\)*:+.*$"
-      order: 2
-    - title: "Features"
-      regexp: "^.*feat[(\\w)]*:+.*$"
-      order: 0
-    - title: "Bug fixes"
-      regexp: "^.*fix[(\\w)]*:+.*$"
-      order: 1
-    - title: "Other"
-      order: 999
-
-  filters:
-    exclude:
-      - "^test:"
-      - "^docs?:"
-      - "typo"
-      - "^ci:"
-
-brews:
-  - repository:
-      owner: packaging
-      name: homebrew
-    homepage: https://dns.froth.zone/awl
-    description: A DNS query tool
-    license: BSD-3-Clause
-    # custom_block: |
-    #   head "https://git.froth.zone/sam/awl.git"
-    install: |-
-      bin.install "awl"
-      bash_completion.install "completions/bash.bash" => "awl"
-      zsh_completion.install "completions/zsh.zsh" => "_awl"
-      fish_completion.install "completions/fish.fish" => "awl.fish"
-      man1.install "docs/awl.1.gz"
-
-scoops:
-  - repository:
-      owner: packaging
-      name: scoop
-    folder: bucket
-    homepage: https://dns.froth.zone/awl
-    description: A DNS query client
-    license: BSD-3-Clause
-
-nix:
-  -
-    repository:
-      owner: packaging
-      name: nur
-    homepage: https://dns.froth.zone/awl
-    description: A DNS query client
-    license: bsd3
-    extra_install: |-
-      installManPage ./docs/awl.1.gz
-      installShellCompletion ./completions/*
 
 nfpms:
   - id: packages
@@ -170,7 +104,6 @@ nfpms:
           {{- else if eq .Arch "arm" }}armhfp
           {{- else if eq .Arch "arm64" }}aarch64
           {{- else }}{{ .Arch }}{{ end -}}
-
   - id: termux
     package_name: awl-dns
     vendor: Sam Therapy <sam@samtherapy.net>
@@ -183,18 +116,105 @@ nfpms:
     section: utils
     formats:
       - termux.deb
-    file_name_template:  >-
-          {{- .PackageName }}_
-          {{- .Version }}_
-          {{- if eq .Arch "amd64" }}x86_64
-          {{- else if eq .Arch "386" }}i686
-          {{- else if eq .Arch "arm" }}arm
-          {{- else if eq .Arch "arm64" }}aarch64
-          {{- else }}{{ .Arch }}{{ end -}}
+    file_name_template: >-
+      {{- .PackageName }}_
+      {{- .Version }}_
+      {{- if eq .Arch "amd64" }}x86_64
+      {{- else if eq .Arch "386" }}i686
+      {{- else if eq .Arch "arm" }}arm
+      {{- else if eq .Arch "arm64" }}aarch64
+      {{- else }}{{ .Arch }}{{ end -}}
+
+snapcrafts:
+  -
+    name: awl-dns
+    grade: stable
+    publish: true
+    summary: A command-line DNS query tool
+    description: |-
+      Awl is a command-line DNS query tool.
+      Awl supports DNS-over-[UDP,TCP,HTTPS,QUIC] and DNSCrypt.
+    confinement: strict
+    license: BSD-3-Clause
+    base: bare
+    apps:
+      awl-dns:
+        command: awl
+        plugs:
+          - network
+        completer: completions/bash.bash
+
+dockers:
+  -
+    image_templates:
+          - "{{ .Env.REGISTRY }}/{{ .Env.IMAGE_NAME }}:latest"
+          - "{{ .Env.REGISTRY }}/{{ .Env.IMAGE_NAME }}:{{ .Tag }}"
+
+checksum:
+  name_template: "checksums.txt"
+
+snapshot:
+  name_template: "{{ incpatch .Version }}-next"
+
+brews:
+  - repository:
+      owner: packaging
+      name: homebrew
+    homepage: https://dns.froth.zone/awl
+    description: A DNS query tool
+    license: BSD-3-Clause
+    # custom_block: |
+    #   head "https://git.froth.zone/sam/awl.git"
+    install: |-
+      bin.install "awl"
+      bash_completion.install "completions/bash.bash" => "awl"
+      zsh_completion.install "completions/zsh.zsh" => "_awl"
+      fish_completion.install "completions/fish.fish" => "awl.fish"
+      man1.install "docs/awl.1.gz"
+
+nix:
+  - repository:
+      owner: packaging
+      name: nur
+    homepage: https://dns.froth.zone/awl
+    description: A DNS query client
+    license: bsd3
+    extra_install: |-
+      installManPage ./docs/awl.1.gz
+      installShellCompletion ./completions/*
+
+scoops:
+  - repository:
+      owner: packaging
+      name: scoop
+    folder: bucket
+    homepage: https://dns.froth.zone/awl
+    description: A DNS query client
+    license: BSD-3-Clause
+
+changelog:
+  sort: asc
+  groups:
+    - title: "Dependency Updates"
+      regexp: "^.*fix\\(deps\\)*:+.*$"
+      order: 2
+    - title: "Features"
+      regexp: "^.*feat[(\\w)]*:+.*$"
+      order: 0
+    - title: "Bug fixes"
+      regexp: "^.*fix[(\\w)]*:+.*$"
+      order: 1
+    - title: "Other"
+      order: 999
+  filters:
+    exclude:
+      - "^test:"
+      - "^docs?:"
+      - "typo"
+      - "^ci:"
 
 uploads:
-  -
-    name: packages
+  - name: packages
     method: PUT
     mode: archive
     exts:

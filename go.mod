@@ -1,9 +1,11 @@
 module dns.froth.zone/awl
 
-go 1.22.2
+go 1.21.9
+
+toolchain go1.22.2
 
 require (
-	dns.froth.zone/dnscrypt v0.0.1
+	dns.froth.zone/dnscrypt v0.0.2
 	github.com/dchest/uniuri v1.2.0
 	github.com/miekg/dns v1.1.58
 	github.com/quic-go/quic-go v0.42.0
