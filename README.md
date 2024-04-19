@@ -7,8 +7,9 @@ A command-line DNS lookup tool that supports DNS queries over UDP, TCP, TLS, HTT
 
 [![Gitea Release](https://img.shields.io/gitea/v/release/sam/awl?gitea_url=https%3A%2F%2Fgit.froth.zone&display_name=release&style=for-the-badge)](https://git.froth.zone/sam/awl)
 [![Last Commit](https://img.shields.io/gitea/last-commit/sam/awl?gitea_url=https%3A%2F%2Fgit.froth.zone&style=for-the-badge)](https://git.froth.zone/sam/awl/commits/branch/master)
-[![Go Report](https://goreportcard.com/badge/dns.froth.zone/awl?style=for-the-badge)](https://goreportcard.com/report/dns.froth.zone/awl)
 [![License](https://img.shields.io/github/license/samtherapy/awl?style=for-the-badge)](https://spdx.org/licenses/BSD-3-Clause.html)
+[![Go Report](https://goreportcard.com/badge/dns.froth.zone/awl?style=for-the-badge)](https://goreportcard.com/report/dns.froth.zone/awl)
+
 
 Awl is designed to be a drop-in replacement for [dig](https://bind9.readthedocs.io/en/v9_18_3/manpages.html#dig-dns-lookup-utility).
 
@@ -35,10 +36,14 @@ On any platform, with [Go](https://go.dev) installed, run the following command 
 go install dns.froth.zone/awl@latest
 ```
 
+### Packaging
+
 Alternatively, many package managers are supported:
 
 <details>
 <summary>Linux</summary>
+
+#### Distro-specific
 
 <details>
 <summary>Alpine Linux</summary>
@@ -117,6 +122,9 @@ emerge -av net-dns/awl
 
 </details>
 
+#### Distro-agnostic
+
+
 <details>
 <summary><a href="https://brew.sh" nofollow>Homebrew</a></summary>
 
@@ -125,9 +133,19 @@ brew install SamTherapy/tap/awl
 ```
 
 </details>
-</details>
-<br />
+<details>
+<summary>Snap</summary>
 
+Snap package available as [awl-dns](https://snapcraft.io/awl-dns)
+
+```shell
+snap install awl-dns ||
+sudo snap install awl-dns
+```
+
+</details>
+</details>
+<hr />
 <details>
 <summary>macOS</summary>
 
@@ -140,8 +158,7 @@ brew install SamTherapy/tap/awl
 
 </details>
 </details>
-<br />
-
+<hr />
 <details>
 <summary>Windows</summary>
 
@@ -166,7 +183,7 @@ Want to use email instead? Use our [mailing list](https://lists.sr.ht/~sammefish
 ### Mirrors
 
 The canonical repository is located on [my personal Forgejo instance](https://git.froth.zone/sam/awl). \
-Official mirrors are located on [GitHub](https://github.com/SamTherapy/awl) and [SourceHut](https://sr.ht/~sammefishe/awl/).
+Official mirrors are located on [GitHub](https://github.com/SamTherapy/awl) and [SourceHut](https://git.sr.ht/~sammefishe/awl/).
 Contributions are accepted on all mirrors, but the Forgejo instance is preferred.
 
 ## License
