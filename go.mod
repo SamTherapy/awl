@@ -8,7 +8,7 @@ require (
 	dns.froth.zone/dnscrypt v0.0.2
 	github.com/dchest/uniuri v1.2.0
 	github.com/miekg/dns v1.1.59
-	github.com/quic-go/quic-go v0.43.0
+	github.com/quic-go/quic-go v0.43.1
 	github.com/stefansundin/go-zflag v1.1.1
 	golang.org/x/net v0.24.0
 	golang.org/x/sys v0.20.0
