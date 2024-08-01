@@ -10,7 +10,6 @@ A command-line DNS lookup tool that supports DNS queries over UDP, TCP, TLS, HTT
 [![License](https://img.shields.io/github/license/samtherapy/awl?style=for-the-badge)](https://spdx.org/licenses/BSD-3-Clause.html)
 [![Go Report](https://goreportcard.com/badge/dns.froth.zone/awl?style=for-the-badge)](https://goreportcard.com/report/dns.froth.zone/awl)
 
-
 Awl is designed to be a drop-in replacement for [dig](https://bind9.readthedocs.io/en/v9_18_3/manpages.html#dig-dns-lookup-utility).
 
 ## Examples
