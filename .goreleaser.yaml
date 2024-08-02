@@ -1,3 +1,4 @@
+version: 2
 # This is an example .goreleaser.yml file with some sensible defaults.
 # Make sure to check the documentation at https://goreleaser.com
 before:
@@ -187,7 +188,7 @@ scoops:
   - repository:
       owner: packaging
       name: scoop
-    folder: bucket
+    directory: bucket
     homepage: https://dns.froth.zone/awl
     description: A DNS query client
     license: BSD-3-Clause
