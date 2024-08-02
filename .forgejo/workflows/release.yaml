@@ -28,7 +28,7 @@ jobs:
         with:
           distribution: goreleaser
           version: latest
-          args: release --clean --skip docker,snapcraft
+          args: release --clean -p 4 --skip docker,snapcraft
         env:
           GORELEASER_FORCE_TOKEN: gitea
           GITEA_TOKEN: ${{ secrets.PUBLISH_TOKEN }}
