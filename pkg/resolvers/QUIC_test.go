@@ -36,21 +36,6 @@ func TestQuic(t *testing.T) {
 			},
 		},
 		{
-			"Valid, Froth",
-			&util.Options{
-				QUIC:   true,
-				Logger: util.InitLogger(0),
-				Request: util.Request{
-					Server:  "dns.froth.zone",
-					Type:    dns.TypeA,
-					Name:    "git.freecumextremist.com",
-					Port:    853,
-					Timeout: 750 * time.Millisecond,
-					Retries: 3,
-				},
-			},
-		},
-		{
 			"Bad domain",
 			&util.Options{
 				QUIC:   true,
@@ -107,6 +92,7 @@ func TestQuic(t *testing.T) {
 				res util.Response
 				err error
 			)
+
 			for i := 0; i <= test.opts.Request.Retries; i++ {
 				res, err = query.CreateQuery(test.opts)
 				if err == nil {

@@ -5,6 +5,7 @@ package resolvers
 import (
 	"context"
 	"crypto/tls"
+	"encoding/binary"
 	"fmt"
 	"io"
 	"strings"
@@ -52,6 +53,7 @@ func (resolver *QUICResolver) LookUp(msg *dns.Msg) (resp util.Response, err erro
 
 	resolver.opts.Logger.Debug("quic: packing query")
 
+	msg.Id = 0
 	// Compress request to over-the-wire
 	buf, err := msg.Pack()
 	if err != nil {
@@ -69,7 +71,7 @@ func (resolver *QUICResolver) LookUp(msg *dns.Msg) (resp util.Response, err erro
 
 	resolver.opts.Logger.Debug("quic: writing to stream")
 
-	_, err = stream.Write(buf)
+	_, err = stream.Write(rfc9250prefix(buf))
 	if err != nil {
 		return resp, fmt.Errorf("doq: quic stream write: %w", err)
 	}
@@ -101,10 +103,19 @@ func (resolver *QUICResolver) LookUp(msg *dns.Msg) (resp util.Response, err erro
 
 	resolver.opts.Logger.Debug("quic: unpacking response")
 
-	err = resp.DNS.Unpack(fullRes)
+	// Unpack response and lop off the first two bytes (RFC 9250 moment)
+	err = resp.DNS.Unpack(fullRes[2:])
 	if err != nil {
 		return resp, fmt.Errorf("doq: unpack: %w", err)
 	}
 
 	return
+}
+
+// rfc9250prefix adds a two-byte prefix to the input data as per RFC 9250.
+func rfc9250prefix(in []byte) []byte {
+	out := make([]byte, 2+len(in))
+	binary.BigEndian.PutUint16(out, uint16(len(in)))
+	copy(out[2:], in)
+	return out
 }
