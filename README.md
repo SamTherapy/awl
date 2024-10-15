@@ -81,7 +81,7 @@ Provided by [Gitea packages](https://git.froth.zone/sam/-/packages/debian/awl-dn
 
 ```shell
 # Install the repository and GPG keys
-curl -JO --content-disposition https://git.froth.zone/packaging/-/packages/debian/git-froth-zone-debian/1-0/files/5937
+curl -JO https://git.froth.zone/packaging/-/packages/debian/git-froth-zone-debian/1-0/files/5937
 sudo dpkg -i git-froth-zone-debian_1-0_all.deb
 rm git-froth-zone-debian_1-0_all.deb
 # Update and install
