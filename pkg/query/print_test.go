@@ -105,7 +105,7 @@ func TestRealPrint(t *testing.T) {
 				ShowQuery:      true,
 			},
 			Request: util.Request{
-				Server:  "https://dns.froth.zone/dns-query",
+				Server:  "https://dns.google/dns-query",
 				Port:    443,
 				Type:    dns.StringToType["NS"],
 				Class:   1,
