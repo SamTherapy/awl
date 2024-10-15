@@ -182,7 +182,7 @@ Want to use email instead? Use our [mailing list](https://lists.sr.ht/~sammefish
 ### Mirrors
 
 The canonical repository is located on [my personal Forgejo instance](https://git.froth.zone/sam/awl). \
-Official mirrors are located on [GitHub](https://github.com/SamTherapy/awl) and [SourceHut](https://git.sr.ht/~sammefishe/awl/).
+Official mirrors are located on [GitHub](https://github.com/SamTherapy/awl), [GitLab](https://gitlab.com/SamTherapy/awl) and [SourceHut](https://git.sr.ht/~sammefishe/awl).
 Contributions are accepted on all mirrors, but the Forgejo instance is preferred.
 
 ## License
