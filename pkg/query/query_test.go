@@ -96,7 +96,7 @@ func TestCreateQ(t *testing.T) {
 				QUIC:   true,
 
 				Request: util.Request{
-					Server:  "zero.dns0.eu",
+					Server:  "dns.adguard.com",
 					Port:    853,
 					Type:    dns.TypeA,
 					Name:    "example.com.",
