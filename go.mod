@@ -6,7 +6,7 @@ require (
 	dns.froth.zone/dnscrypt v0.0.2
 	github.com/dchest/uniuri v1.2.0
 	github.com/miekg/dns v1.1.62
-	github.com/quic-go/quic-go v0.48.2
+	github.com/quic-go/quic-go v0.49.0
 	github.com/stefansundin/go-zflag v1.1.1
 	golang.org/x/net v0.34.0
 	golang.org/x/sys v0.29.0
@@ -21,7 +21,7 @@ require (
 	github.com/google/go-cmp v0.6.0 // indirect
 	github.com/google/pprof v0.0.0-20240727154555-813a5fbdbec8 // indirect
 	github.com/onsi/ginkgo/v2 v2.19.1 // indirect
-	go.uber.org/mock v0.4.0 // indirect
+	go.uber.org/mock v0.5.0 // indirect
 	golang.org/x/crypto v0.32.0 // indirect
 	golang.org/x/exp v0.0.0-20240719175910-8a7402abbf56 // indirect
 	golang.org/x/mod v0.19.0 // indirect
