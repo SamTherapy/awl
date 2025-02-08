@@ -11,7 +11,7 @@ require (
 	golang.org/x/net v0.34.0
 	golang.org/x/sys v0.30.0
 	gopkg.in/yaml.v3 v3.0.1
-	gotest.tools/v3 v3.5.1
+	gotest.tools/v3 v3.5.2
 )
 
 require (
