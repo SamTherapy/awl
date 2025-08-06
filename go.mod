@@ -2,7 +2,7 @@ module dns.froth.zone/awl
 
 go 1.23.0
 
-toolchain go1.24.5
+toolchain go1.24.6
 
 require (
 	dns.froth.zone/dnscrypt v0.0.2
