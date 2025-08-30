@@ -8,7 +8,7 @@ import (
 
 	"dns.froth.zone/awl/pkg/query"
 	"dns.froth.zone/awl/pkg/util"
-	"dns.froth.zone/dnscrypt"
+	"github.com/ameshkov/dnscrypt/v2"
 	"github.com/miekg/dns"
 	"gotest.tools/v3/assert"
 )

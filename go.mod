@@ -1,11 +1,11 @@
 module dns.froth.zone/awl
 
-go 1.23.0
+go 1.24.1
 
 toolchain go1.25.0
 
 require (
-	dns.froth.zone/dnscrypt v0.0.2
+	github.com/ameshkov/dnscrypt/v2 v2.4.0
 	github.com/dchest/uniuri v1.2.0
 	github.com/miekg/dns v1.1.68
 	github.com/quic-go/quic-go v0.54.0
@@ -17,11 +17,12 @@ require (
 )
 
 require (
-	github.com/AdguardTeam/golibs v0.25.1 // indirect
+	github.com/AdguardTeam/golibs v0.32.7 // indirect
 	github.com/ameshkov/dnsstamps v1.0.3 // indirect
-	github.com/google/go-cmp v0.6.0 // indirect
+	github.com/google/go-cmp v0.7.0 // indirect
 	go.uber.org/mock v0.5.0 // indirect
 	golang.org/x/crypto v0.41.0 // indirect
+	golang.org/x/exp v0.0.0-20250305212735-054e65f0b394 // indirect
 	golang.org/x/mod v0.26.0 // indirect
 	golang.org/x/sync v0.16.0 // indirect
 	golang.org/x/text v0.28.0 // indirect
