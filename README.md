@@ -81,9 +81,9 @@ Provided by [Gitea packages](https://git.froth.zone/sam/-/packages/debian/awl-dn
 
 ```shell
 # Install the repository and GPG keys
-curl -JO https://git.froth.zone/packaging/-/packages/debian/git-froth-zone-debian/1-0/files/5937
-sudo dpkg -i git-froth-zone-debian_1-0_all.deb
-rm git-froth-zone-debian_1-0_all.deb
+curl -JO https://git.froth.zone/packaging/-/packages/debian/git-froth-zone-debian/2-0/files/6209
+sudo dpkg -i git-froth-zone-debian_2-0_all.deb
+rm git-froth-zone-debian_2-0_all.deb
 # Update and install
 sudo apt update
 sudo apt install awl-dns
