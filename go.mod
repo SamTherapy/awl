@@ -2,7 +2,7 @@ module dns.froth.zone/awl
 
 go 1.24.1
 
-toolchain go1.25.1
+toolchain go1.25.2
 
 require (
 	github.com/ameshkov/dnscrypt/v2 v2.4.0
@@ -10,7 +10,7 @@ require (
 	github.com/miekg/dns v1.1.68
 	github.com/quic-go/quic-go v0.55.0
 	github.com/stefansundin/go-zflag v1.1.1
-	golang.org/x/net v0.44.0
+	golang.org/x/net v0.45.0
 	golang.org/x/sys v0.36.0
 	gopkg.in/yaml.v3 v3.0.1
 	gotest.tools/v3 v3.5.2
