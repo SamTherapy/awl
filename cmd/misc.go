@@ -3,14 +3,14 @@
 package cli
 
 import (
-	"fmt"
-	"math/rand"
-	"strings"
-
 	"dns.froth.zone/awl/conf"
 	"dns.froth.zone/awl/pkg/util"
+	"fmt"
 	"github.com/miekg/dns"
 	"golang.org/x/net/idna"
+	"log/slog"
+	"math/rand"
+	"strings"
 )
 
 // ParseMiscArgs parses the wildcard arguments, dig style.
@@ -24,17 +24,17 @@ func ParseMiscArgs(args []string, opts *util.Options) error {
 		case strings.HasPrefix(arg, "@"):
 			arg = arg[1:]
 			// Automatically set flags based on URI header
-			opts.Logger.Info(arg, "detected as a server")
+			slog.Debug("detected as a server", slog.StringValue(arg))
 
 			switch {
 			case strings.HasPrefix(arg, "tls://"):
 				opts.TLS = true
 				opts.Request.Server = strings.TrimPrefix(arg, "tls://")
-				opts.Logger.Info("DNS-over-TLS implicitly set")
+				slog.Info("DNS-over-TLS implicitly set")
 			case strings.HasPrefix(arg, "https://"):
 				opts.HTTPS = true
 				opts.Request.Server = arg
-				opts.Logger.Info("DNS-over-HTTPS implicitly set")
+				slog.Info("DNS-over-HTTPS implicitly set")
 
 				_, endpoint, isSplit := strings.Cut(arg, "/")
 				if isSplit {
@@ -43,15 +43,15 @@ func ParseMiscArgs(args []string, opts *util.Options) error {
 			case strings.HasPrefix(arg, "quic://"):
 				opts.QUIC = true
 				opts.Request.Server = strings.TrimPrefix(arg, "quic://")
-				opts.Logger.Info("DNS-over-QUIC implicitly set.")
+				slog.Info("DNS-over-QUIC implicitly set.")
 			case strings.HasPrefix(arg, "sdns://"):
 				opts.DNSCrypt = true
 				opts.Request.Server = arg
-				opts.Logger.Info("DNSCrypt implicitly set")
+				slog.Info("DNSCrypt implicitly set")
 			case strings.HasPrefix(arg, "tcp://"):
 				opts.TCP = true
 				opts.Request.Server = strings.TrimPrefix(arg, "tcp://")
-				opts.Logger.Info("TCP implicitly set")
+				slog.Info("TCP implicitly set")
 			case strings.HasPrefix(arg, "udp://"):
 				opts.Request.Server = strings.TrimPrefix(arg, "udp://")
 			default:
@@ -71,7 +71,7 @@ func ParseMiscArgs(args []string, opts *util.Options) error {
 
 		// Dig-style +queries
 		case strings.HasPrefix(arg, "+"):
-			opts.Logger.Info(arg, "detected as a dig query")
+			slog.Debug("detected as a dig query", slog.StringValue(arg))
 
 			if err := ParseDig(strings.ToLower(arg[1:]), opts); err != nil {
 				return err
@@ -81,7 +81,7 @@ func ParseMiscArgs(args []string, opts *util.Options) error {
 		case strings.Contains(arg, "."):
 			var err error
 
-			opts.Logger.Info(arg, "detected as a domain name")
+			slog.Debug("detected as a domain name", slog.StringValue(arg))
 			opts.Request.Name, err = idna.ToASCII(arg)
 			if err != nil {
 				return fmt.Errorf("unicode to punycode: %w", err)
@@ -89,14 +89,14 @@ func ParseMiscArgs(args []string, opts *util.Options) error {
 
 		// DNS query type
 		case ok:
-			opts.Logger.Info(arg, "detected as a type")
+			slog.Debug("detected as a type", slog.StringValue(arg))
 			opts.Request.Type = r
 
 		// Domain?
 		default:
 			var err error
 
-			opts.Logger.Info(arg, "is unknown. Assuming domain")
+			slog.Debug("is unknown. Assuming domain", slog.StringValue(arg))
 			opts.Request.Name, err = idna.ToASCII(arg)
 			if err != nil {
 				return fmt.Errorf("unicode to punycode: %w", err)
@@ -106,20 +106,20 @@ func ParseMiscArgs(args []string, opts *util.Options) error {
 
 	// If nothing was set, set a default
 	if opts.Request.Name == "" {
-		opts.Logger.Info("Domain not specified, making a default")
+		slog.Info("Domain not specified, making a default")
 		opts.Request.Name = "."
 
 		if opts.Request.Type == 0 {
-			opts.Logger.Info("Query not specified, making an \"NS\" query")
+			slog.Info("Query not specified, making an \"NS\" query")
 			opts.Request.Type = dns.StringToType["NS"]
 		}
 	} else if opts.Request.Type == 0 {
-		opts.Logger.Info("Query not specified, making an \"A\" query")
+		slog.Info("Query not specified, making an \"A\" query")
 		opts.Request.Type = dns.StringToType["A"]
 	}
 
 	if opts.Request.Server == "" {
-		opts.Logger.Info("Server not specified, selecting a default")
+		slog.Info("Server not specified, selecting a default")
 		// Set "defaults" for each if there is no input
 		switch {
 		case opts.DNSCrypt:
@@ -167,13 +167,13 @@ func ParseMiscArgs(args []string, opts *util.Options) error {
 		}
 	}
 
-	opts.Logger.Info("DNS server set to", opts.Request.Server)
+	slog.Debug("DNS server set to", slog.StringValue(opts.Request.Server))
 
 	// Make reverse addresses proper addresses
 	if opts.Reverse {
 		var err error
 
-		opts.Logger.Info("Making reverse DNS query proper *.arpa domain")
+		slog.Info("Making reverse DNS query proper *.arpa domain")
 
 		if dns.TypeToString[opts.Request.Type] == "A" {
 			opts.Request.Type = dns.StringToType["PTR"]
@@ -189,7 +189,7 @@ func ParseMiscArgs(args []string, opts *util.Options) error {
 	if !strings.HasSuffix(opts.Request.Name, ".") {
 		opts.Request.Name = fmt.Sprintf("%s.", opts.Request.Name)
 
-		opts.Logger.Info("Domain made canonical")
+		slog.Info("Domain made canonical")
 	}
 
 	return nil

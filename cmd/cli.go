@@ -5,6 +5,7 @@ package cli
 import (
 	"errors"
 	"fmt"
+	"log/slog"
 	"runtime"
 	"strconv"
 	"strings"
@@ -31,8 +32,8 @@ func ParseCLI(args []string, version string) (opts *util.Options, err error) {
 		return opts, err
 	}
 
-	opts.Logger.Info("Dig/Drill flags parsed")
-	opts.Logger.Debug(fmt.Sprintf("%+v", opts))
+	slog.Debug("Dig/Drill flags parsed")
+	slog.Debug(fmt.Sprintf("%+v", opts))
 
 	// Special options and exceptions time
 
@@ -44,7 +45,7 @@ func ParseCLI(args []string, version string) (opts *util.Options, err error) {
 		}
 	}
 
-	opts.Logger.Info("Port set to", opts.Request.Port)
+	slog.Info("Port set to", slog.Int("Port", opts.Request.Port))
 
 	// Set timeout to 0.5 seconds if set below 0.5
 	if opts.Request.Timeout < (time.Second / 2) {
@@ -57,14 +58,14 @@ func ParseCLI(args []string, version string) (opts *util.Options, err error) {
 
 	if opts.Trace {
 		if opts.TLS || opts.HTTPS || opts.QUIC {
-			opts.Logger.Warn("Every query after the root query will only use UDP/TCP")
+			slog.Warn("Every query after the root query will only use UDP/TCP")
 		}
 
 		opts.RD = true
 	}
 
-	opts.Logger.Info("Options fully populated")
-	opts.Logger.Debug(fmt.Sprintf("%+v", opts))
+	slog.Info("Options fully populated")
+	slog.Debug(fmt.Sprintf("%+v", opts))
 
 	return
 }
@@ -244,8 +245,8 @@ func parseFlags(args []string, version string) (opts *util.Options, flags []stri
 		}
 	}
 
-	opts.Logger.Info("POSIX flags parsed")
-	opts.Logger.Debug(fmt.Sprintf("%+v", opts))
+	slog.Info("POSIX flags parsed")
+	slog.Debug(fmt.Sprintf("%+v", opts))
 
 	if *versionFlag {
 		fmt.Printf("awl version %s, built with %s\n", version, runtime.Version())

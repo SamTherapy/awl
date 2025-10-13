@@ -3,12 +3,12 @@
 package cli
 
 import (
+	"dns.froth.zone/awl/pkg/util"
 	"fmt"
+	"log/slog"
 	"strconv"
 	"strings"
 	"time"
-
-	"dns.froth.zone/awl/pkg/util"
 )
 
 // ParseDig parses commands from the popular DNS tool dig.
@@ -22,7 +22,7 @@ func ParseDig(arg string, opts *util.Options) error {
 		arg = strings.TrimPrefix(arg, "no")
 	}
 
-	opts.Logger.Info("Setting", arg)
+	slog.Info("Setting", slog.String("arg", arg))
 
 	switch arg {
 	case "trace", "notrace":
