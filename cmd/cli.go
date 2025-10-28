@@ -12,7 +12,7 @@ import (
 
 	"dns.froth.zone/awl/pkg/util"
 	"github.com/miekg/dns"
-	flag "github.com/stefansundin/go-zflag"
+	flag "github.com/spf13/pflag"
 )
 
 // ParseCLI parses arguments given from the CLI and passes them into an `Options`
@@ -91,56 +91,56 @@ func parseFlags(args []string, version string) (opts *util.Options, flags []stri
 	//
 	// Remember, when adding a flag edit the manpage and the completions :)
 	var (
-		port  = flagSet.Int("port", 0, "`port` to make DNS query (default: 53 for UDP/TCP, 853 for TLS/QUIC)", flag.OptShorthand('p'), flag.OptDisablePrintDefault(true))
-		query = flagSet.String("query", "", "domain name to `query` (default: .)", flag.OptShorthand('q'))
-		class = flagSet.String("class", "IN", "DNS `class` to query", flag.OptShorthand('c'))
-		qType = flagSet.String("qType", "", "`type` to query (default: A)", flag.OptShorthand('t'))
+		port  = flagSet.IntP("port", "p", 0, "`port` to make DNS query (default 53 for UDP/TCP, 853 for TLS/QUIC)")
+		query = flagSet.StringP("query", "q", "", "domain name to `query` (default .)")
+		class = flagSet.String("class", "IN", "DNS `class` to query")
+		qType = flagSet.String("qType", "", "`type` to query (default A)")
 
-		ipv4    = flagSet.Bool("4", false, "force IPv4", flag.OptShorthand('4'))
-		ipv6    = flagSet.Bool("6", false, "force IPv6", flag.OptShorthand('6'))
-		reverse = flagSet.Bool("reverse", false, "do a reverse lookup", flag.OptShorthand('x'))
+		ipv4    = flagSet.BoolP("4", "4", false, "force IPv4")
+		ipv6    = flagSet.BoolP("6", "6", false, "force IPv6")
+		reverse = flagSet.BoolP("reverse", "x", false, "do a reverse lookup")
 		trace   = flagSet.Bool("trace", false, "trace from the root")
 
-		timeout = flagSet.Float32("timeout", 5, "Timeout, in `seconds`")
+		timeout = flagSet.Duration("timeout", 5, "Timeout, in `seconds`")
 		retry   = flagSet.Int("retries", 2, "number of `times` to retry")
 
 		edns         = flagSet.Bool("no-edns", false, "disable EDNS entirely")
 		ednsVer      = flagSet.Uint8("edns-ver", 0, "set EDNS version")
-		dnssec       = flagSet.Bool("dnssec", false, "enable DNSSEC", flag.OptShorthand('D'))
+		dnssec       = flagSet.BoolP("dnssec", "D", false, "enable DNSSEC")
 		expire       = flagSet.Bool("expire", false, "set EDNS expire")
-		nsid         = flagSet.Bool("nsid", false, "set EDNS NSID", flag.OptShorthand('n'))
-		cookie       = flagSet.Bool("no-cookie", false, "disable sending EDNS cookie (default: cookie sent)")
+		nsid         = flagSet.BoolP("nsid", "n", false, "set EDNS NSID")
+		cookie       = flagSet.Bool("no-cookie", false, "disable sending EDNS cookie (default cookie sent)")
 		tcpKeepAlive = flagSet.Bool("keep-alive", false, "send EDNS TCP keep-alive")
-		udpBufSize   = flagSet.Uint16("buffer-size", 1232, "set EDNS UDP buffer size", flag.OptShorthand('b'))
+		udpBufSize   = flagSet.Uint16P("buffer-size", "b", 1232, "set EDNS UDP buffer size")
 		mbzflag      = flagSet.String("zflag", "0", "set EDNS z-flag `value`")
 		subnet       = flagSet.String("subnet", "", "set EDNS client subnet")
 		padding      = flagSet.Bool("pad", false, "set EDNS padding")
 
-		badCookie = flagSet.Bool("no-bad-cookie", false, "ignore BADCOOKIE EDNS responses (default: retry with correct cookie")
-		truncate  = flagSet.Bool("no-truncate", false, "ignore truncation if a UDP request truncates (default: retry with TCP)")
+		badCookie = flagSet.Bool("no-bad-cookie", false, "ignore BADCOOKIE EDNS responses (default retry with correct cookie")
+		truncate  = flagSet.Bool("no-truncate", false, "ignore truncation if a UDP request truncates (default retry with TCP)")
 
 		tcp      = flagSet.Bool("tcp", false, "use TCP")
 		dnscrypt = flagSet.Bool("dnscrypt", false, "use DNSCrypt")
-		tls      = flagSet.Bool("tls", false, "use DNS-over-TLS", flag.OptShorthand('T'))
-		https    = flagSet.Bool("https", false, "use DNS-over-HTTPS", flag.OptShorthand('H'))
-		quic     = flagSet.Bool("quic", false, "use DNS-over-QUIC", flag.OptShorthand('Q'))
+		tls      = flagSet.BoolP("tls", "T", false, "use DNS-over-TLS")
+		https    = flagSet.BoolP("https", "H", false, "use DNS-over-HTTPS")
+		quic     = flagSet.BoolP("quic", "Q", false, "use DNS-over-QUIC")
 
 		tlsHost  = flagSet.String("tls-host", "", "Server name to use for TLS verification")
 		noVerify = flagSet.Bool("tls-no-verify", false, "Disable TLS cert verification")
 
-		aaflag = flagSet.Bool("aa", false, "set/unset AA (Authoratative Answer) flag (default: not set)")
-		adflag = flagSet.Bool("ad", false, "set/unset AD (Authenticated Data) flag (default: not set)")
-		cdflag = flagSet.Bool("cd", false, "set/unset CD (Checking Disabled) flag (default: not set)")
-		qrflag = flagSet.Bool("qr", false, "set/unset QR (QueRy) flag (default: not set)")
-		rdflag = flagSet.Bool("rd", true, "set/unset RD (Recursion Desired) flag (default: set)", flag.OptDisablePrintDefault(true))
-		raflag = flagSet.Bool("ra", false, "set/unset RA (Recursion Available) flag (default: not set)")
-		tcflag = flagSet.Bool("tc", false, "set/unset TC (TrunCated) flag (default: not set)")
-		zflag  = flagSet.Bool("z", false, "set/unset Z (Zero) flag (default: not set)", flag.OptShorthand('z'))
+		aaflag = flagSet.Bool("aa", false, "set/unset AA (Authoratative Answer) flag (default not set)")
+		adflag = flagSet.Bool("ad", false, "set/unset AD (Authenticated Data) flag (default not set)")
+		cdflag = flagSet.Bool("cd", false, "set/unset CD (Checking Disabled) flag (default not set)")
+		qrflag = flagSet.Bool("qr", false, "set/unset QR (QueRy) flag (default not set)")
+		rdflag = flagSet.Bool("rd", true, "set/unset RD (Recursion Desired) flag (default set)")
+		raflag = flagSet.Bool("ra", false, "set/unset RA (Recursion Available) flag (default not set)")
+		tcflag = flagSet.Bool("tc", false, "set/unset TC (TrunCated) flag (default not set)")
+		zflag  = flagSet.BoolP("z", "z", false, "set/unset Z (Zero) flag (default not set)")
 
-		short = flagSet.Bool("short", false, "print just the results", flag.OptShorthand('s'))
-		json  = flagSet.Bool("json", false, "print the result(s) as JSON", flag.OptShorthand('j'))
-		xml   = flagSet.Bool("xml", false, "print the result(s) as XML", flag.OptShorthand('X'))
-		yaml  = flagSet.Bool("yaml", false, "print the result(s) as yaml", flag.OptShorthand('y'))
+		short = flagSet.BoolP("short", "s", false, "print just the results")
+		json  = flagSet.BoolP("json", "j", false, "print the result(s) as JSON")
+		xml   = flagSet.BoolP("xml", "X", false, "print the result(s) as XML")
+		yaml  = flagSet.BoolP("yaml", "y", false, "print the result(s) as yaml")
 
 		noC     = flagSet.Bool("no-comments", false, "disable printing the comments")
 		noQ     = flagSet.Bool("no-question", false, "disable printing the question section")
@@ -150,9 +150,11 @@ func parseFlags(args []string, version string) (opts *util.Options, flags []stri
 		noAdd   = flagSet.Bool("no-additional", false, "disable printing the additional section")
 		noStats = flagSet.Bool("no-statistics", false, "disable printing the statistics section")
 
-		verbosity   = flagSet.Int("verbosity", 1, "sets verbosity `level`", flag.OptShorthand('v'), flag.OptNoOptDefVal("2"))
-		versionFlag = flagSet.Bool("version", false, "print version information", flag.OptShorthand('V'))
+		verbosity   = flagSet.IntP("verbosity", "v", 1, "sets verbosity `level`")
+		versionFlag = flagSet.BoolP("version", "V", false, "print version information")
 	)
+
+	flagSet.Lookup("verbosity").NoOptDefVal = "2"
 
 	// Don't sort the flags when -h is given
 	flagSet.SortFlags = true
@@ -163,7 +165,7 @@ func parseFlags(args []string, version string) (opts *util.Options, flags []stri
 	}
 
 	// TODO: DRY, dumb dumb.
-	mbz, err := strconv.ParseInt(*mbzflag, 0, 16)
+	mbz, err := strconv.ParseUint(*mbzflag, 0, 16)
 	if err != nil {
 		return &util.Options{Logger: util.InitLogger(*verbosity)}, nil, fmt.Errorf("EDNS MBZ: %w", err)
 	}
@@ -201,7 +203,7 @@ func parseFlags(args []string, version string) (opts *util.Options, flags []stri
 			Type:    dns.StringToType[strings.ToUpper(*qType)],
 			Class:   dns.StringToClass[strings.ToUpper(*class)],
 			Name:    *query,
-			Timeout: time.Duration(*timeout * float32(time.Second)),
+			Timeout: *timeout * time.Second,
 			Retries: *retry,
 			Port:    *port,
 		},

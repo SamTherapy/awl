@@ -5,7 +5,7 @@ package main
 import (
 	"testing"
 
-	"github.com/stefansundin/go-zflag"
+	"github.com/spf13/pflag"
 	"gotest.tools/v3/assert"
 )
 
@@ -43,6 +43,6 @@ func TestHelp(t *testing.T) {
 	args := []string{"awl", "-h"}
 
 	_, code, err := run(args)
-	assert.ErrorIs(t, err, zflag.ErrHelp)
+	assert.ErrorIs(t, err, pflag.ErrHelp)
 	assert.Equal(t, code, 1)
 }
