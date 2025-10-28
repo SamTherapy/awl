@@ -3,9 +3,7 @@ before:
   hooks:
     - make clean
     - go mod tidy
-    # Make manpages
-    - docs/makeman.sh
-    # Vendor dependencies
+    - docs/prepare-packaging.sh
     - go mod vendor
 
 builds:
@@ -13,7 +11,7 @@ builds:
       - CGO_ENABLED=0
     targets:
       - go_first_class
-      - plan9_amd64
+      # - plan9_amd64
       - freebsd_amd64
 
 universal_binaries:
@@ -66,11 +64,18 @@ nfpms:
         dst: /usr/share/bash-completion/completions/awl
       - src: docs/awl.1.gz
         dst: /usr/share/man/man1/awl.1.gz
-      - src: LICENSE
-        dst: /usr/share/docs/awl/copyright
       - src: completions/fish.fish
         dst: /usr/share/fish/vendor_completions.d/awl.fish
       # DEB only
+      - src: LICENSE
+        dst: /usr/share/doc/awl/copyright
+        packager: deb
+      - src: README.md.gz
+        dst: /usr/share/doc/awl/README.md.gz
+        packager: deb
+      - src: docs/CONTRIBUTING.md.gz
+        dst: /usr/share/doc/awl/CONTRIBUTING.md.gz
+        packager: deb
       - src: completions/zsh.zsh
         dst: /usr/share/zsh/vendor-completions/_awl
         packager: deb
@@ -79,6 +84,15 @@ nfpms:
         dst: /usr/share/zsh/site-functions/_awl
         packager: apk
       # RPM only
+      - src: LICENSE
+        dst: /usr/share/licenses/awl/LICENSE
+        packager: rpm
+      - src: README.md
+        dst: /usr/share/doc/awl/README.md
+        packager: rpm
+      - src: docs/CONTRIBUTING.md
+        dst: /usr/share/doc/awl/CONTRIBUTING.md.gz
+        packager: rpm
       - src: completions/zsh.zsh
         dst: /usr/share/zsh/site-functions/_awl
         packager: rpm
@@ -125,8 +139,7 @@ nfpms:
       {{- else }}{{ .Arch }}{{ end -}}
 
 snapcrafts:
-  -
-    name: awl-dns
+  - name: awl-dns
     grade: stable
     publish: true
     summary: A command-line DNS query tool
@@ -144,10 +157,9 @@ snapcrafts:
         completer: completions/bash.bash
 
 dockers:
-  -
-    image_templates:
-          - "{{ .Env.REGISTRY }}/{{ .Env.IMAGE_NAME }}:latest"
-          - "{{ .Env.REGISTRY }}/{{ .Env.IMAGE_NAME }}:{{ .Tag }}"
+  - image_templates:
+      - "{{ .Env.REGISTRY }}/{{ .Env.IMAGE_NAME }}:latest"
+      - "{{ .Env.REGISTRY }}/{{ .Env.IMAGE_NAME }}:{{ .Tag }}"
 
 checksum:
   name_template: "checksums.txt"
@@ -163,7 +175,7 @@ homebrew_casks:
     description: A command-line DNS query tool
     license: BSD-3-Clause
     manpages:
-    - "docs/awl.1.gz"
+      - "docs/awl.1.gz"
     completions:
       bash: "completions/bash.bash"
       zsh: "completions/zsh.zsh"

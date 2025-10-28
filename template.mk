@@ -87,8 +87,11 @@ cover: coverage/cover.html
 clean:
 	$(GO) clean
 # Ignore errors if you remove something that doesn't exist
-	rm -f docs/$(PROG).1
+	rm -f docs/awl.1{,.gz}
+	rm -f docs/CONTRIBUTING.md.gz
+	rm -f README.md.gz
 	rm -f coverage/cover*
+	rm -rf dist
 	rm -rf vendor
 
 ## help: Prints this help message
