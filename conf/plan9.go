@@ -26,7 +26,7 @@ func GetDNSConfig() (*dns.ClientConfig, error) {
 
 	str := string(dat)
 
-	str = strings.ReplaceAll(str, "\n", "")
+	// str = strings.ReplaceAll(str, "\n", "")
 	spl := strings.FieldsFunc(str, splitChars)
 
 	var servers []string
@@ -51,7 +51,7 @@ func GetDNSConfig() (*dns.ClientConfig, error) {
 
 // Split the string at either space or tabs.
 func splitChars(r rune) bool {
-	return r == ' ' || r == '\t'
+	return r == ' ' || r == '\t' || r == '\n'
 }
 
 var errPlan9 = errors.New("plan9Config: no DNS servers found")
