@@ -7,8 +7,8 @@ import (
 	"fmt"
 	"net"
 
+	"codeberg.org/miekg/dns"
 	"dns.froth.zone/awl/pkg/util"
-	"github.com/miekg/dns"
 )
 
 // StandardResolver is for UDP/TCP resolvers.

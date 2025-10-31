@@ -6,7 +6,7 @@ import (
 	"fmt"
 	"strings"
 
-	"github.com/miekg/dns"
+	"codeberg.org/miekg/dns"
 )
 
 type errReverseDNS struct {

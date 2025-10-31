@@ -7,9 +7,9 @@ import (
 	"math/rand"
 	"strings"
 
+	"codeberg.org/miekg/dns"
 	"dns.froth.zone/awl/conf"
 	"dns.froth.zone/awl/pkg/util"
-	"github.com/miekg/dns"
 	"golang.org/x/net/idna"
 )
 

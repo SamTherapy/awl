@@ -6,9 +6,9 @@ import (
 	"fmt"
 	"time"
 
+	"codeberg.org/miekg/dns"
 	"dns.froth.zone/awl/pkg/util"
 	"github.com/ameshkov/dnscrypt/v2"
-	"github.com/miekg/dns"
 )
 
 // DNSCryptResolver is for making DNSCrypt queries.

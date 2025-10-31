@@ -8,10 +8,10 @@ import (
 	"testing"
 	"time"
 
+	"codeberg.org/miekg/dns"
 	"dns.froth.zone/awl/pkg/query"
 	"dns.froth.zone/awl/pkg/util"
 	"github.com/ameshkov/dnscrypt/v2"
-	"github.com/miekg/dns"
 	"gotest.tools/v3/assert"
 )
 

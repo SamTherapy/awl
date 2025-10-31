@@ -6,9 +6,9 @@ import (
 	"strings"
 	"testing"
 
+	"codeberg.org/miekg/dns"
 	cli "dns.froth.zone/awl/cmd"
 	"dns.froth.zone/awl/pkg/util"
-	"github.com/miekg/dns"
 	"gotest.tools/v3/assert"
 )
 

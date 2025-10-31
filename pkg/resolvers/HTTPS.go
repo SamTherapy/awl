@@ -10,8 +10,8 @@ import (
 	"net/http"
 	"time"
 
+	"codeberg.org/miekg/dns"
 	"dns.froth.zone/awl/pkg/util"
-	"github.com/miekg/dns"
 )
 
 // HTTPSResolver is for DNS-over-HTTPS queries.

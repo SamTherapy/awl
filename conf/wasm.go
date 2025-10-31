@@ -6,7 +6,7 @@ package conf
 import (
 	"errors"
 
-	"github.com/miekg/dns"
+	"codeberg.org/miekg/dns"
 )
 
 // GetDNSConfig doesn't do anything, because it is impossible (and bad security)

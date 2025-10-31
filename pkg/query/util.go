@@ -6,8 +6,8 @@ import (
 	"strings"
 	"time"
 
+	"codeberg.org/miekg/dns"
 	"dns.froth.zone/awl/pkg/util"
-	"github.com/miekg/dns"
 	"golang.org/x/net/idna"
 )
 
@@ -172,7 +172,7 @@ func (message *Message) displayAdditional(msg *dns.Msg, opts *util.Options, opt 
 func (message *Message) ParseOpt(rcode int, rr dns.OPT) (ret EDNS0, err error) {
 	ret.Rcode = dns.RcodeToString[rcode]
 
-	// Most of this is taken from https://github.com/miekg/dns/blob/master/edns.go#L76
+	// Most of this is taken from https://codeberg.org/miekg/dns/blob/master/edns.go#L76
 	if rr.Do() {
 		ret.Flags = append(ret.Flags, "DO")
 	}

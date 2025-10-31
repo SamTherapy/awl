@@ -7,8 +7,8 @@ import (
 	"strconv"
 	"strings"
 
+	"codeberg.org/miekg/dns"
 	"dns.froth.zone/awl/pkg/util"
-	"github.com/miekg/dns"
 )
 
 const (

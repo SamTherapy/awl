@@ -11,15 +11,15 @@ import (
 	"strings"
 	"time"
 
+	"codeberg.org/miekg/dns"
 	"dns.froth.zone/awl/pkg/util"
-	"github.com/miekg/dns"
 	"golang.org/x/net/idna"
 	"gopkg.in/yaml.v3"
 )
 
 // ToString turns the response into something that looks a lot like dig
 //
-// Much of this is taken from https://github.com/miekg/dns/blob/master/msg.go#L900
+// Much of this is taken from https://codeberg.org/miekg/dns/blob/master/msg.go#L900
 func ToString(res util.Response, opts *util.Options) (s string, err error) {
 	if res.DNS == nil {
 		return "<nil> MsgHdr", errNoMessage

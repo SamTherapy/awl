@@ -6,8 +6,8 @@ import (
 	"fmt"
 	"net"
 
+	"codeberg.org/miekg/dns"
 	"dns.froth.zone/awl/pkg/logawl"
-	"github.com/miekg/dns"
 )
 
 // Options is the grand structure for all query options.

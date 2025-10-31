@@ -6,10 +6,10 @@ import (
 	"fmt"
 	"strconv"
 
+	"codeberg.org/miekg/dns"
 	"dns.froth.zone/awl/pkg/resolvers"
 	"dns.froth.zone/awl/pkg/util"
 	"github.com/dchest/uniuri"
-	"github.com/miekg/dns"
 )
 
 // CreateQuery creates a DNS query from the options given.

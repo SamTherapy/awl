@@ -9,7 +9,7 @@ import (
 	"os"
 	"strings"
 
-	"github.com/miekg/dns"
+	"codeberg.org/miekg/dns/dnsconf"
 )
 
 // GetDNSConfig gets DNS information from Plan 9, because it's different from UNIX and Windows.
@@ -18,7 +18,7 @@ import (
 // Yoink it and use it.
 //
 // See ndb(7).
-func GetDNSConfig() (*dns.ClientConfig, error) {
+func GetDNSConfig() (*dnsconf.Config, error) {
 	dat, err := os.ReadFile("/net/ndb")
 	if err != nil {
 		return nil, fmt.Errorf("read ndb: %w", err)
@@ -42,7 +42,7 @@ func GetDNSConfig() (*dns.ClientConfig, error) {
 	}
 
 	// TODO: read more about how customizable Plan 9 is
-	return &dns.ClientConfig{
+	return &dnsconf.Config{
 		Servers: servers,
 		Search:  []string{},
 		Port:    "53",

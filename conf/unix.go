@@ -8,12 +8,12 @@ package conf
 import (
 	"fmt"
 
-	"github.com/miekg/dns"
+	"codeberg.org/miekg/dns/dnsconf"
 )
 
 // GetDNSConfig gets the DNS configuration, either from /etc/resolv.conf or somewhere else.
-func GetDNSConfig() (*dns.ClientConfig, error) {
-	conf, err := dns.ClientConfigFromFile("/etc/resolv.conf")
+func GetDNSConfig() (*dnsconf.Config, error) {
+	conf, err := dnsconf.FromFile("/etc/resolv.conf")
 	if err != nil {
 		return nil, fmt.Errorf("unix config: %w", err)
 	}

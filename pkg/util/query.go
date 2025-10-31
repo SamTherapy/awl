@@ -5,7 +5,7 @@ package util
 import (
 	"time"
 
-	"github.com/miekg/dns"
+	"codeberg.org/miekg/dns"
 )
 
 // Response is the DNS response.

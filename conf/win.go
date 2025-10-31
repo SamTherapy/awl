@@ -8,7 +8,7 @@ import (
 	"strings"
 	"unsafe"
 
-	"github.com/miekg/dns"
+	"codeberg.org/miekg/dns/dnsconf"
 	"golang.org/x/sys/windows"
 )
 
@@ -20,7 +20,7 @@ https://gist.github.com/moloch--/9fb1c8497b09b45c840fe93dd23b1e98
 // GetDNSConfig (Windows version) returns all DNS server addresses using windows fuckery.
 //
 // Here be dragons.
-func GetDNSConfig() (*dns.ClientConfig, error) {
+func GetDNSConfig() (*dnsconf.Config, error) {
 	length := uint32(100000)
 	byt := make([]byte, length)
 
@@ -70,8 +70,8 @@ func GetDNSConfig() (*dns.ClientConfig, error) {
 		servers = append(servers, server)
 	}
 
-	// TODO: Make configurable, based on defaults in https://github.com/miekg/dns/blob/master/clientconfig.go
-	return &dns.ClientConfig{
+	// TODO: Make configurable, based on defaults in https://codeberg.org/miekg/dns/blob/master/clientconfig.go
+	return &dnsconf.Config{
 		Servers:  servers,
 		Search:   []string{},
 		Port:     "53",

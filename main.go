@@ -10,10 +10,11 @@ import (
 	"strings"
 	"time"
 
+	"codeberg.org/miekg/dns"
+
 	cli "dns.froth.zone/awl/cmd"
 	"dns.froth.zone/awl/pkg/query"
 	"dns.froth.zone/awl/pkg/util"
-	"github.com/miekg/dns"
 )
 
 var version = "DEV"
