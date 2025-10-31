@@ -26,7 +26,6 @@ func GetDNSConfig() (*dns.ClientConfig, error) {
 
 	str := string(dat)
 
-	// str = strings.ReplaceAll(str, "\n", "")
 	spl := strings.FieldsFunc(str, splitChars)
 
 	var servers []string
