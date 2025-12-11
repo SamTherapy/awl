@@ -7,7 +7,7 @@ toolchain go1.25.5
 require (
 	github.com/ameshkov/dnscrypt/v2 v2.4.0
 	github.com/dchest/uniuri v1.2.0
-	github.com/miekg/dns v1.1.68
+	github.com/miekg/dns v1.1.69
 	github.com/quic-go/quic-go v0.57.1
 	github.com/stefansundin/go-zflag v1.1.1
 	golang.org/x/net v0.48.0
