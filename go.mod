@@ -8,7 +8,7 @@ require (
 	github.com/ameshkov/dnscrypt/v2 v2.4.0
 	github.com/dchest/uniuri v1.2.0
 	github.com/miekg/dns v1.1.70
-	github.com/quic-go/quic-go v0.58.0
+	github.com/quic-go/quic-go v0.58.1
 	github.com/stefansundin/go-zflag v1.1.1
 	golang.org/x/net v0.48.0
 	golang.org/x/sys v0.40.0
