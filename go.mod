@@ -2,7 +2,7 @@ module dns.froth.zone/awl
 
 go 1.24.1
 
-toolchain go1.25.5
+toolchain go1.25.6
 
 require (
 	github.com/ameshkov/dnscrypt/v2 v2.4.0
