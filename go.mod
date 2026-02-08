@@ -11,7 +11,7 @@ require (
 	github.com/quic-go/quic-go v0.59.0
 	github.com/stefansundin/go-zflag v1.1.1
 	golang.org/x/net v0.49.0
-	golang.org/x/sys v0.40.0
+	golang.org/x/sys v0.41.0
 	gopkg.in/yaml.v3 v3.0.1
 	gotest.tools/v3 v3.5.2
 )
